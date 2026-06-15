@@ -25,8 +25,8 @@ export default async function OpportunitiesPage() {
             View all your previously analyzed documents and opportunities.
           </p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard">Upload New</Link>
+        <Button render={<Link href="/dashboard" />}>
+          Upload New
         </Button>
       </div>
 
@@ -67,10 +67,8 @@ export default async function OpportunitiesPage() {
                       <div className="text-2xl font-bold text-primary">{opp.readiness_score || 0}%</div>
                       <div className="text-xs text-muted-foreground">Readiness</div>
                     </div>
-                    <Button variant="secondary" className="rounded-apple-md" asChild>
-                      <Link href={`/opportunities/${opp.id}`}>
-                        View Details <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
+                    <Button variant="secondary" className="rounded-apple-md" render={<Link href={`/opportunities/${opp.id}`} />}>
+                      View Details <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
                 </div>
@@ -84,8 +82,8 @@ export default async function OpportunitiesPage() {
             <p className="text-muted-foreground max-w-sm mt-2 mb-6">
               Upload your first circular, scholarship, or scheme document to generate an action plan.
             </p>
-            <Button asChild>
-              <Link href="/dashboard">Upload Document</Link>
+            <Button render={<Link href="/dashboard" />}>
+              Upload Document
             </Button>
           </Card>
         )}
@@ -94,7 +92,7 @@ export default async function OpportunitiesPage() {
   )
 }
 
-function AlertCircle(props: any) {
+function AlertCircle(props: React.ComponentProps<"svg">) {
   return (
     <svg
       {...props}

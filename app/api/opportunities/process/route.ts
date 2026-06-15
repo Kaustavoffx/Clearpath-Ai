@@ -132,6 +132,7 @@ export async function POST(request: Request) {
       }
     `
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const contents: any[] = [prompt]
     if (inlineData) {
       contents.push({ inlineData })
@@ -193,7 +194,7 @@ export async function POST(request: Request) {
 
     // 7. Save Action Steps
     if (aiResult.action_checklist && aiResult.action_checklist.length > 0) {
-      const stepsToInsert = aiResult.action_checklist.map((step: any) => ({
+      const stepsToInsert = aiResult.action_checklist.map((step: { step_number: number, title: string, description: string }) => ({
         opportunity_id: oppRecord.id,
         step_number: step.step_number,
         title: DOMPurify.sanitize(step.title, { ALLOWED_TAGS: [] }),
@@ -208,8 +209,9 @@ export async function POST(request: Request) {
     
     return NextResponse.json({ id: oppRecord.id })
 
-  } catch (error: any) {
-    logger.error({ error: error.message, stack: error.stack }, 'Fatal API Route Error')
+  } catch (error: unknown) {
+    const err = error as Error
+    logger.error({ error: err.message, stack: err.stack }, 'Fatal API Route Error')
     // Generic error to client, hide internal stack
     return NextResponse.json({ error: 'An unexpected error occurred during processing.' }, { status: 500 })
   }

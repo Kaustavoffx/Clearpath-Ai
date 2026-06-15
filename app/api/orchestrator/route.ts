@@ -89,8 +89,9 @@ export async function POST(request: Request) {
         })
         const buffer = Buffer.from(await mp3.arrayBuffer())
         audioBase64 = buffer.toString('base64')
-      } catch (e: any) {
-         logger.error('OpenAI TTS failed, falling back to text only', e.message)
+      } catch (e: unknown) {
+         const err = e as Error
+         logger.error({ error: err.message }, 'OpenAI TTS failed, falling back to text only')
       }
     }
 
@@ -100,8 +101,9 @@ export async function POST(request: Request) {
       intent: intentData.intent
     })
 
-  } catch (error: any) {
-    logger.error({ error: error.message }, 'Orchestrator failed')
+  } catch (error: unknown) {
+    const err = error as Error
+    logger.error({ error: err.message }, 'Orchestrator failed')
     return NextResponse.json({ error: 'Orchestrator failed' }, { status: 500 })
   }
 }

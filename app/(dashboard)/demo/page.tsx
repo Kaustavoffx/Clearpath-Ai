@@ -25,8 +25,9 @@ export default function DemoPage() {
       toast.success('Demo environment ready!', { id: toastId })
       router.push(`/opportunities/${result.id}`)
       
-    } catch (error: any) {
-      toast.error(error.message || 'Something went wrong', { id: toastId })
+    } catch (error: unknown) {
+      const err = error as Error
+      toast.error(err.message || 'Something went wrong', { id: toastId })
     } finally {
       setIsLoading(false)
     }
@@ -41,7 +42,7 @@ export default function DemoPage() {
           </div>
           <CardTitle className="text-3xl">Judge Demo Mode</CardTitle>
           <CardDescription className="text-base mt-2">
-            Experience ClearPath AI's capabilities instantly without uploading a document.
+            Experience ClearPath AI&apos;s capabilities instantly without uploading a document.
           </CardDescription>
         </CardHeader>
         <CardContent className="text-muted-foreground text-sm">

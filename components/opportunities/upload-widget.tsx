@@ -8,7 +8,13 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createBrowserClient } from '@supabase/ssr'
 
-export function UploadWidget() {
+import { env } from '@/lib/env'
+
+interface UploadWidgetProps {
+  onUploadComplete?: (id: string) => void
+}
+
+export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
   const [mode, setMode] = useState<'file' | 'url'>('file')
   const [file, setFile] = useState<File | null>(null)
   const [url, setUrl] = useState('')
@@ -16,8 +22,8 @@ export function UploadWidget() {
   const router = useRouter()
 
   const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    env.NEXT_PUBLIC_SUPABASE_URL || '',
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
   )
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -46,7 +52,7 @@ export function UploadWidget() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Not authenticated')
 
-      let payload: any = {}
+      let payload: Record<string, unknown> = {}
 
       if (mode === 'file' && file) {
         toast.loading('Uploading document...', { id: toastId })
@@ -80,10 +86,15 @@ export function UploadWidget() {
       const result = await response.json()
 
       toast.success('Analysis complete!', { id: toastId })
-      router.push(`/opportunities/${result.id}`)
+      if (onUploadComplete) {
+        onUploadComplete(result.id)
+      } else {
+        router.push(`/opportunities/${result.id}`)
+      }
       
-    } catch (error: any) {
-      toast.error(error.message || 'Something went wrong', { id: toastId })
+    } catch (error: unknown) {
+      const err = error as Error
+      toast.error(err.message || 'Something went wrong', { id: toastId })
     } finally {
       setIsUploading(false)
     }

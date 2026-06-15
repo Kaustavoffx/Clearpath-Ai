@@ -21,39 +21,43 @@ export function VoiceInterface() {
   // In a full production build, we'd use @deepgram/sdk via WebSockets here.
   // We'll use the native Web Speech API as a lightweight polyfill if available,
   // falling back to a text-input simulation if needed.
-  
-  const startListening = useCallback(() => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-       toast.error("Speech recognition is not supported in this browser.")
-       return
-    }
-    
-    setIsListening(true)
-    setTranscript("")
-    
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    const recognition = new SpeechRecognition()
-    recognition.continuous = false
-    recognition.interimResults = true
-    
-    recognition.onresult = (event: any) => {
-      const current = event.resultIndex
-      const result = event.results[current][0].transcript
-      setTranscript(result)
-    }
-    
-    recognition.onend = () => {
-      setIsListening(false)
-      // When listening ends, send to orchestrator
-      if (transcript.trim().length > 0) {
-        processTranscript(transcript)
-      }
-    }
-    
-    recognition.start()
-  }, [transcript])
 
-  const processTranscript = async (finalText: string) => {
+  const fallbackTTS = useCallback((text: string) => {
+    setIsSpeaking(true)
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.onend = () => setIsSpeaking(false)
+    window.speechSynthesis.speak(utterance)
+  }, [])
+
+  const playAudio = useCallback(async (base64Audio: string) => {
+    try {
+      setIsSpeaking(true)
+      const audioData = atob(base64Audio)
+      const arrayBuffer = new ArrayBuffer(audioData.length)
+      const view = new Uint8Array(arrayBuffer)
+      for (let i = 0; i < audioData.length; i++) {
+        view[i] = audioData.charCodeAt(i)
+      }
+      
+      if (!audioContextRef.current) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+      }
+      
+      const audioBuffer = await audioContextRef.current.decodeAudioData(arrayBuffer)
+      const source = audioContextRef.current.createBufferSource()
+      source.buffer = audioBuffer
+      source.connect(audioContextRef.current.destination)
+      source.onended = () => setIsSpeaking(false)
+      source.start(0)
+      sourceNodeRef.current = source
+    } catch (e) {
+      console.error("Audio playback failed", e)
+      setIsSpeaking(false)
+    }
+  }, [])
+
+  const processTranscript = useCallback(async (finalText: string) => {
     setIsProcessing(true)
     setAiResponse("")
     
@@ -80,46 +84,46 @@ export function VoiceInterface() {
         fallbackTTS(data.text)
       }
       
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to process intent')
+    } catch (error: unknown) {
+      const e = error as Error
+      toast.error(e.message || 'Failed to process intent')
     } finally {
       setIsProcessing(false)
     }
-  }
-
-  const playAudio = async (base64Audio: string) => {
-    try {
-      setIsSpeaking(true)
-      const audioData = atob(base64Audio)
-      const arrayBuffer = new ArrayBuffer(audioData.length)
-      const view = new Uint8Array(arrayBuffer)
-      for (let i = 0; i < audioData.length; i++) {
-        view[i] = audioData.charCodeAt(i)
-      }
-      
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
-      }
-      
-      const audioBuffer = await audioContextRef.current.decodeAudioData(arrayBuffer)
-      const source = audioContextRef.current.createBufferSource()
-      source.buffer = audioBuffer
-      source.connect(audioContextRef.current.destination)
-      source.onended = () => setIsSpeaking(false)
-      source.start(0)
-      sourceNodeRef.current = source
-    } catch (e) {
-      console.error("Audio playback failed", e)
-      setIsSpeaking(false)
+  }, [documentContext, playAudio, fallbackTTS])
+  
+  const startListening = useCallback(() => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+       toast.error("Speech recognition is not supported in this browser.")
+       return
     }
-  }
-
-  const fallbackTTS = (text: string) => {
-    setIsSpeaking(true)
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.onend = () => setIsSpeaking(false)
-    window.speechSynthesis.speak(utterance)
-  }
+    
+    setIsListening(true)
+    setTranscript("")
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SpeechRecognition = (window as unknown as { SpeechRecognition: any }).SpeechRecognition || (window as unknown as { webkitSpeechRecognition: any }).webkitSpeechRecognition
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recognition = new (SpeechRecognition as any)()
+    recognition.continuous = false
+    recognition.interimResults = true
+    
+    recognition.onresult = (event: unknown) => {
+      const current = (event as { resultIndex: number }).resultIndex
+      const result = (event as { results: { transcript: string }[][] }).results[current][0].transcript
+      setTranscript(result)
+    }
+    
+    recognition.onend = () => {
+      setIsListening(false)
+      // When listening ends, send to orchestrator
+      if (transcript.trim().length > 0) {
+        processTranscript(transcript)
+      }
+    }
+    
+    recognition.start()
+  }, [transcript, processTranscript])
 
   const handleToggleListen = () => {
     if (isListening) {
@@ -139,7 +143,7 @@ export function VoiceInterface() {
       <div className="text-center space-y-4 max-w-2xl min-h-[120px] flex flex-col justify-end">
          {transcript && !aiResponse && (
            <p className="text-2xl text-muted-foreground animate-in fade-in slide-in-from-bottom-4">
-             "{transcript}"
+             &quot;{transcript}&quot;
            </p>
          )}
          {aiResponse && (
@@ -149,7 +153,7 @@ export function VoiceInterface() {
          )}
          {!transcript && !aiResponse && !isListening && (
            <p className="text-xl text-muted-foreground opacity-50">
-             Tap the orb and say, "What's my next deadline?"
+             Tap the orb and say, &quot;What&apos;s my next deadline?&quot;
            </p>
          )}
       </div>

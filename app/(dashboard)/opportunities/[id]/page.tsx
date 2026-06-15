@@ -43,9 +43,10 @@ export default async function OpportunityDetailsPage({
   }
 
   // Get signed URL for the document to show in Evidence View
-  const { data: { signedUrl } } = await supabase.storage
+  const { data } = await supabase.storage
     .from('opportunities')
     .createSignedUrl(opportunity.storage_path, 3600) // 1 hour
+  const signedUrl = data?.signedUrl
 
   const getReadinessColor = (score: number) => {
     if (score >= 80) return "text-green-500"
@@ -114,7 +115,7 @@ export default async function OpportunityDetailsPage({
             
             <TabsContent value="action-plan" className="pt-2">
               <div className="space-y-4">
-                {opportunity.action_steps && opportunity.action_steps.length > 0 ? opportunity.action_steps.sort((a: any, b: any) => a.step_number - b.step_number).map((step: any) => (
+                {opportunity.action_steps && opportunity.action_steps.length > 0 ? opportunity.action_steps.sort((a: { step_number: number }, b: { step_number: number }) => a.step_number - b.step_number).map((step: { id: string, step_number: number, title: string, description: string }) => (
                   <Card key={step.id}>
                     <CardHeader className="flex flex-row items-center gap-4 py-4">
                       <div className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center font-bold">
@@ -171,12 +172,12 @@ export default async function OpportunityDetailsPage({
             <TabsContent value="evidence" className="pt-2">
               <div className="space-y-4">
                 {opportunity.evidence_references && opportunity.evidence_references.length > 0 ? (
-                  opportunity.evidence_references.map((ref: any, i: number) => (
+                  opportunity.evidence_references.map((ref: { claim: string, quote_from_document: string }, i: number) => (
                     <Card key={i} className="glass-thick border-l-4 border-l-primary">
                       <CardContent className="p-4 flex flex-col gap-2">
                         <div className="font-semibold text-sm">{ref.claim}</div>
                         <div className="bg-muted p-3 rounded-apple-md text-xs font-mono text-muted-foreground italic">
-                          "{ref.quote_from_document}"
+                          &quot;{ref.quote_from_document}&quot;
                         </div>
                       </CardContent>
                     </Card>

@@ -18,13 +18,13 @@ export interface Opportunity {
   simplified_summary: string;
   deadline: string | null;
   status: Status;
-  eligibility_analysis?: Record<string, any>;
+  eligibility_analysis?: Record<string, unknown>;
   required_documents?: string[];
   opportunity_value?: string;
   opportunity_loss_prediction?: string;
   readiness_score?: number;
   risk_score?: number;
-  risk_analysis?: Record<string, any>;
+  risk_analysis?: Record<string, unknown>;
   confidence_score?: number;
   evidence_references?: Record<string, string>[];
   created_at: string;

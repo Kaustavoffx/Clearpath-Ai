@@ -2,6 +2,7 @@
 
 import { User } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { env } from "@/lib/env"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -18,8 +19,8 @@ import { GlassPanel } from "@/components/ui/glass/glass-panel"
 export function Header() {
   const router = useRouter()
   const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    env.NEXT_PUBLIC_SUPABASE_URL || '',
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
   )
 
   const handleLogout = async () => {
@@ -32,11 +33,9 @@ export function Header() {
       <div className="flex items-center gap-4">
         <ThemeToggle />
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="icon" className="rounded-full bg-foreground/5 hover:bg-foreground/10 border-0">
-              <User className="h-5 w-5" />
-              <span className="sr-only">Toggle user menu</span>
-            </Button>
+          <DropdownMenuTrigger render={<Button variant="secondary" size="icon" className="rounded-full bg-foreground/5 hover:bg-foreground/10 border-0" />}>
+            <User className="h-5 w-5" />
+            <span className="sr-only">Toggle user menu</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="rounded-apple-lg border-apple-glass-border shadow-apple-md">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>

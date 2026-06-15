@@ -1,5 +1,4 @@
 import { ThemeToggle } from "@/components/theme-toggle"
-import { UserNav } from "@/components/layout/user-nav"
 import { GlassPanel } from "@/components/ui/glass/glass-panel"
 
 export default function DashboardLayout({
@@ -19,7 +18,6 @@ export default function DashboardLayout({
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggle />
-          <UserNav />
         </div>
       </header>
       

@@ -95,8 +95,9 @@ export async function POST(request: Request) {
     logger.info({ userId: user.id, demoId: oppRecord.id }, 'Successfully created demo opportunity')
     return NextResponse.json({ id: oppRecord.id })
 
-  } catch (error: any) {
-    logger.error({ error: error.message }, 'Fatal Demo Route Error')
+  } catch (error: unknown) {
+    const err = error as Error
+    logger.error({ error: err.message }, 'Fatal Demo Route Error')
     return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 })
   }
 }
