@@ -1,26 +1,158 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-inter);
+  
+  --color-apple-glass-thin: var(--apple-glass-thin);
+  --color-apple-glass-regular: var(--apple-glass-regular);
+  --color-apple-glass-thick: var(--apple-glass-thick);
+  --color-apple-glass-border: var(--apple-glass-border);
+  --color-apple-glass-highlight: var(--apple-glass-highlight);
+  --color-apple-base: var(--apple-base);
+  
+  --shadow-apple-sm: 0 4px 12px var(--shadow-apple);
+  --shadow-apple-md: 0 8px 24px var(--shadow-apple), 0 2px 8px var(--shadow-apple-inner);
+  --shadow-apple-lg: 0 16px 40px var(--shadow-apple), 0 4px 12px var(--shadow-apple-inner);
+  
+  --radius-apple-sm: 0.5rem;
+  --radius-apple-md: 0.875rem;
+  --radius-apple-lg: 1.25rem;
+  --radius-apple-xl: 1.75rem;
+  
+  --color-sidebar: var(--apple-glass-regular);
+  --color-sidebar-foreground: var(--foreground);
+  --color-sidebar-border: var(--apple-glass-border);
+  --color-sidebar-ring: oklch(0.556 0 0);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-card: var(--apple-glass-regular);
+  --color-card-foreground: var(--foreground);
+  
+  --color-popover: var(--apple-glass-thick);
+  --color-popover-foreground: var(--foreground);
+
+  --color-border: var(--apple-glass-border);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* Apple Dynamic Abstract Backgrounds - Light Mode */
+  --background: oklch(0.98 0.01 250);
+  --apple-base: oklch(0.96 0.02 245);
+  
+  /* Text */
+  --foreground: oklch(0.1 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  
+  /* Glass Materials Light */
+  --apple-glass-thin: rgba(255, 255, 255, 0.4);
+  --apple-glass-regular: rgba(255, 255, 255, 0.6);
+  --apple-glass-thick: rgba(255, 255, 255, 0.85);
+  
+  --apple-glass-border: rgba(0, 0, 0, 0.05);
+  --apple-glass-highlight: rgba(255, 255, 255, 0.7);
+  
+  /* Shadows Light */
+  --shadow-apple: rgba(0, 0, 0, 0.04);
+  --shadow-apple-inner: rgba(0, 0, 0, 0.02);
+
+  /* Primary Accent (Apple Blue) */
+  --primary: oklch(0.55 0.2 260);
+  --primary-foreground: oklch(1 0 0);
+  
+  --muted: rgba(0, 0, 0, 0.05);
+  
+  --radius: 0.875rem;
+}
+
+.dark {
+  /* Apple Dynamic Abstract Backgrounds - Dark Mode */
+  --background: oklch(0.12 0.02 260);
+  --apple-base: oklch(0.08 0.03 260);
+  
+  /* Text */
+  --foreground: oklch(0.98 0 0);
+  --muted-foreground: oklch(0.6 0 0);
+  
+  /* Glass Materials Dark */
+  --apple-glass-thin: rgba(30, 30, 30, 0.4);
+  --apple-glass-regular: rgba(30, 30, 30, 0.65);
+  --apple-glass-thick: rgba(40, 40, 40, 0.85);
+  
+  --apple-glass-border: rgba(255, 255, 255, 0.1);
+  --apple-glass-highlight: rgba(255, 255, 255, 0.15);
+  
+  /* Shadows Dark */
+  --shadow-apple: rgba(0, 0, 0, 0.3);
+  --shadow-apple-inner: rgba(0, 0, 0, 0.15);
+
+  /* Primary Accent (Apple Blue vibrant) */
+  --primary: oklch(0.6 0.22 260);
+  --primary-foreground: oklch(1 0 0);
+  
+  --muted: rgba(255, 255, 255, 0.1);
+}
+
+@layer base {
+  body {
+    /* Create a deep abstract gradient background mesh */
+    background: radial-gradient(circle at 15% 50%, rgba(0, 122, 255, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(255, 45, 85, 0.06), transparent 25%),
+                radial-gradient(circle at 50% 80%, rgba(88, 86, 214, 0.08), transparent 30%),
+                var(--apple-base);
+    background-attachment: fixed;
+    /* Apple typography antialiasing */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .glass-thin {
+    @apply bg-apple-glass-thin backdrop-blur-xl border border-apple-glass-border shadow-apple-sm relative overflow-hidden;
+  }
+  .glass-thin::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none rounded-[inherit];
+    box-shadow: inset 0 1px 1px var(--apple-glass-highlight);
+  }
+
+  .glass-regular {
+    @apply bg-apple-glass-regular backdrop-blur-2xl border border-apple-glass-border shadow-apple-md relative overflow-hidden;
+  }
+  .glass-regular::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none rounded-[inherit];
+    box-shadow: inset 0 1px 1px var(--apple-glass-highlight);
+  }
+
+  .glass-thick {
+    @apply bg-apple-glass-thick backdrop-blur-3xl border border-apple-glass-border shadow-apple-lg relative overflow-hidden;
+  }
+  .glass-thick::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none rounded-[inherit];
+    box-shadow: inset 0 1px 1px var(--apple-glass-highlight);
+  }
+
+  /* Spring physics motion classes */
+  .spring-transition {
+    transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+    transition-duration: 400ms;
+  }
+  .spring-active:active {
+    transform: scale(0.97);
+    transition-duration: 150ms;
+  }
 }
