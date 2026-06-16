@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getURL } from '@/lib/utils'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -31,7 +32,8 @@ export async function signup(formData: FormData) {
     options: {
       data: {
         full_name: formData.get('full_name') as string,
-      }
+      },
+      emailRedirectTo: `${getURL()}/auth/callback`,
     }
   }
 

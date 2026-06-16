@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getURL } from '@/lib/utils'
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
@@ -11,17 +12,10 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error) {
-      const forwardedHost = request.headers.get('x-forwarded-host')
-      const isHttps = request.headers.get('x-forwarded-proto') === 'https'
-      
-      if (forwardedHost) {
-        return NextResponse.redirect(`http${isHttps ? 's' : ''}://${forwardedHost}${next}`)
-      } else {
-        return NextResponse.redirect(`${requestUrl.origin}${next}`)
-      }
+      return NextResponse.redirect(`${getURL()}${next}`)
     }
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(`${requestUrl.origin}/login?error=Could not authenticate user`)
+  return NextResponse.redirect(`${getURL()}/login?error=Could not authenticate user`)
 }
