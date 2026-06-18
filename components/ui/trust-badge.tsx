@@ -23,7 +23,7 @@ export function TrustBadge({ variant, title, description, className }: TrustBadg
         {icons[variant]}
       </div>
       <div>
-        <h4 className="text-step-0 font-bold text-foreground">{title}</h4>
+        <h4 className="text-step-0 font-semibold text-foreground">{title}</h4>
         <p className="text-step-0 text-muted-foreground">{description}</p>
       </div>
     </div>

@@ -42,7 +42,7 @@ export function DemoShowcase() {
           <Zap className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h2 className="text-step-2 font-bold tracking-tight text-foreground">Live Demo Showcase</h2>
+          <h2 className="text-step-2 font-semibold tracking-tight text-foreground">Live Demo Showcase</h2>
           <p className="text-sm text-muted-foreground">Test the AI with pre-configured diverse documents to see instant personalized extraction.</p>
         </div>
       </div>
@@ -56,7 +56,7 @@ export function DemoShowcase() {
         >
           {loadingType === 'scholarship' ? <Loader2 className="w-6 h-6 animate-spin text-primary" /> : <GraduationCap className="w-6 h-6 text-primary" />}
           <div className="text-left">
-            <div className="font-bold">Try Scholarship</div>
+            <div className="font-semibold">Try Scholarship</div>
             <div className="text-xs text-muted-foreground font-normal">Complex Merit & Financial</div>
           </div>
         </Button>
@@ -69,7 +69,7 @@ export function DemoShowcase() {
         >
           {loadingType === 'scheme' ? <Loader2 className="w-6 h-6 animate-spin text-primary" /> : <Landmark className="w-6 h-6 text-primary" />}
           <div className="text-left">
-            <div className="font-bold">Try Government Scheme</div>
+            <div className="font-semibold">Try Government Scheme</div>
             <div className="text-xs text-muted-foreground font-normal">State Subsidy & Income Limits</div>
           </div>
         </Button>
@@ -82,7 +82,7 @@ export function DemoShowcase() {
         >
           {loadingType === 'circular' ? <Loader2 className="w-6 h-6 animate-spin text-primary" /> : <FileText className="w-6 h-6 text-primary" />}
           <div className="text-left">
-            <div className="font-bold">Try School Circular</div>
+            <div className="font-semibold">Try School Circular</div>
             <div className="text-xs text-muted-foreground font-normal">Urgent Exam Notice</div>
           </div>
         </Button>

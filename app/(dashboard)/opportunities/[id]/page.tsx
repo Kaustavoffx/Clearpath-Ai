@@ -77,7 +77,7 @@ export default async function OpportunityDetailsPage({
         <Link 
           href={`?judge=${isJudgeMode ? 'false' : 'true'}`} 
           className={cn(
-            "text-[12px] font-mono font-bold uppercase tracking-widest px-4 py-2 rounded-[999px] flex items-center gap-2 border transition-spring shadow-glass-card",
+            "text-[12px] font-mono font-semibold uppercase tracking-widest px-4 py-2 rounded-[999px] flex items-center gap-2 border transition-spring shadow-glass-card",
             isJudgeMode ? "bg-warning/20 text-warning border-warning/50" : "bg-glass-surface text-muted-foreground border-glass-border hover:bg-glass-layer hover:text-foreground"
           )}
         >
@@ -94,7 +94,7 @@ export default async function OpportunityDetailsPage({
           {/* HEADER AREA */}
           <div className="flex flex-col gap-4 relative z-10">
             <div className="flex items-center gap-3">
-              <Badge variant="outline" className="bg-glass-surface text-foreground uppercase tracking-widest border-glass-border shadow-sm px-3 py-1 text-[11px] font-bold">
+              <Badge variant="outline" className="bg-glass-surface text-foreground uppercase tracking-widest border-glass-border shadow-sm px-3 py-1 text-[11px] font-semibold">
                 {opportunity.category || 'Document'}
               </Badge>
               <span className="text-[13px] flex items-center gap-1.5 font-medium bg-glass-surface px-3 py-1 rounded-[8px] border border-glass-border">
@@ -106,7 +106,7 @@ export default async function OpportunityDetailsPage({
                 })()}
               </span>
             </div>
-            <h1 className="text-[48px] leading-[1.1] font-bold tracking-[-0.03em] text-balance">
+            <h1 className="text-[48px] leading-[1.1] font-semibold tracking-[-0.03em] text-balance">
               {opportunity.title}
             </h1>
           </div>
@@ -117,11 +117,11 @@ export default async function OpportunityDetailsPage({
             <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-success/10 blur-[100px] pointer-events-none" />
 
             <div className="flex-1 relative z-10 flex flex-col justify-center">
-              <div className="text-[12px] font-bold mb-4 uppercase tracking-widest flex items-center gap-2 text-muted-foreground">
+              <div className="text-[12px] font-semibold mb-4 uppercase tracking-widest flex items-center gap-2 text-muted-foreground">
                 <Activity className="w-4 h-4" /> Application Readiness Engine
               </div>
               <div className="flex items-end gap-4 mb-4">
-                <div className="text-[88px] leading-[0.9] font-bold tracking-[-0.04em] text-foreground">
+                <div className="text-[56px] leading-[0.9] font-semibold tracking-[-0.04em] text-foreground">
                   {readinessScore}% 
                 </div>
                 <span className="text-[16px] font-medium text-muted-foreground mb-3">
@@ -135,15 +135,15 @@ export default async function OpportunityDetailsPage({
 
             <div className="flex-1 grid grid-cols-2 gap-4 relative z-10">
               <div className="bg-glass-surface/50 p-5 rounded-[16px] border border-glass-border">
-                <div className="text-[11px] uppercase font-bold text-muted-foreground mb-2">Success Probability</div>
-                <div className="font-bold text-[24px] text-success">{successProbability}%</div>
+                <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-2">Success Probability</div>
+                <div className="font-semibold text-[24px] text-success">{successProbability}%</div>
               </div>
               <div className="bg-glass-surface/50 p-5 rounded-[16px] border border-glass-border">
-                <div className="text-[11px] uppercase font-bold text-muted-foreground mb-2">Time Required</div>
-                <div className="font-bold text-[24px] text-foreground">{estimatedTimeMins} min</div>
+                <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-2">Time Required</div>
+                <div className="font-semibold text-[24px] text-foreground">{estimatedTimeMins} min</div>
               </div>
               <div className="col-span-2 bg-glass-surface/50 p-5 rounded-[16px] border border-glass-border">
-                <div className="text-[11px] uppercase font-bold text-muted-foreground mb-3">Checklist Overview</div>
+                <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-3">Checklist Overview</div>
                 <div className="flex gap-6">
                   <div className="flex items-center gap-2 text-[15px] font-medium text-success">
                     <CheckCircle2 className="w-5 h-5" /> {completedCount} Completed
@@ -166,7 +166,7 @@ export default async function OpportunityDetailsPage({
               <ul className="space-y-4 pt-2">
                 {missingDocs.length > 0 ? missingDocs.map((doc: string, i: number) => (
                   <li key={i} className="flex items-start gap-3 p-4 bg-danger/5 rounded-[12px] border border-danger/20">
-                    <span className="text-danger mt-0.5 font-bold">✗</span>
+                    <span className="text-danger mt-0.5 font-semibold">✗</span>
                     <span className="text-[15px] font-medium text-foreground">{doc}</span>
                   </li>
                 )) : (
@@ -196,7 +196,7 @@ export default async function OpportunityDetailsPage({
                         <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />
                       )}
                       <div>
-                        <span className={cn("text-[13px] font-bold uppercase tracking-wider mb-1 block", isMismatch ? "text-danger" : "text-success")}>
+                        <span className={cn("text-[13px] font-semibold uppercase tracking-wider mb-1 block", isMismatch ? "text-danger" : "text-success")}>
                           {isMismatch ? 'Mismatch' : 'Matched'}
                         </span>
                         <span className={cn("text-[15px] font-medium leading-relaxed text-foreground")}>{cleanReq}</span>
@@ -243,7 +243,7 @@ export default async function OpportunityDetailsPage({
                     <div className="inline-flex items-center justify-center w-20 h-20 rounded-[24px] bg-danger/10 border border-danger/20 text-danger mb-6 shadow-sm">
                       <TrendingDown className="w-10 h-10" />
                     </div>
-                    <h2 className="text-[32px] font-bold text-danger mb-4 tracking-tight">Opportunity Loss Simulator</h2>
+                    <h2 className="text-[32px] font-semibold text-danger mb-4 tracking-tight">Opportunity Loss Simulator</h2>
                     <p className="text-[18px] opacity-80 text-foreground max-w-[500px] mx-auto leading-relaxed">Here is exactly what happens if you ignore this document.</p>
                   </div>
 
@@ -255,12 +255,12 @@ export default async function OpportunityDetailsPage({
                     
                     <div className="grid grid-cols-2 gap-6">
                       <div className="bg-glass-surface/50 p-6 rounded-[16px] border-l-4 border-glass-border border-l-danger">
-                        <div className="text-[11px] uppercase font-bold tracking-wider text-muted-foreground mb-2">Financial Loss</div>
-                        <div className="font-bold text-[24px] text-foreground">{opportunity.opportunity_value || "Unknown"}</div>
+                        <div className="text-[11px] uppercase font-semibold tracking-wider text-muted-foreground mb-2">Financial Loss</div>
+                        <div className="font-semibold text-[24px] text-foreground">{opportunity.opportunity_value || "Unknown"}</div>
                       </div>
                       <div className="bg-glass-surface/50 p-6 rounded-[16px] border-l-4 border-glass-border border-l-danger">
-                        <div className="text-[11px] uppercase font-bold tracking-wider text-muted-foreground mb-2">Time Left</div>
-                        <div className="font-bold text-[24px] text-danger">
+                        <div className="text-[11px] uppercase font-semibold tracking-wider text-muted-foreground mb-2">Time Left</div>
+                        <div className="font-semibold text-[24px] text-danger">
                           {(() => {
                             if (!opportunity.deadline) return 'Immediate';
                             const d = new Date(opportunity.deadline);
@@ -278,18 +278,18 @@ export default async function OpportunityDetailsPage({
               <div className="mb-8 p-8 border border-glass-border rounded-[24px] bg-glass-surface shadow-glass-card">
                 <div className="flex items-center gap-3 mb-8">
                   <ShieldAlert className="w-8 h-8 text-foreground" />
-                  <h2 className="text-[24px] font-bold tracking-tight">Responsible AI Declaration</h2>
+                  <h2 className="text-[24px] font-semibold tracking-tight">Responsible AI Declaration</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                   <div>
-                    <h3 className="text-[12px] uppercase font-bold tracking-wider text-muted-foreground mb-3">Overall AI Confidence</h3>
+                    <h3 className="text-[12px] uppercase font-semibold tracking-wider text-muted-foreground mb-3">Overall AI Confidence</h3>
                     <div className="flex items-end gap-2">
-                      <span className="text-[48px] font-bold leading-none text-success tracking-[-0.03em]">{opportunity.confidence_score || 85}%</span>
+                      <span className="text-[48px] font-semibold leading-none text-success tracking-[-0.03em]">{opportunity.confidence_score || 85}%</span>
                     </div>
                     <p className="text-[14px] text-muted-foreground mt-3 leading-relaxed">Based on document clarity, formatting, and explicit language detection.</p>
                   </div>
                   <div>
-                    <h3 className="text-[12px] uppercase font-bold tracking-wider text-warning mb-3">AI Limitations</h3>
+                    <h3 className="text-[12px] uppercase font-semibold tracking-wider text-warning mb-3">AI Limitations</h3>
                     <ul className="text-[14px] text-muted-foreground space-y-3 list-disc pl-5">
                       <li>Cannot make legal or financial guarantees.</li>
                       <li>May miss unstated or implied dependencies.</li>
@@ -297,7 +297,7 @@ export default async function OpportunityDetailsPage({
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-[12px] uppercase font-bold tracking-wider text-danger mb-3">Potential Errors</h3>
+                    <h3 className="text-[12px] uppercase font-semibold tracking-wider text-danger mb-3">Potential Errors</h3>
                     <ul className="text-[14px] text-muted-foreground space-y-3 list-disc pl-5">
                       <li>Hallucinated eligibility criteria.</li>
                       <li>Misinterpreted required document lists.</li>
@@ -320,7 +320,7 @@ export default async function OpportunityDetailsPage({
                           <div key={i} className={cn("liquid-glass-card p-6 border-l-4", isMissing ? "border-l-danger bg-danger/5" : "border-l-success")}>
                             <div className="flex justify-between items-start mb-4 gap-4">
                               <div className="font-semibold text-[16px] text-foreground">{ref.claim}</div>
-                              {isMissing && <Badge variant="destructive" className="shrink-0 text-[10px] uppercase tracking-wider font-bold">Unverified</Badge>}
+                              {isMissing && <Badge variant="destructive" className="shrink-0 text-[10px] uppercase tracking-wider font-semibold">Unverified</Badge>}
                             </div>
                             
                             <div className="space-y-4">
@@ -330,13 +330,13 @@ export default async function OpportunityDetailsPage({
                               
                               <div className="flex gap-4 pt-4 border-t border-glass-border">
                                 <div className="flex-1">
-                                  <div className="text-[11px] uppercase font-bold text-muted-foreground mb-1">Confidence</div>
-                                  <div className={cn("text-[14px] font-bold", (ref.confidence_score || 0) < 70 ? "text-warning" : "text-success")}>
+                                  <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-1">Confidence</div>
+                                  <div className={cn("text-[14px] font-semibold", (ref.confidence_score || 0) < 70 ? "text-warning" : "text-success")}>
                                     {ref.confidence_score || (isMissing ? 0 : 80)}%
                                   </div>
                                 </div>
                                 <div className="flex-1 border-l border-glass-border pl-4">
-                                  <div className="text-[11px] uppercase font-bold text-muted-foreground mb-1">Risk if wrong</div>
+                                  <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-1">Risk if wrong</div>
                                   <div className="text-[14px] text-muted-foreground leading-tight">{ref.risk_assessment || "Unknown risk. Verify manually."}</div>
                                 </div>
                               </div>
@@ -353,7 +353,7 @@ export default async function OpportunityDetailsPage({
                 </div>
 
                 <div className="lg:col-span-1 liquid-glass-card h-full flex flex-col overflow-hidden">
-                  <div className="p-5 border-b border-glass-border font-bold text-[13px] bg-glass-surface/50 uppercase tracking-widest text-muted-foreground flex items-center justify-center">Official Source Document</div>
+                  <div className="p-5 border-b border-glass-border font-semibold text-[13px] bg-glass-surface/50 uppercase tracking-widest text-muted-foreground flex items-center justify-center">Official Source Document</div>
                   <div className="flex-1 bg-white">
                     {signedUrl ? (
                       <iframe 

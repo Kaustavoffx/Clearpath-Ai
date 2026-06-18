@@ -47,7 +47,7 @@ export default async function SettingsPage() {
           <Settings2 className="h-6 w-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Preferences</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">Preferences</h1>
           <p className="text-muted-foreground text-section text-sm mt-1">
             Manage your personal data and application settings.
           </p>

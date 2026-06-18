@@ -26,7 +26,7 @@ export default function GlobalError({
             <div className="w-20 h-20 bg-danger/10 text-danger rounded-[24px] border border-danger/20 flex items-center justify-center mx-auto mb-8 shadow-glass-card">
               <AlertTriangle className="w-10 h-10" />
             </div>
-            <h2 className="text-[28px] font-bold mb-4 tracking-tight text-foreground">Mission Aborted</h2>
+            <h2 className="text-[28px] font-semibold mb-4 tracking-tight text-foreground">Mission Aborted</h2>
             <p className="text-[16px] text-muted-foreground mb-10 leading-relaxed">
               A critical failure occurred in the processing node. Your document vault and data remain perfectly secure.
             </p>

@@ -23,7 +23,7 @@ export default function OpportunityError({
         <AlertTriangle className="w-10 h-10 text-danger relative z-10" />
       </div>
       
-      <h1 className="text-[32px] md:text-[40px] font-bold tracking-tight mb-4 text-foreground text-balance">
+      <h1 className="text-[32px] md:text-[40px] font-semibold tracking-tight mb-4 text-foreground text-balance">
         Unable to load opportunity
       </h1>
       
@@ -35,13 +35,13 @@ export default function OpportunityError({
         <Button 
           onClick={reset} 
           variant="outline" 
-          className="flex-1 bg-glass-surface hover:bg-glass-layer border-glass-border shadow-sm text-[14px] h-12 uppercase tracking-widest font-bold"
+          className="flex-1 bg-glass-surface hover:bg-glass-layer border-glass-border shadow-sm text-[14px] h-12 uppercase tracking-widest font-semibold"
         >
           <RefreshCcw className="w-4 h-4 mr-2" /> Try Again
         </Button>
         <Link 
           href="/opportunities"
-          className="flex-1 text-[14px] h-12 uppercase tracking-widest font-bold shadow-elevation-1 inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          className="flex-1 text-[14px] h-12 uppercase tracking-widest font-semibold shadow-elevation-1 inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
         >
           <Home className="w-4 h-4 mr-2" /> All Opportunities
         </Link>

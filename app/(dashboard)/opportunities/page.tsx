@@ -17,7 +17,7 @@ export default async function OpportunitiesPage() {
     <div className="container-wide py-12 flex flex-col gap-12 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-glass-border pb-8">
         <div>
-          <h1 className="text-[32px] font-bold tracking-[-0.025em] mb-2">Active Action Plans</h1>
+          <h1 className="text-[32px] font-semibold tracking-[-0.025em] mb-2">Active Action Plans</h1>
           <p className="text-[16px] text-muted-foreground max-w-[600px]">
             Monitor and execute your guaranteed action plans based on uploaded documents.
           </p>
@@ -55,8 +55,8 @@ export default async function OpportunitiesPage() {
 
                 <div className="md:w-64 flex flex-col justify-center items-center md:items-end gap-4 md:border-l md:border-glass-border md:pl-8">
                   <div className="text-center md:text-right">
-                    <div className="text-[48px] font-extrabold text-success tracking-[-0.02em] leading-none">{opp.readiness_score || 0}%</div>
-                    <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mt-2">Readiness</div>
+                    <div className="text-[48px] font-semibold text-success tracking-[-0.02em] leading-none">{opp.readiness_score || 0}%</div>
+                    <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mt-2">Readiness</div>
                   </div>
                   <Link href={`/opportunities/${opp.id}`} className={cn(buttonVariants(), "w-full md:w-auto h-10 px-6 rounded-[999px] shadow-glass-card group transition-spring")}>
                     View Plan <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-spring" />

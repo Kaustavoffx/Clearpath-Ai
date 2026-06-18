@@ -57,8 +57,8 @@ export function ReadinessRing({ score, size = 120, strokeWidth = 12, className }
       
       {/* Score text */}
       <div className="absolute flex flex-col items-center justify-center text-center">
-        <span className="text-3xl font-bold tracking-tighter">{progress}%</span>
-        <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground mt-0.5">Ready</span>
+        <span className="text-3xl font-semibold tracking-tighter">{progress}%</span>
+        <span className="text-[10px] uppercase font-semibold tracking-wider text-muted-foreground mt-0.5">Ready</span>
       </div>
     </div>
   )

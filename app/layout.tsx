@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { cmGeom } from "@/lib/fonts";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider"
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: {
@@ -45,7 +39,7 @@ export default function RootLayout({
       <head>
         <link rel="preload" as="image" href="/background.webp" />
       </head>
-      <body className={`${inter.variable} font-sans antialiased text-foreground min-h-screen flex flex-col relative`}>
+      <body className={`${cmGeom.variable} font-sans antialiased text-foreground min-h-screen flex flex-col relative`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

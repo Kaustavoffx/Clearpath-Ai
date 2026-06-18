@@ -33,7 +33,7 @@ export function AppNavigation() {
           {/* Logo / Brand */}
           <div className="flex items-center gap-4 whitespace-nowrap overflow-hidden pt-2">
             <div className="h-10 w-10 shrink-0 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center shadow-[0_0_20px_rgba(var(--primary),0.3)]">
-              <span className="text-primary font-bold text-lg">C</span>
+              <span className="text-primary font-semibold text-lg">C</span>
             </div>
             <span className="font-bold tracking-tight text-xl text-foreground">
               ClearPath OS
@@ -72,10 +72,10 @@ export function AppNavigation() {
           </div>
           <Link href="/settings" className="flex items-center gap-4 px-3 py-3 rounded-[12px] hover:bg-glass-layer transition-colors border border-transparent hover:border-glass-border">
              <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center border border-primary/30 shadow-[0_0_10px_rgba(var(--primary),0.2)]">
-               <span className="text-primary font-bold text-sm">JS</span>
+               <span className="text-primary font-semibold text-sm">JS</span>
              </div>
              <div className="flex flex-col">
-               <span className="font-bold text-sm leading-tight text-foreground">John Student</span>
+               <span className="font-semibold text-sm leading-tight text-foreground">John Student</span>
                <span className="text-[11px] uppercase tracking-wider text-muted-foreground mt-0.5">Free Plan</span>
              </div>
           </Link>
@@ -121,7 +121,7 @@ export function AppNavigation() {
           <div className="flex flex-col gap-2 px-6 py-6 flex-1 overflow-y-auto">
              <div className="flex items-center gap-4 mb-8 pb-8 border-b border-glass-border">
                <div className="h-12 w-12 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center shadow-[0_0_20px_rgba(var(--primary),0.3)]">
-                 <span className="text-primary font-bold text-xl">C</span>
+                 <span className="text-primary font-semibold text-xl">C</span>
                </div>
                <span className="font-bold tracking-tight text-2xl text-foreground">ClearPath OS</span>
              </div>
@@ -131,7 +131,7 @@ export function AppNavigation() {
                   key={index} 
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-4 rounded-[16px] text-[18px] font-bold text-muted-foreground hover:text-foreground hover:bg-glass-layer border border-transparent hover:border-glass-border transition-all"
+                  className="flex items-center justify-between p-4 rounded-[16px] text-[18px] font-semibold text-muted-foreground hover:text-foreground hover:bg-glass-layer border border-transparent hover:border-glass-border transition-all"
                 >
                   <div className="flex items-center gap-4">
                     <item.icon className="w-6 h-6" />
@@ -149,10 +149,10 @@ export function AppNavigation() {
              </div>
              <Link href="/settings" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-[16px] bg-glass-layer border border-glass-border transition-colors">
                <div className="w-12 h-12 shrink-0 rounded-full bg-primary/10 flex items-center justify-center border border-primary/30 shadow-[0_0_10px_rgba(var(--primary),0.2)]">
-                 <span className="text-primary font-bold">JS</span>
+                 <span className="text-primary font-semibold">JS</span>
                </div>
                <div className="flex flex-col">
-                 <span className="font-bold text-[16px] leading-tight text-foreground">John Student</span>
+                 <span className="font-semibold text-[16px] leading-tight text-foreground">John Student</span>
                  <span className="text-[12px] uppercase tracking-wider text-muted-foreground mt-1">Free Plan</span>
                </div>
              </Link>

@@ -118,7 +118,7 @@ export function StressTranslator({ originalText, simplifiedText, isProcessing = 
           <Sparkles className="w-32 h-32 text-primary" />
         </div>
         <div className="relative z-10">
-          <div className="text-[12px] font-bold uppercase tracking-widest text-primary mb-4 flex items-center gap-2">
+          <div className="text-[12px] font-semibold uppercase tracking-widest text-primary mb-4 flex items-center gap-2">
             <Sparkles className="w-4 h-4" /> Plain English
           </div>
           <p className="text-[20px] md:text-[24px] font-medium leading-[1.4] tracking-tight text-balance text-foreground">

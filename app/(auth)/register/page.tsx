@@ -27,7 +27,7 @@ export default async function RegisterPage({
             <span className="font-semibold text-[18px] tracking-tight text-foreground">ClearPath OS</span>
           </Link>
           
-          <h1 className="text-[48px] leading-[1.1] font-bold tracking-[-0.03em] mb-6 text-foreground max-w-[15ch]">
+          <h1 className="text-[48px] leading-[1.1] font-semibold tracking-[-0.03em] mb-6 text-foreground max-w-[15ch]">
             Initialize your Mission Profile.
           </h1>
           <p className="text-[18px] text-muted-foreground max-w-[400px] mb-12 leading-[28px]">

@@ -26,7 +26,7 @@ export function HumanReviewAction() {
         </span>
       </label>
       <Button 
-        className="w-full h-14 px-8 text-step-1 font-bold shadow-elevation-2 transition-crisp disabled:opacity-50"
+        className="w-full h-14 px-8 text-step-1 font-semibold shadow-elevation-2 transition-crisp disabled:opacity-50"
         disabled={!isVerified}
         onClick={() => alert("Redirecting to application portal...")}
       >

@@ -21,7 +21,7 @@ export default function DashboardError({
         <div className="w-16 h-16 bg-warning/10 text-warning rounded-full flex items-center justify-center mx-auto mb-6">
           <AlertTriangle className="w-8 h-8" />
         </div>
-        <h2 className="text-step-3 font-bold mb-4">Application Error</h2>
+        <h2 className="text-step-3 font-semibold mb-4">Application Error</h2>
         <p className="text-step-1 text-muted-foreground mb-8 text-balance">
           We encountered an issue loading this section of your Mission Control.
         </p>
