@@ -1,4 +1,5 @@
 import { AppNavigation } from "@/components/navigation/app-navigation"
+import { AdvisorFloatingButton } from "@/components/advisor/advisor-floating-button"
 import { Suspense } from "react"
 
 export default function DashboardLayout({
@@ -16,6 +17,9 @@ export default function DashboardLayout({
       <main className="flex-1 flex flex-col relative w-full min-h-screen md:pl-[260px] pb-20 md:pb-0 transition-all duration-500">
         {children}
       </main>
+
+      {/* Global Advisor Component */}
+      <AdvisorFloatingButton />
     </div>
   )
 }

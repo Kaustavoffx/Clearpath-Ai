@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { UploadWidget } from "@/components/opportunities/upload-widget"
 import { ShieldCheck, FolderArchive, Target, Clock, AlertTriangle, IndianRupee } from "lucide-react"
 import { DecisionCard } from "@/components/ui/decision-card"
+import { MorningBriefing } from "@/components/advisor/morning-briefing"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -22,6 +23,10 @@ export default async function DashboardPage() {
         <p className="text-muted-foreground mt-2 text-step-2">
           Ingest documents, generate action plans, and track your active opportunities.
         </p>
+      </div>
+
+      <div className="mb-12">
+        <MorningBriefing />
       </div>
 
       {/* KPI Cards */}
