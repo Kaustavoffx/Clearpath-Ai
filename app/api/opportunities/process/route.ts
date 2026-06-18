@@ -1,12 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { GoogleGenAI } from '@google/genai'
 import { z } from 'zod'
 import { rateLimit } from '@/lib/security/rate-limit'
 import { logger } from '@/lib/logger'
-import { env } from '@/lib/env'
-import sanitizeHtml from 'sanitize-html'
-import { extractJsonFromGeminiResponse } from '@/lib/utils'
 
 // Input Validation Schema
 const processRequestSchema = z.object({
@@ -59,292 +55,40 @@ export async function POST(request: Request) {
       })
     }
 
-    let inlineData = null
-    let rawTextContext = null
-
-    // 3. Fetch input data securely
-    if (filePath) {
-      // Basic path traversal protection (Supabase Storage handles most, but defense in depth)
-      if (filePath.includes('..')) {
-         logger.error({ userId: user.id, filePath }, 'Attempted path traversal')
-         return NextResponse.json({ error: 'Invalid file path' }, { status: 400 })
-      }
-
-      const { data: fileData, error: downloadError } = await supabase.storage
-        .from('opportunities')
-        .download(filePath)
-
-      if (downloadError || !fileData) {
-        logger.error({ error: downloadError }, 'Failed to download file from Supabase')
-        return NextResponse.json({ error: 'Failed to download file' }, { status: 500 })
-      }
-
-      const arrayBuffer = await fileData.arrayBuffer()
-      const buffer = Buffer.from(arrayBuffer)
-      
-      inlineData = {
-        data: buffer.toString('base64'),
-        mimeType: filePath.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg'
-      }
-    } else if (url) {
-      logger.info({ userId: user.id, url }, 'Fetching external URL')
-      const res = await fetch(url)
-      const html = await res.text()
-      
-      // Strip basic HTML
-      rawTextContext = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-                           .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-                           .replace(/<[^>]+>/g, ' ')
-                           .replace(/\s+/g, ' ')
-                           .trim()
+    if (filePath && filePath.includes('..')) {
+      logger.error({ userId: user.id, filePath }, 'Attempted path traversal')
+      return NextResponse.json({ error: 'Invalid file path' }, { status: 400 })
     }
 
-    // 4. Prompt Injection Protection & Execution
-    const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY })
+    // 3. Save initial PENDING record immediately
+    const titlePlaceholder = url ? `Link: ${new URL(url).hostname}` : (filePath?.split('/').pop() || 'Uploaded Document')
 
-    const profileContext = profile ? `
-      IMPORTANT - STUDENT PROFILE CONTEXT:
-      - Grade/Academic Status: ${profile.gradeLevel || 'Unknown'}
-      - State/Region: ${profile.state || 'Unknown'}
-      - Income Range: ${profile.incomeRange || 'Unknown'}
-      - Social Category: ${profile.category || 'Unknown'}
-      - Career Interest: ${profile.careerInterest || 'Unknown'}
-      
-      When extracting "eligibility_analysis.requirements", you MUST cross-reference each document requirement against the Student Profile Context above.
-      Prefix every requirement with either "[MATCHED]" if the student clearly meets it, or "[MISMATCH]" if they clearly do not meet it. If ambiguous, prefix with "[MISMATCH]".
-      Append a brief reason to the string.
-      Example: "[MATCHED] Income below ₹2.5L (Student: ${profile.incomeRange || 'Unknown'})"
-      Example: "[MISMATCH] Must be Class 11 (Student: ${profile.gradeLevel || 'Unknown'})"
-    ` : ''
-
-    const prompt = `
-      You are an expert, highly precise educational consultant AI.
-      Analyze the provided document (or text extracted from a URL) and extract structured information.
-      ${profileContext}
-      
-      CRITICAL RULES:
-      - NEVER hallucinate or guess.
-      - NEVER invent deadlines.
-      - NEVER invent eligibility requirements.
-      - If specific information is unavailable or not explicitly stated in the document, you MUST return the exact string: "Not Found In Document".
-      
-      Return ONLY a valid JSON object matching this schema perfectly:
-      {
-        "title": "String, name of the opportunity",
-        "category": "Scholarship | Circular | School Circular | Government Scheme | Scheme | Internship | Competition | Other",
-        "document_type": "String, type of document analyzed",
-        "plain_language_summary": "String, a simple 2-3 sentence explanation",
-        "important_dates": {
-          "deadline": "ISO 8601 Date String or 'Not Found In Document'",
-          "other_dates": ["String: Event - Date"]
-        },
-        "eligibility_analysis": {
-          "requirements": ["String" or "Not Found In Document"],
-          "is_student_eligible_by_default": "Boolean or null"
-        },
-        "required_documents": ["String" or "Not Found In Document"],
-        "opportunity_value": "String, exact value/prize/grant or 'Not Found In Document'",
-        "opportunity_loss_analysis": "String, what the student concretely loses if they miss this",
-        "readiness_score": "Integer 0-100",
-        "risk_score": "Integer 0-100",
-        "confidence_score": "Integer 0-100, your confidence in the extraction based on document clarity",
-        "evidence_references": [
-          {
-            "claim": "String, what the AI is claiming",
-            "quote_from_document": "String, exact verbatim quote from the text supporting the claim (use 'Not Found In Document' if not explicitly stated)",
-            "confidence_score": "Integer 0-100, your confidence in this specific claim based on the source quote",
-            "risk_assessment": "String, what happens to the user if this specific AI claim is wrong (e.g., 'Application rejected instantly', 'User misses deadline')"
-          }
-        ],
-        "action_checklist": [
-          { "step_number": 1, "title": "String", "description": "String" }
-        ]
-      }
-    `
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const contents: any[] = [prompt]
-    if (inlineData) {
-      contents.push({ inlineData })
-    } else if (rawTextContext) {
-      // Prompt Injection Delimiters
-      contents.push(`--- START OF USER URL CONTENT ---\n\n${rawTextContext}\n\n--- END OF USER URL CONTENT ---`)
-    }
-
-    logger.info({ userId: user.id }, 'Initiating Gemini generation')
-    
-    const generatePromise = ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: contents,
-      config: {
-        responseMimeType: "application/json"
-      }
-    })
-
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('AI Request Timed Out')), 28000)
-    )
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const response = await Promise.race([generatePromise, timeoutPromise]) as any;
-
-    const responseText = response.text
-    if (!responseText) {
-      throw new Error("Empty response from Gemini")
-    }
-
-    logger.info({ rawResponsePreview: responseText.substring(0, 200) + '...' }, 'Raw Gemini Response Received')
-
-    const { data: rawAiResult, error: parseError, raw } = extractJsonFromGeminiResponse(responseText)
-
-    if (parseError || !rawAiResult) {
-      logger.error({ 
-        error: parseError, 
-        rawGeminiResponse: raw 
-      }, 'Failed to parse JSON from Gemini')
-      
-      return NextResponse.json({ 
-        error: 'Failed to parse JSON from Gemini', 
-        details: parseError,
-        rawGeminiResponse: raw
-      }, { status: 500 })
-    }
-
-    const aiResponseSchema = z.object({
-      title: z.string().catch("Unknown Opportunity"),
-      category: z.string().catch("OTHER"),
-      plain_language_summary: z.string().catch("Summary could not be generated."),
-      important_dates: z.any().catch({ deadline: "Not Found In Document" }),
-      eligibility_analysis: z.any().catch({ requirements: [] }),
-      required_documents: z.array(z.string()).catch([]),
-      opportunity_value: z.string().catch("Not Found In Document"),
-      opportunity_loss_analysis: z.string().catch("Loss analysis unavailable."),
-      readiness_score: z.coerce.number().catch(0),
-      risk_score: z.coerce.number().catch(0),
-      confidence_score: z.coerce.number().catch(0),
-      funding_amount: z.coerce.number().catch(0),
-      urgency_score: z.coerce.number().catch(0),
-      deadline_days_remaining: z.coerce.number().catch(-1),
-      evidence_references: z.array(z.object({
-        claim: z.string().catch("Unknown Claim"),
-        quote_from_document: z.string().catch("Not Found In Document"),
-        confidence_score: z.coerce.number().catch(0),
-        risk_assessment: z.string().catch("Unknown Risk")
-      })).catch([]),
-      action_checklist: z.array(z.any()).catch([]),
-    }).passthrough()
-
-    const parsedAiResult = aiResponseSchema.safeParse(rawAiResult)
-    
-    if (!parsedAiResult.success) {
-      logger.error({ 
-        errors: parsedAiResult.error.flatten(), 
-        rawGeminiResponse: rawAiResult 
-      }, 'Failed to validate Gemini response schema')
-      
-      return NextResponse.json({ 
-        error: 'The AI generated an invalid response format.', 
-        details: parsedAiResult.error.flatten() 
-      }, { status: 422 })
-    }
-
-    const aiResult = parsedAiResult.data
-
-    logger.info({ 
-      rawGeminiResponse: rawAiResult, 
-      parsedGeminiResponse: aiResult 
-    }, 'Successfully parsed and validated Gemini response')
-
-    const rawCategory = aiResult.category || 'Unknown'
-    const normalizedCategory = rawCategory.toUpperCase().trim()
-
-    const categoryMapping: Record<string, string> = {
-      'SCHOLARSHIP': 'SCHOLARSHIP',
-      'CIRCULAR': 'CIRCULAR',
-      'SCHOOL CIRCULAR': 'CIRCULAR',
-      'GOVERNMENT SCHEME': 'SCHEME',
-      'SCHEME': 'SCHEME',
-      'INTERNSHIP': 'INTERNSHIP',
-      'COMPETITION': 'COMPETITION',
-    }
-
-    let finalCategory = categoryMapping[normalizedCategory] || 'OTHER'
-
-    const validCategories = [
-      'SCHOLARSHIP',
-      'CIRCULAR',
-      'SCHEME',
-      'INTERNSHIP',
-      'COMPETITION',
-      'OTHER'
-    ]
-
-    if (!validCategories.includes(finalCategory)) {
-      finalCategory = 'OTHER'
-    }
-
-    logger.info({ 
-      rawCategory, 
-      normalizedCategory, 
-      finalDatabaseCategory: finalCategory 
-    }, 'Category Normalization')
-
-    // 5. Output Sanitization (XSS Protection)
-    const sanitizeOptions = { allowedTags: [], allowedAttributes: {} }
-    const sanitizedTitle = sanitizeHtml(aiResult.title || 'Unknown Opportunity', sanitizeOptions)
-    const sanitizedSummary = sanitizeHtml(aiResult.plain_language_summary || '', sanitizeOptions)
-    const sanitizedValue = sanitizeHtml(aiResult.opportunity_value || '', sanitizeOptions)
-    const sanitizedLoss = sanitizeHtml(aiResult.opportunity_loss_analysis || '', sanitizeOptions)
-
-    // 6. Save to Database securely
     const { data: oppRecord, error: oppError } = await supabase
       .from('opportunities')
       .insert({
         user_id: user.id,
-        title: sanitizedTitle,
-        category: finalCategory,
-        storage_path: filePath || url || 'url-input',
-        simplified_summary: sanitizedSummary,
-        deadline: aiResult.important_dates?.deadline !== 'Not Found In Document' ? new Date(aiResult.important_dates?.deadline).toISOString() : null,
-        eligibility_analysis: aiResult.eligibility_analysis || {},
-        required_documents: aiResult.required_documents || [],
-        opportunity_value: sanitizedValue,
-        opportunity_loss_prediction: sanitizedLoss,
-        readiness_score: aiResult.readiness_score || 0,
-        risk_score: aiResult.risk_score || 0,
-        confidence_score: aiResult.confidence_score || 0,
-        evidence_references: aiResult.evidence_references || [],
-        status: 'PROCESSED'
+        title: titlePlaceholder,
+        category: 'OTHER',
+        storage_path: filePath || url || 'unknown',
+        simplified_summary: 'Pending Analysis...',
+        status: 'PENDING'
       })
       .select()
       .single()
 
     if (oppError || !oppRecord) {
-      logger.error({ error: oppError }, 'Failed to insert opportunity into DB')
+      logger.error({ error: oppError }, 'Failed to insert pending opportunity into DB')
       throw new Error('Failed to save opportunity to database')
     }
 
-    // 7. Save Action Steps
-    if (aiResult.action_checklist && aiResult.action_checklist.length > 0) {
-      const stepsToInsert = aiResult.action_checklist.map((step: { step_number: number, title: string, description: string }) => ({
-        opportunity_id: oppRecord.id,
-        step_number: step.step_number,
-        title: sanitizeHtml(step.title, sanitizeOptions),
-        description: sanitizeHtml(step.description, sanitizeOptions),
-        status: 'PENDING'
-      }))
-
-      await supabase.from('action_steps').insert(stepsToInsert)
-    }
-
-    logger.info({ userId: user.id, opportunityId: oppRecord.id }, 'Successfully processed opportunity')
+    logger.info({ userId: user.id, opportunityId: oppRecord.id }, 'Successfully created pending opportunity')
     
+    // 4. Return immediately for background processing UI
     return NextResponse.json({ id: oppRecord.id })
 
   } catch (error: unknown) {
     const err = error as Error
-    logger.error({ error: err.message, stack: err.stack }, 'Fatal API Route Error')
-    // Generic error to client, hide internal stack
-    return NextResponse.json({ error: 'An unexpected error occurred during processing.' }, { status: 500 })
+    logger.error({ error: err.message, stack: err.stack }, 'Fatal API Route Error in Ingestion')
+    return NextResponse.json({ error: 'An unexpected error occurred during ingestion.' }, { status: 500 })
   }
 }

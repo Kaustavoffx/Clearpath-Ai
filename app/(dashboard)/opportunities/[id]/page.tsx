@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { DecisionCard } from "@/components/ui/decision-card"
 import { HumanInTheLoopPipeline } from "@/components/opportunities/human-in-the-loop-pipeline"
 import { JudgeArchitectureFlow } from "@/components/opportunities/judge-architecture-flow"
+import { ProcessingOrchestrator } from "@/components/opportunities/processing-orchestrator"
 import { Metadata } from "next"
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -45,6 +46,10 @@ export default async function OpportunityDetailsPage({
 
   if (error || !opportunity) {
     notFound()
+  }
+
+  if (opportunity.status === 'PENDING') {
+    return <ProcessingOrchestrator opportunityId={id} />
   }
 
   let signedUrl = null

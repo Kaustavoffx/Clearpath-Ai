@@ -92,9 +92,6 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
 
       const result = await response.json()
 
-      // Artificial delay to let user see processing state
-      await new Promise(r => setTimeout(r, 800))
-
       if (onUploadComplete) {
         onUploadComplete(result.id)
       } else {
