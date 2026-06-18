@@ -24,3 +24,56 @@ export function getBaseUrl() {
 
   return 'http://localhost:3000';
 }
+
+export function extractJsonFromGeminiResponse(rawResponse: string): { data: any, error: string | null, raw: string } {
+  if (!rawResponse || typeof rawResponse !== 'string') {
+    return { data: null, error: "Empty or invalid response type", raw: rawResponse }
+  }
+
+  let text = rawResponse.trim()
+
+  // Remove markdown blocks if present (Case B & D)
+  if (text.includes('```')) {
+    const match = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)
+    if (match && match[1]) {
+      text = match[1].trim()
+    }
+  }
+
+  try {
+    // Attempt parsing directly (Case A and cleaned Case B/D)
+    return { data: JSON.parse(text), error: null, raw: rawResponse }
+  } catch (e) {
+    // Fallback: extract substring from first '{' to last '}' (Case C)
+    const firstBrace = text.indexOf('{')
+    const lastBrace = text.lastIndexOf('}')
+
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+      const candidate = text.substring(firstBrace, lastBrace + 1)
+      try {
+        return { data: JSON.parse(candidate), error: null, raw: rawResponse }
+      } catch (innerError) {
+        // Keep falling through
+      }
+    }
+
+    // Fallback: extract substring from first '[' to last ']'
+    const firstBracket = text.indexOf('[')
+    const lastBracket = text.lastIndexOf(']')
+
+    if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
+      const candidate = text.substring(firstBracket, lastBracket + 1)
+      try {
+        return { data: JSON.parse(candidate), error: null, raw: rawResponse }
+      } catch (innerError) {
+        // Keep falling through
+      }
+    }
+
+    return { 
+      data: null, 
+      error: e instanceof Error ? e.message : 'Unknown parsing error', 
+      raw: rawResponse 
+    }
+  }
+}

@@ -6,6 +6,7 @@ import { rateLimit } from '@/lib/security/rate-limit'
 import { logger } from '@/lib/logger'
 import { env } from '@/lib/env'
 import sanitizeHtml from 'sanitize-html'
+import { extractJsonFromGeminiResponse } from '@/lib/utils'
 
 // Input Validation Schema
 const processRequestSchema = z.object({
@@ -156,11 +157,21 @@ export async function POST(request: Request) {
       throw new Error("Empty response from Gemini")
     }
 
-    let rawAiResult: any = {}
-    try {
-      rawAiResult = JSON.parse(responseText)
-    } catch (e) {
-      throw new Error("Failed to parse JSON from Gemini")
+    logger.info({ rawResponsePreview: responseText.substring(0, 200) + '...' }, 'Raw Gemini Response Received')
+
+    const { data: rawAiResult, error: parseError, raw } = extractJsonFromGeminiResponse(responseText)
+
+    if (parseError || !rawAiResult) {
+      logger.error({ 
+        error: parseError, 
+        rawGeminiResponse: raw 
+      }, 'Failed to parse JSON from Gemini')
+      
+      return NextResponse.json({ 
+        error: 'Failed to parse JSON from Gemini', 
+        details: parseError,
+        rawGeminiResponse: raw
+      }, { status: 500 })
     }
 
     const aiResponseSchema = z.object({
