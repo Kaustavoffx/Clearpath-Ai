@@ -106,7 +106,7 @@ export async function POST(request: Request) {
       Return ONLY a valid JSON object matching this schema perfectly:
       {
         "title": "String, name of the opportunity",
-        "category": "Scholarship | Internship | Government Program | School Circular | Competition | Financial Aid | Other",
+        "category": "SCHOLARSHIP | CIRCULAR | SCHEME | INTERNSHIP | COMPETITION | OTHER",
         "document_type": "String, type of document analyzed",
         "plain_language_summary": "String, a simple 2-3 sentence explanation",
         "important_dates": {
@@ -182,18 +182,17 @@ export async function POST(request: Request) {
     const aiResult = aiResponseSchema.parse(rawAiResult)
 
     const validCategories = [
-      'Scholarship',
-      'Internship',
-      'Government Program',
-      'School Circular',
-      'Competition',
-      'Financial Aid',
-      'Other'
+      'SCHOLARSHIP',
+      'CIRCULAR',
+      'SCHEME',
+      'INTERNSHIP',
+      'COMPETITION',
+      'OTHER'
     ]
 
-    let safeCategory = aiResult.category || 'Other'
+    let safeCategory = aiResult.category || 'OTHER'
     if (!validCategories.includes(safeCategory)) {
-      safeCategory = 'Other'
+      safeCategory = 'OTHER'
     }
 
     // 5. Output Sanitization (XSS Protection)
