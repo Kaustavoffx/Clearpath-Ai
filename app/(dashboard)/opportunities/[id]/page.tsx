@@ -106,7 +106,7 @@ export default async function OpportunityDetailsPage({
                 })()}
               </span>
             </div>
-            <h1 className="text-[48px] leading-[1.1] font-semibold tracking-[-0.03em] text-balance">
+            <h1 className="text-hero-title text-balance">
               {opportunity.title}
             </h1>
           </div>
@@ -121,7 +121,7 @@ export default async function OpportunityDetailsPage({
                 <Activity className="w-4 h-4" /> Application Readiness Engine
               </div>
               <div className="flex items-end gap-4 mb-4">
-                <div className="text-[56px] leading-[0.9] font-semibold tracking-[-0.04em] text-foreground">
+                <div className="text-metric-number text-foreground">
                   {readinessScore}% 
                 </div>
                 <span className="text-[16px] font-medium text-muted-foreground mb-3">
@@ -135,12 +135,10 @@ export default async function OpportunityDetailsPage({
 
             <div className="flex-1 grid grid-cols-2 gap-4 relative z-10">
               <div className="bg-glass-surface/50 p-5 rounded-[16px] border border-glass-border">
-                <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-2">Success Probability</div>
-                <div className="font-semibold text-[24px] text-success">{successProbability}%</div>
+                <div className="text-metric-number text-success">{successProbability}%</div>
               </div>
               <div className="bg-glass-surface/50 p-5 rounded-[16px] border border-glass-border">
-                <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-2">Time Required</div>
-                <div className="font-semibold text-[24px] text-foreground">{estimatedTimeMins} min</div>
+                <div className="text-metric-number text-foreground">{estimatedTimeMins} min</div>
               </div>
               <div className="col-span-2 bg-glass-surface/50 p-5 rounded-[16px] border border-glass-border">
                 <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-3">Checklist Overview</div>
@@ -255,8 +253,7 @@ export default async function OpportunityDetailsPage({
                     
                     <div className="grid grid-cols-2 gap-6">
                       <div className="bg-glass-surface/50 p-6 rounded-[16px] border-l-4 border-glass-border border-l-danger">
-                        <div className="text-[11px] uppercase font-semibold tracking-wider text-muted-foreground mb-2">Financial Loss</div>
-                        <div className="font-semibold text-[24px] text-foreground">{opportunity.opportunity_value || "Unknown"}</div>
+                        <div className="text-metric-number text-foreground">{opportunity.opportunity_value || "Unknown"}</div>
                       </div>
                       <div className="bg-glass-surface/50 p-6 rounded-[16px] border-l-4 border-glass-border border-l-danger">
                         <div className="text-[11px] uppercase font-semibold tracking-wider text-muted-foreground mb-2">Time Left</div>
@@ -278,13 +275,13 @@ export default async function OpportunityDetailsPage({
               <div className="mb-8 p-8 border border-glass-border rounded-[24px] bg-glass-surface shadow-glass-card">
                 <div className="flex items-center gap-3 mb-8">
                   <ShieldAlert className="w-8 h-8 text-foreground" />
-                  <h2 className="text-[24px] font-semibold tracking-tight">Responsible AI Declaration</h2>
+                  <h2 className="text-section-title">Responsible AI Declaration</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                   <div>
                     <h3 className="text-[12px] uppercase font-semibold tracking-wider text-muted-foreground mb-3">Overall AI Confidence</h3>
                     <div className="flex items-end gap-2">
-                      <span className="text-[48px] font-semibold leading-none text-success tracking-[-0.03em]">{opportunity.confidence_score || 85}%</span>
+                      <span className="text-[48px] font-medium leading-none text-success tracking-[-0.03em]">{opportunity.confidence_score || 85}%</span>
                     </div>
                     <p className="text-[14px] text-muted-foreground mt-3 leading-relaxed">Based on document clarity, formatting, and explicit language detection.</p>
                   </div>
@@ -309,7 +306,7 @@ export default async function OpportunityDetailsPage({
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 h-[800px]">
                 <div className="lg:col-span-1 space-y-6 overflow-y-auto pr-4 pb-12 custom-scrollbar">
-                  <h2 className="text-[24px] font-semibold sticky top-0 bg-glass-surface/95 backdrop-blur-sm py-6 z-10 border-b border-glass-border mb-6 text-foreground">Evidence Matrix</h2>
+                  <h2 className="text-section-title sticky top-0 bg-glass-surface/95 backdrop-blur-sm py-6 z-10 border-b border-glass-border mb-6 text-foreground">Evidence Matrix</h2>
                   
                   <div className="space-y-6">
                     {Array.isArray(opportunity.evidence_references) && opportunity.evidence_references.length > 0 ? (
@@ -319,7 +316,7 @@ export default async function OpportunityDetailsPage({
                         return (
                           <div key={i} className={cn("liquid-glass-card p-6 border-l-4", isMissing ? "border-l-danger bg-danger/5" : "border-l-success")}>
                             <div className="flex justify-between items-start mb-4 gap-4">
-                              <div className="font-semibold text-[16px] text-foreground">{ref.claim}</div>
+                              <div className="text-card-title text-[16px] text-foreground">{ref.claim}</div>
                               {isMissing && <Badge variant="destructive" className="shrink-0 text-[10px] uppercase tracking-wider font-semibold">Unverified</Badge>}
                             </div>
                             

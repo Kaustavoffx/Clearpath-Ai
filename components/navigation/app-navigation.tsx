@@ -56,7 +56,7 @@ export function AppNavigation() {
                 >
                   <item.icon className={cn("w-5 h-5 shrink-0 relative z-10 transition-transform duration-300 group-hover/item:scale-110", isActive && "text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]")} />
                   
-                  <span className="font-semibold whitespace-nowrap relative z-10 text-[15px]">
+                  <span className={cn("whitespace-nowrap relative z-10 text-[15px]", isActive ? "font-semibold" : "font-medium")}>
                     {item.name}
                   </span>
                 </Link>
@@ -68,7 +68,7 @@ export function AppNavigation() {
         {/* Bottom Profile / Settings */}
         <div className="mt-auto p-6 flex flex-col gap-4 border-t border-glass-border bg-glass-surface/30">
           <div className="flex items-center justify-between w-full">
-            <span className="text-[13px] font-semibold text-muted-foreground uppercase tracking-widest">Theme</span>
+            <span className="text-card-label text-muted-foreground">Theme</span>
             <ThemeToggle />
           </div>
           <Link href="/settings" className="flex items-center gap-4 px-3 py-3 rounded-[12px] hover:bg-glass-layer transition-colors border border-transparent hover:border-glass-border">
@@ -76,7 +76,7 @@ export function AppNavigation() {
                <span className="text-primary font-semibold text-sm">JS</span>
              </div>
              <div className="flex flex-col">
-               <span className="font-semibold text-sm leading-tight text-foreground">John Student</span>
+               <span className="font-medium text-sm leading-tight text-foreground">John Student</span>
                <span className="text-[11px] uppercase tracking-wider text-muted-foreground mt-0.5">Free Plan</span>
              </div>
           </Link>
@@ -132,7 +132,9 @@ export function AppNavigation() {
                   key={index} 
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-between p-4 rounded-[16px] text-[18px] font-semibold text-muted-foreground hover:text-foreground hover:bg-glass-layer border border-transparent hover:border-glass-border transition-all"
+                  className={cn("flex items-center justify-between p-4 rounded-[16px] text-[18px] text-muted-foreground hover:text-foreground hover:bg-glass-layer border border-transparent hover:border-glass-border transition-all",
+                    item.isActiveOverride || pathname === item.href ? "font-semibold text-primary" : "font-medium"
+                  )}
                 >
                   <div className="flex items-center gap-4">
                     <item.icon className="w-6 h-6" />
@@ -145,7 +147,7 @@ export function AppNavigation() {
           
           <div className="p-6 mt-auto border-t border-glass-border bg-glass-surface/50">
              <div className="flex items-center justify-between mb-6">
-               <span className="text-[13px] font-semibold text-muted-foreground uppercase tracking-widest">Theme</span>
+               <span className="text-card-label">Theme</span>
                <ThemeToggle />
              </div>
              <Link href="/settings" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-[16px] bg-glass-layer border border-glass-border transition-colors">
@@ -153,7 +155,7 @@ export function AppNavigation() {
                  <span className="text-primary font-semibold">JS</span>
                </div>
                <div className="flex flex-col">
-                 <span className="font-semibold text-[16px] leading-tight text-foreground">John Student</span>
+                 <span className="font-medium text-[16px] leading-tight text-foreground">John Student</span>
                  <span className="text-[12px] uppercase tracking-wider text-muted-foreground mt-1">Free Plan</span>
                </div>
              </Link>

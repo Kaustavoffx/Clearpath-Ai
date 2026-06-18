@@ -21,11 +21,11 @@ export function DecisionCard({ title, label, icon, children, footer, isActive, c
       <div className="px-6 py-5 border-b border-glass-border bg-glass-surface/50 flex items-center justify-between">
         <div className="flex items-center gap-3">
           {icon && <div className="text-muted-foreground">{icon}</div>}
-          <h3 className="text-[18px] font-semibold text-foreground tracking-[-0.015em]">{title}</h3>
+          <h3 className="text-card-title text-foreground">{title}</h3>
         </div>
-        {label && <span className="text-[11px] font-medium uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-[999px] border border-primary/20">{label}</span>}
+        {label && <span className="text-status-badge text-primary bg-primary/10 px-3 py-1 rounded-[999px] border border-primary/20">{label}</span>}
       </div>
-      <div className="p-6 flex-1 text-[16px] text-muted-foreground leading-[24px]">
+      <div className="p-6 flex-1 text-body-text">
         {children}
       </div>
       {footer && (

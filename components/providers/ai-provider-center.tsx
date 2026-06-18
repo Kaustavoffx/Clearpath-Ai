@@ -168,20 +168,20 @@ export function AIProviderCenter() {
       
       {/* Hero Section */}
       <div className="mb-12 border-b border-glass-border pb-10">
-        <h1 className="text-[40px] md:text-[56px] font-semibold tracking-tight text-white mb-2 flex items-center gap-4">
+        <h1 className="text-hero-title text-white mb-2 flex items-center gap-4">
           AI Provider Center
         </h1>
         <h2 className="text-[24px] text-primary font-medium tracking-wide mb-6">Bring your own AI.</h2>
         
-        <p className="text-[16px] text-muted-foreground max-w-2xl leading-relaxed mb-6">
+        <p className="text-body-text text-muted-foreground max-w-2xl mb-6">
           ClearPath OS never stores your API keys. Your keys remain encrypted securely in your browser and are used exclusively for requests you initiate.
         </p>
 
         <div className="flex flex-wrap gap-3">
-          <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-success bg-success/10 border border-success/20 px-4 py-2 rounded-full">
+          <div className="flex items-center gap-2 text-status-badge text-success bg-success/10 border border-success/20 px-4 py-2 rounded-full">
             <ShieldCheck className="w-4 h-4" /> Security Verified
           </div>
-          <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-info bg-info/10 border border-info/20 px-4 py-2 rounded-full">
+          <div className="flex items-center gap-2 text-status-badge text-info bg-info/10 border border-info/20 px-4 py-2 rounded-full">
             <Key className="w-4 h-4" /> BYOK Enabled
           </div>
         </div>
@@ -199,7 +199,7 @@ export function AIProviderCenter() {
               
               <div className="relative z-10 flex-1 flex flex-col">
                 <div className="flex items-center justify-between mb-6">
-                   <div className={cn("text-[14px] font-bold tracking-widest uppercase", provider.color)}>
+                   <div className={cn("text-card-label text-[14px]", provider.color)}>
                      {provider.logoText}
                    </div>
                    {status.connected ? (
@@ -210,7 +210,7 @@ export function AIProviderCenter() {
                 </div>
 
                 <div className="mb-6">
-                  <div className="text-[12px] uppercase tracking-widest text-muted-foreground font-semibold mb-3">Used For:</div>
+                  <div className="text-card-label text-muted-foreground mb-3">Used For:</div>
                   <ul className="space-y-2">
                     {provider.usedFor.map((use, i) => (
                       <li key={i} className="flex items-start gap-2 text-[14px] text-white/80">
@@ -223,11 +223,11 @@ export function AIProviderCenter() {
 
                 <div className="mt-auto pt-6 border-t border-white/5">
                    <div className="flex items-center justify-between mb-4">
-                     <span className="text-[12px] text-muted-foreground font-medium uppercase tracking-wider">Status</span>
+                     <span className="text-card-label text-muted-foreground">Status</span>
                      {status.connected ? (
-                       <span className="text-[12px] font-semibold text-success flex items-center gap-1.5">Connected</span>
+                       <span className="text-[12px] font-medium text-success flex items-center gap-1.5">Connected</span>
                      ) : (
-                       <span className="text-[12px] font-semibold text-muted-foreground">Not Connected</span>
+                       <span className="text-[12px] font-medium text-muted-foreground">Not Connected</span>
                      )}
                    </div>
                    
@@ -249,51 +249,51 @@ export function AIProviderCenter() {
 
       {/* Security Panel */}
       <div className="mb-16">
-        <h3 className="text-[20px] font-semibold text-white mb-6">Your Data & Security</h3>
+        <h3 className="text-section-title text-white mb-6">Your Data & Security</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-[#0B1E2E]/40 border border-white/5 p-6 rounded-[16px]">
             <Lock className="w-6 h-6 text-primary mb-3" />
-            <h4 className="text-[15px] font-medium text-white mb-1">Encrypted Storage</h4>
-            <p className="text-[13px] text-muted-foreground">Keys are encrypted before local storage.</p>
+            <h4 className="text-card-title text-[15px] text-white mb-1">Encrypted Storage</h4>
+            <p className="text-helper-text">Keys are encrypted before local storage.</p>
           </div>
           <div className="bg-[#0B1E2E]/40 border border-white/5 p-6 rounded-[16px]">
             <Server className="w-6 h-6 text-info mb-3" />
-            <h4 className="text-[15px] font-medium text-white mb-1">Local First</h4>
-            <p className="text-[13px] text-muted-foreground">Keys never touch the ClearPath OS database.</p>
+            <h4 className="text-card-title text-[15px] text-white mb-1">Local First</h4>
+            <p className="text-helper-text">Keys never touch the ClearPath OS database.</p>
           </div>
           <div className="bg-[#0B1E2E]/40 border border-white/5 p-6 rounded-[16px]">
             <ShieldCheck className="w-6 h-6 text-success mb-3" />
-            <h4 className="text-[15px] font-medium text-white mb-1">No Sharing</h4>
-            <p className="text-[13px] text-muted-foreground">ClearPath never sells or logs API credentials.</p>
+            <h4 className="text-card-title text-[15px] text-white mb-1">No Sharing</h4>
+            <p className="text-helper-text">ClearPath never sells or logs API credentials.</p>
           </div>
           <div className="bg-[#0B1E2E]/40 border border-white/5 p-6 rounded-[16px]">
             <RefreshCw className="w-6 h-6 text-warning mb-3" />
-            <h4 className="text-[15px] font-medium text-white mb-1">Instant Revocation</h4>
-            <p className="text-[13px] text-muted-foreground">Remove access instantly at any time.</p>
+            <h4 className="text-card-title text-[15px] text-white mb-1">Instant Revocation</h4>
+            <p className="text-helper-text">Remove access instantly at any time.</p>
           </div>
         </div>
       </div>
 
       {/* Advanced Settings Placeholder */}
       <div className="mb-16 bg-[#0B1E2E]/30 border border-white/5 p-8 rounded-[24px]">
-         <h3 className="text-[20px] font-semibold text-white mb-6">Advanced Routing</h3>
+         <h3 className="text-section-title text-white mb-6">Advanced Routing</h3>
          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
            <div>
-             <div className="text-[12px] uppercase tracking-widest text-muted-foreground font-semibold mb-3">Document Intelligence</div>
+             <div className="text-card-label text-muted-foreground mb-3">Document Intelligence</div>
              <div className="flex items-center gap-3">
                <div className="w-4 h-4 rounded-full border-4 border-primary bg-[#0B1E2E]" />
                <span className="text-[14px] font-medium text-white">Google Gemini</span>
              </div>
            </div>
            <div>
-             <div className="text-[12px] uppercase tracking-widest text-muted-foreground font-semibold mb-3">Advisor Reasoning</div>
+             <div className="text-card-label text-muted-foreground mb-3">Advisor Reasoning</div>
              <div className="flex items-center gap-3">
                <div className="w-4 h-4 rounded-full border-4 border-primary bg-[#0B1E2E]" />
                <span className="text-[14px] font-medium text-white">OpenAI</span>
              </div>
            </div>
            <div>
-             <div className="text-[12px] uppercase tracking-widest text-muted-foreground font-semibold mb-3">Voice Engine</div>
+             <div className="text-card-label text-muted-foreground mb-3">Voice Engine</div>
              <div className="flex items-center gap-3">
                <div className="w-4 h-4 rounded-full border-4 border-primary bg-[#0B1E2E]" />
                <span className="text-[14px] font-medium text-white">Deepgram</span>
@@ -307,8 +307,8 @@ export function AIProviderCenter() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
         
         <div className="text-center mb-10 relative z-10">
-          <h3 className="text-[20px] font-semibold text-primary mb-2">You control the intelligence layer.</h3>
-          <p className="text-[14px] text-muted-foreground max-w-xl mx-auto">
+          <h3 className="text-card-title text-[20px] text-primary mb-2">You control the intelligence layer.</h3>
+          <p className="text-body-text text-muted-foreground max-w-xl mx-auto">
             ClearPath OS never locks users into a proprietary model. By owning your keys, you retain 100% control over your data routing, privacy, and expenditure.
           </p>
         </div>
@@ -352,7 +352,7 @@ export function AIProviderCenter() {
              {/* Modal Header */}
              <div className="flex justify-between items-center p-6 border-b border-white/5 bg-[#0B1E2E]/50">
                <div>
-                 <h2 className="text-[20px] font-semibold text-white tracking-tight flex items-center gap-2">
+                 <h2 className="text-card-title text-white flex items-center gap-2">
                    Connect {PROVIDERS[activeModal].name}
                  </h2>
                </div>
@@ -365,7 +365,7 @@ export function AIProviderCenter() {
                 {/* Left Pane: Instructions */}
                 <div className="w-full md:w-1/2 p-8 border-r border-white/5 bg-[#07111D]">
                    <div className="mb-8">
-                     <h3 className="text-[14px] font-semibold text-white mb-2">{PROVIDERS[activeModal].name} powers:</h3>
+                     <h3 className="text-[14px] font-medium text-white mb-2">{PROVIDERS[activeModal].name} powers:</h3>
                      <ul className="space-y-3 mt-4">
                         {PROVIDERS[activeModal].usedFor.map((use, i) => (
                           <li key={i} className="flex items-center gap-3 text-[14px] text-muted-foreground">
@@ -376,12 +376,12 @@ export function AIProviderCenter() {
                    </div>
 
                    <div className="mb-10 bg-white/5 p-4 rounded-[12px] border border-white/5">
-                     <div className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold mb-1">Estimated Cost</div>
+                     <div className="text-card-label text-muted-foreground mb-1">Estimated Cost</div>
                      <div className="text-[14px] font-medium text-white">{PROVIDERS[activeModal].cost}</div>
                    </div>
 
                    <div>
-                     <h3 className="text-[14px] font-semibold text-white mb-4">How to get your API key</h3>
+                     <h3 className="text-[14px] font-medium text-white mb-4">How to get your API key</h3>
                      <div className="space-y-4">
                        {PROVIDERS[activeModal].steps.map((step, i) => (
                          <div key={i} className="flex items-start gap-4">

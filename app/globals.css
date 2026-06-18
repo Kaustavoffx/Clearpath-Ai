@@ -112,30 +112,33 @@
     @apply w-full max-w-[1440px] mx-auto px-6 md:px-12;
   }
 
-  /* Typography Scale */
-  /* Body Text: 14-16px, weight 400, line-height 1.6 */
-  .text-step-0 {
-    @apply text-[14px] md:text-[16px] leading-[1.6] font-normal max-w-[70ch];
+  /* Semantic Typography Scale */
+  .text-hero-title {
+    @apply text-[48px] md:text-[56px] leading-[1.1] tracking-[-0.03em] font-bold;
   }
-  /* Labels: 12-13px, weight 500 */
-  .text-step-1 {
-    @apply text-[12px] md:text-[13px] leading-[1.5] font-medium tracking-wide uppercase;
+  .text-section-title {
+    @apply text-[28px] md:text-[36px] leading-[1.2] tracking-[-0.02em] font-bold;
   }
-  /* Metadata: 11-12px, weight 400 */
-  .text-step-2 {
-    @apply text-[11px] md:text-[12px] leading-[1.5] font-normal text-muted-foreground;
+  .text-card-title {
+    @apply text-[18px] md:text-[20px] leading-[1.3] tracking-[-0.01em] font-medium;
   }
-  /* Card Titles: 18-20px, weight 500 */
-  .text-step-3 {
-    @apply text-[18px] md:text-[20px] leading-[1.3] font-medium tracking-[-0.01em];
+  .text-metric-number {
+    @apply text-[32px] md:text-[40px] leading-none font-bold;
   }
-  /* Section Titles: 28-36px, weight 600 */
-  .text-step-4 {
-    @apply text-[28px] md:text-[36px] leading-[1.2] font-semibold tracking-[-0.02em];
+  .text-card-label {
+    @apply text-[11px] md:text-[12px] uppercase tracking-wider opacity-80 font-medium;
   }
-  /* Hero Title: 48-56px, weight 600 */
-  .text-step-5, .text-hero {
-    @apply text-[48px] md:text-[56px] leading-[1.1] font-semibold tracking-[-0.03em];
+  .text-status-badge {
+    @apply text-[10px] md:text-[11px] uppercase tracking-widest font-medium;
+  }
+  .text-body-text {
+    @apply text-[14px] md:text-[16px] leading-[1.6] max-w-[70ch] font-normal text-white/90;
+  }
+  .text-helper-text {
+    @apply text-[12px] md:text-[13px] leading-[1.5] text-muted-foreground font-normal;
+  }
+  .text-evidence-quote {
+    @apply text-[14px] md:text-[15px] italic border-l-2 pl-4 text-white/80 font-normal;
   }
 
   /* Structural/Visual Base */
