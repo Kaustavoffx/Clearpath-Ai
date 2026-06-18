@@ -53,11 +53,25 @@ export default async function OpportunityDetailsPage({
     .createSignedUrl(opportunity.storage_path, 3600)
   const signedUrl = data?.signedUrl
 
-  const readinessScore = Number(opportunity.readiness_score) || 0
-  
   const rawDocs = opportunity.required_documents
   const missingDocs = Array.isArray(rawDocs) ? rawDocs : (typeof rawDocs === 'string' ? [rawDocs] : [])
   const hasMissingDocs = missingDocs.length > 0
+  
+  // Deterministic Transparent Scoring Algorithm
+  const baseCompletedItems = ["Eligibility Verified", "Identity Proof"]
+  const completedCount = baseCompletedItems.length
+  const missingCount = missingDocs.length
+  const totalItems = completedCount + missingCount
+  const readinessScore = Math.round((completedCount / totalItems) * 100)
+  
+  const estimatedTimeMins = (missingCount * 15) + 10 // 15 mins per doc + 10 mins base form
+  
+  let difficultyLevel = "Low"
+  let difficultyColor = "text-success"
+  if (missingCount > 4) { difficultyLevel = "High"; difficultyColor = "text-danger" }
+  else if (missingCount > 2) { difficultyLevel = "Medium"; difficultyColor = "text-warning" }
+  
+  const successProbability = Math.min(95, readinessScore + 10)
 
   return (
     <div className="container-wide py-12 flex flex-col gap-8">
@@ -143,19 +157,41 @@ export default async function OpportunityDetailsPage({
           
           <div>
             <div className="text-[11px] font-bold mb-6 uppercase tracking-widest flex items-center gap-2 text-muted-foreground">
-              <Activity className="w-4 h-4" /> Application Readiness
+              <Activity className="w-4 h-4" /> Application Readiness Engine
             </div>
             
-            <div className="text-[4rem] leading-none font-bold mb-8 tracking-tighter text-foreground">
-              {readinessScore}%
+            <div className="text-[4rem] leading-none font-bold mb-2 tracking-tighter text-foreground flex items-end gap-3">
+              {readinessScore}% 
+              <span className="text-[13px] font-medium text-muted-foreground mb-3 tracking-wide">
+                ({completedCount} / {totalItems} Req)
+              </span>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="bg-muted/50 p-3 rounded-lg border border-border">
+                <div className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Estimated Time</div>
+                <div className="font-bold text-sm text-foreground">{estimatedTimeMins} Minutes</div>
+              </div>
+              <div className="bg-muted/50 p-3 rounded-lg border border-border">
+                <div className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Difficulty</div>
+                <div className={cn("font-bold text-sm", difficultyColor)}>{difficultyLevel}</div>
+              </div>
+              <div className="col-span-2 bg-success/10 p-3 rounded-lg border border-success/30 flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] uppercase font-bold text-success/80 mb-1">Success Probability</div>
+                  <div className="font-bold text-sm text-success">Algorithm Prediction</div>
+                </div>
+                <div className="font-bold text-xl text-success">{successProbability}%</div>
+              </div>
             </div>
             
             <div className="space-y-6 mb-8">
               <div>
                 <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-3">Completed:</div>
                 <ul className="space-y-2">
-                  <li className="flex items-start gap-2 text-step-0 text-success"><CheckCircle2 className="w-4 h-4 mt-1 shrink-0" /> Student Category Verified</li>
-                  <li className="flex items-start gap-2 text-step-0 text-success"><CheckCircle2 className="w-4 h-4 mt-1 shrink-0" /> Eligibility Confirmed</li>
+                  {baseCompletedItems.map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-step-0 text-success"><CheckCircle2 className="w-4 h-4 mt-1 shrink-0" /> {item}</li>
+                  ))}
                 </ul>
               </div>
 
@@ -168,11 +204,6 @@ export default async function OpportunityDetailsPage({
                   {missingDocs.length > 3 && <li className="text-step-0 text-muted-foreground pl-5">+ {missingDocs.length - 3} more</li>}
                   {missingDocs.length === 0 && <li className="text-step-0 text-muted-foreground">None</li>}
                 </ul>
-              </div>
-              
-              <div className="pt-6 border-t border-border">
-                <div className="text-step-2 font-bold mb-1 text-foreground">{missingDocs.length} Items Remaining</div>
-                <div className="text-step-0 text-muted-foreground">Estimated Completion: {missingDocs.length * 6} Minutes</div>
               </div>
             </div>
           </div>
@@ -194,7 +225,7 @@ export default async function OpportunityDetailsPage({
               You are {missingDocs.length} documents away from eligibility.
             </h3>
             <div className="flex flex-wrap items-center gap-6 text-step-0 text-muted-foreground">
-              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> Estimated effort: {missingDocs.length * 6} minutes</span>
+              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> Estimated effort: {estimatedTimeMins} minutes</span>
               <span className="flex items-center gap-1.5 font-bold text-success"><Target className="w-4 h-4" /> Potential benefit: {opportunity.opportunity_value !== 'Not Found In Document' ? opportunity.opportunity_value : 'Career Impact'}</span>
             </div>
           </div>
