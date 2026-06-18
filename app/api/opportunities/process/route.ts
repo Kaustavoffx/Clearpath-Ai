@@ -172,14 +172,36 @@ export async function POST(request: Request) {
       required_documents: z.any().optional(),
       opportunity_value: z.string().optional(),
       opportunity_loss_analysis: z.string().optional(),
-      readiness_score: z.number().optional(),
-      risk_score: z.number().optional(),
-      confidence_score: z.number().optional(),
+      readiness_score: z.coerce.number().optional(),
+      risk_score: z.coerce.number().optional(),
+      confidence_score: z.coerce.number().optional(),
+      funding_amount: z.coerce.number().optional(),
+      urgency_score: z.coerce.number().optional(),
+      deadline_days_remaining: z.coerce.number().optional(),
       evidence_references: z.any().optional(),
       action_checklist: z.array(z.any()).optional(),
     }).passthrough()
 
-    const aiResult = aiResponseSchema.parse(rawAiResult)
+    const parsedAiResult = aiResponseSchema.safeParse(rawAiResult)
+    
+    if (!parsedAiResult.success) {
+      logger.error({ 
+        errors: parsedAiResult.error.flatten(), 
+        rawGeminiResponse: rawAiResult 
+      }, 'Failed to validate Gemini response schema')
+      
+      return NextResponse.json({ 
+        error: 'The AI generated an invalid response format.', 
+        details: parsedAiResult.error.flatten() 
+      }, { status: 422 })
+    }
+
+    const aiResult = parsedAiResult.data
+
+    logger.info({ 
+      rawGeminiResponse: rawAiResult, 
+      parsedGeminiResponse: aiResult 
+    }, 'Successfully parsed and validated Gemini response')
 
     const rawCategory = aiResult.category || 'Unknown'
     const normalizedCategory = rawCategory.toUpperCase().trim()
