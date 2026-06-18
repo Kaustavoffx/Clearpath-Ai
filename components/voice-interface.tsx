@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { VoiceOrb } from '@/components/ui/voice-orb'
 import { toast } from 'sonner'
 import { UploadWidget } from '@/components/opportunities/upload-widget'
+import { useRouter } from 'next/navigation'
 
 export function VoiceInterface() {
   const [isListening, setIsListening] = useState(false)
@@ -12,6 +13,7 @@ export function VoiceInterface() {
   const [transcript, setTranscript] = useState("")
   const [aiResponse, setAiResponse] = useState("")
   const [documentContext, setDocumentContext] = useState<string | null>(null)
+  const router = useRouter()
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
@@ -170,9 +172,12 @@ export function VoiceInterface() {
          <p className="text-xs text-center text-muted-foreground mb-2">Drag and drop a document here to analyze</p>
          <UploadWidget 
             onUploadComplete={(id) => {
+              console.log('opportunityId:', id)
+              console.log('Navigation event: Navigating to', `/opportunities/${id}`)
               toast.success("Document cached for voice analysis.")
               // In a real app, we'd fetch the document text here to populate context.
               setDocumentContext("Document ID: " + id + " has been uploaded.")
+              router.push(`/opportunities/${id}`)
             }} 
          />
       </div>

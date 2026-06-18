@@ -80,10 +80,14 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
 
       const result = await response.json()
 
+      console.log('API response:', result)
+      console.log('opportunityId:', result.id)
+
       toast.success('Analysis complete!', { id: toastId })
       if (onUploadComplete) {
         onUploadComplete(result.id)
       } else {
+        console.log('Navigation event: Navigating to', `/opportunities/${result.id}`)
         router.push(`/opportunities/${result.id}`)
       }
       

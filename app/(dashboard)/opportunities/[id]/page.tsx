@@ -38,6 +38,10 @@ export default async function OpportunityDetailsPage({
     .eq('id', id)
     .single()
 
+  console.log('Result fetch - id:', id)
+  console.log('Result fetch - error:', error)
+  console.log('Result fetch - opportunity exists:', !!opportunity)
+
   if (error || !opportunity) {
     notFound()
   }
