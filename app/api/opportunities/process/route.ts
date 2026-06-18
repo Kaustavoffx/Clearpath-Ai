@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { rateLimit } from '@/lib/security/rate-limit'
 import { logger } from '@/lib/logger'
 import { env } from '@/lib/env'
-import DOMPurify from 'isomorphic-dompurify'
+import sanitizeHtml from 'sanitize-html'
 
 // Input Validation Schema
 const processRequestSchema = z.object({
@@ -159,10 +159,11 @@ export async function POST(request: Request) {
     const aiResult = JSON.parse(responseText)
 
     // 5. Output Sanitization (XSS Protection)
-    const sanitizedTitle = DOMPurify.sanitize(aiResult.title || 'Unknown Opportunity', { ALLOWED_TAGS: [] })
-    const sanitizedSummary = DOMPurify.sanitize(aiResult.plain_language_summary || '', { ALLOWED_TAGS: [] })
-    const sanitizedValue = DOMPurify.sanitize(aiResult.opportunity_value || '', { ALLOWED_TAGS: [] })
-    const sanitizedLoss = DOMPurify.sanitize(aiResult.opportunity_loss_analysis || '', { ALLOWED_TAGS: [] })
+    const sanitizeOptions = { allowedTags: [], allowedAttributes: {} }
+    const sanitizedTitle = sanitizeHtml(aiResult.title || 'Unknown Opportunity', sanitizeOptions)
+    const sanitizedSummary = sanitizeHtml(aiResult.plain_language_summary || '', sanitizeOptions)
+    const sanitizedValue = sanitizeHtml(aiResult.opportunity_value || '', sanitizeOptions)
+    const sanitizedLoss = sanitizeHtml(aiResult.opportunity_loss_analysis || '', sanitizeOptions)
 
     // 6. Save to Database securely
     const { data: oppRecord, error: oppError } = await supabase
@@ -197,8 +198,8 @@ export async function POST(request: Request) {
       const stepsToInsert = aiResult.action_checklist.map((step: { step_number: number, title: string, description: string }) => ({
         opportunity_id: oppRecord.id,
         step_number: step.step_number,
-        title: DOMPurify.sanitize(step.title, { ALLOWED_TAGS: [] }),
-        description: DOMPurify.sanitize(step.description, { ALLOWED_TAGS: [] }),
+        title: sanitizeHtml(step.title, sanitizeOptions),
+        description: sanitizeHtml(step.description, sanitizeOptions),
         status: 'PENDING'
       }))
 
