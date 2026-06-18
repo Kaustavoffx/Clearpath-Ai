@@ -23,9 +23,9 @@ export function ReadinessRing({ score, size = 120, strokeWidth = 12, className }
   const circumference = radius * 2 * Math.PI
   const strokeDashoffset = circumference - (progress / 100) * circumference
 
-  let colorClass = "text-emerald-500"
-  if (score < 50) colorClass = "text-rose-500"
-  else if (score < 80) colorClass = "text-amber-500"
+  let colorClass = "text-success"
+  if (score < 50) colorClass = "text-danger"
+  else if (score < 80) colorClass = "text-warning"
 
   return (
     <div className={cn("relative flex items-center justify-center", className)} style={{ width: size, height: size }}>

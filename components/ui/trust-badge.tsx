@@ -12,8 +12,8 @@ interface TrustBadgeProps {
 
 export function TrustBadge({ variant, title, description, className }: TrustBadgeProps) {
   const icons = {
-    security: <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />,
-    guarantee: <CheckCircle2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />,
+    security: <Lock className="w-4 h-4 text-success" />,
+    guarantee: <CheckCircle2 className="w-4 h-4 text-primary" />,
     privacy: <ShieldCheck className="w-4 h-4 text-primary" />
   }
 

@@ -18,20 +18,20 @@ export function VoiceOrb({ isListening, isProcessing, isSpeaking, onToggleListen
   let icon = <Mic className="w-8 h-8 text-primary" />
   
   if (isListening) {
-    stateClass = "border-red-500/50 shadow-[0_0_60px_rgba(239,68,68,0.4)] scale-110 animate-pulse"
-    icon = <Mic className="w-8 h-8 text-red-500 animate-bounce" />
+    stateClass = "border-danger/50 shadow-[0_0_80px_rgba(213,138,58,0.5)]"
+    icon = <Mic className="w-8 h-8 text-danger animate-pulse" />
   } else if (isProcessing) {
-    stateClass = "border-amber-500/50 shadow-[0_0_60px_rgba(245,158,11,0.4)]"
-    icon = <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
+    stateClass = "border-warning/50 shadow-[0_0_60px_rgba(213,138,58,0.4)]"
+    icon = <Loader2 className="w-8 h-8 text-warning animate-spin" />
   } else if (isSpeaking) {
-    stateClass = "border-emerald-500/50 shadow-[0_0_80px_rgba(16,185,129,0.5)] scale-105"
+    stateClass = "border-primary/50 shadow-[0_0_80px_rgba(232,235,104,0.5)] scale-105"
     // We could put a waveform here, but an icon is simpler for now
     icon = (
       <div className="flex items-end justify-center gap-1 h-8">
-        <div className="w-1.5 bg-emerald-500 rounded-full animate-[bounce_1s_infinite_100ms] h-full" />
-        <div className="w-1.5 bg-emerald-500 rounded-full animate-[bounce_1s_infinite_300ms] h-4/5" />
-        <div className="w-1.5 bg-emerald-500 rounded-full animate-[bounce_1s_infinite_200ms] h-full" />
-        <div className="w-1.5 bg-emerald-500 rounded-full animate-[bounce_1s_infinite_400ms] h-3/5" />
+        <div className="w-1.5 bg-primary rounded-full animate-[bounce_1s_infinite_100ms] h-full" />
+        <div className="w-1.5 bg-primary rounded-full animate-[bounce_1s_infinite_300ms] h-4/5" />
+        <div className="w-1.5 bg-primary rounded-full animate-[bounce_1s_infinite_200ms] h-full" />
+        <div className="w-1.5 bg-primary rounded-full animate-[bounce_1s_infinite_400ms] h-3/5" />
       </div>
     )
   }
@@ -41,9 +41,9 @@ export function VoiceOrb({ isListening, isProcessing, isSpeaking, onToggleListen
       {/* Outer Glow / Ripple Effect */}
       <div className={cn(
         "absolute inset-0 rounded-full transition-all duration-700 ease-in-out opacity-50 blur-xl",
-        isListening ? "bg-red-500/30 scale-150" : 
-        isProcessing ? "bg-amber-500/30 scale-110" : 
-        isSpeaking ? "bg-emerald-500/40 scale-150" : 
+        isListening ? "bg-danger/30 scale-150" : 
+        isProcessing ? "bg-warning/30 scale-110" : 
+        isSpeaking ? "bg-primary/40 scale-150" : 
         "bg-primary/20 scale-100 group-hover:scale-110"
       )} />
       
