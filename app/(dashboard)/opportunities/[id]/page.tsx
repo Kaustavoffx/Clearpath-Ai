@@ -8,6 +8,8 @@ import Link from "next/link"
 import { StressTranslator } from "@/components/ui/stress-translator"
 import { cn } from "@/lib/utils"
 import { DecisionCard } from "@/components/ui/decision-card"
+import { HumanReviewAction } from "@/components/opportunities/human-review-action"
+import { ShieldAlert } from "lucide-react"
 
 import { Metadata } from "next"
 
@@ -72,6 +74,12 @@ export default async function OpportunityDetailsPage({
           <Bug className="w-3 h-3" />
           {isJudgeMode ? "Viewing Impact Narrative" : "Why This Matters"}
         </Link>
+      </div>
+
+      {/* RAI WARNING BANNER */}
+      <div className="bg-warning/10 border border-warning/30 text-warning px-4 py-3 rounded-lg flex items-center justify-center gap-3 text-sm font-medium shadow-elevation-1">
+        <ShieldAlert className="w-5 h-5 shrink-0" />
+        <span><strong>Verify Before Acting:</strong> This action plan is AI-generated. Always verify deadlines and requirements against the official source document.</span>
       </div>
 
       {/* TOP SECTION: Hero & Readiness */}
@@ -191,9 +199,7 @@ export default async function OpportunityDetailsPage({
             </div>
           </div>
         </div>
-        <Button className="shrink-0 h-14 px-8 text-step-1 font-bold shadow-elevation-2">
-          Apply Now <ArrowRight className="w-5 h-5 ml-2" />
-        </Button>
+        <HumanReviewAction />
       </div>
 
       {/* NEW TABS SYSTEM: Explain / Do / Miss */}
@@ -354,52 +360,107 @@ export default async function OpportunityDetailsPage({
           </div>
         </TabsContent>
 
-        {/* EVIDENCE / SOURCE TAB */}
+        {/* EVIDENCE / SOURCE TAB (Responsible AI Panel) */}
         <TabsContent value="evidence" className="pt-4 outline-none animate-in fade-in duration-500">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 h-[700px]">
-            <div className="lg:col-span-1 space-y-6 overflow-y-auto pr-4">
-              <h2 className="text-step-3 sticky top-0 bg-background/90 py-4 z-10">Evidence & Trust Layer</h2>
-              <p className="text-step-1 text-muted-foreground mb-8">Every AI claim is strictly backed by the document.</p>
+          <div className="mb-8 p-6 border border-border rounded-xl bg-muted/30">
+            <div className="flex items-center gap-3 mb-6">
+              <ShieldAlert className="w-6 h-6 text-foreground" />
+              <h2 className="text-step-2 font-bold tracking-tight">Responsible AI Declaration</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div>
+                <h3 className="text-[11px] uppercase font-bold tracking-wider text-muted-foreground mb-2">Overall AI Confidence</h3>
+                <div className="flex items-end gap-2">
+                  <span className="text-step-4 font-bold leading-none text-success">{opportunity.confidence_score || 85}%</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">Based on document clarity, formatting, and explicit language detection.</p>
+              </div>
+              <div>
+                <h3 className="text-[11px] uppercase font-bold tracking-wider text-warning mb-2">AI Limitations</h3>
+                <ul className="text-xs text-muted-foreground space-y-2 list-disc pl-4">
+                  <li>Cannot make legal or financial guarantees.</li>
+                  <li>May miss unstated or implied dependencies.</li>
+                  <li>Deadlines may change post-publication without notice.</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-[11px] uppercase font-bold tracking-wider text-danger mb-2">Potential Errors</h3>
+                <ul className="text-xs text-muted-foreground space-y-2 list-disc pl-4">
+                  <li>Hallucinated eligibility criteria.</li>
+                  <li>Misinterpreted required document lists.</li>
+                  <li>Ignored critical footnotes or fine print.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 h-[700px]">
+            <div className="lg:col-span-1 space-y-6 overflow-y-auto pr-4 pb-12">
+              <h2 className="text-step-3 sticky top-0 bg-background/90 py-4 z-10 border-b border-border mb-4">Evidence Matrix</h2>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {Array.isArray(opportunity.evidence_references) && opportunity.evidence_references.length > 0 ? (
-                  opportunity.evidence_references.map((ref: { claim: string, quote_from_document: string }, i: number) => (
-                    <div key={i} className="decision-surface p-6">
-                      <div className="font-bold text-step-0 mb-4">{ref.claim}</div>
-                      <div className="decision-surface-muted p-4">
-                        <p className="text-[13px] font-mono text-muted-foreground leading-relaxed italic">
-                          &quot;{ref.quote_from_document}&quot;
-                        </p>
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  opportunity.evidence_references.map((ref: any, i: number) => {
+                    const isMissing = !ref.quote_from_document || ref.quote_from_document === 'Not Found In Document'
+                    return (
+                      <div key={i} className={cn("decision-surface p-6 border-l-4", isMissing ? "border-l-danger bg-danger/5" : "border-l-success")}>
+                        <div className="flex justify-between items-start mb-4 gap-4">
+                          <div className="font-bold text-step-0">{ref.claim}</div>
+                          {isMissing && <Badge variant="destructive" className="shrink-0 text-[10px] uppercase tracking-wider font-bold">Unverified</Badge>}
+                        </div>
+                        
+                        <div className="space-y-4">
+                          <div className={cn("p-4 rounded-md text-[13px] font-mono leading-relaxed", isMissing ? "bg-danger/10 text-danger italic" : "bg-muted text-muted-foreground")}>
+                            {isMissing ? "⚠ AI could not find an explicit quote to back this claim in the text." : `"${ref.quote_from_document}"`}
+                          </div>
+                          
+                          <div className="flex gap-4 pt-4 border-t border-border">
+                            <div className="flex-1">
+                              <div className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Confidence</div>
+                              <div className={cn("text-xs font-bold", (ref.confidence_score || 0) < 70 ? "text-warning" : "text-success")}>
+                                {ref.confidence_score || (isMissing ? 0 : 80)}%
+                              </div>
+                            </div>
+                            <div className="flex-1 border-l border-border pl-4">
+                              <div className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Risk if wrong</div>
+                              <div className="text-xs text-muted-foreground leading-tight">{ref.risk_assessment || "Unknown risk. Verify manually."}</div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    )
+                  })
                 ) : (
-                  <div className="p-8 text-center text-muted-foreground border border-dashed rounded-xl text-step-0">
+                  <div className="p-8 text-center text-muted-foreground border border-dashed border-border rounded-xl text-step-0">
                     No specific quotes extracted.
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="lg:col-span-2 decision-surface h-full">
-              {signedUrl ? (
-                <iframe 
-                  src={signedUrl} 
-                  className="w-full h-full border-0 bg-white" 
-                  title="Document Evidence"
-                />
-              ) : opportunity.storage_path?.startsWith('http') ? (
-                <iframe 
-                  src={opportunity.storage_path} 
-                  className="w-full h-full border-0 bg-white" 
-                  title="URL Evidence"
-                />
-              ) : (
-                <div className="flex flex-col h-full items-center justify-center text-muted-foreground gap-4 bg-muted/20">
-                  <BookOpen className="w-12 h-12 opacity-20" />
-                  <p className="text-step-1">Document viewer unavailable</p>
-                </div>
-              )}
+            <div className="lg:col-span-1 decision-surface h-full flex flex-col overflow-hidden">
+              <div className="p-4 border-b border-border font-bold text-sm bg-muted/30 uppercase tracking-widest text-muted-foreground flex items-center justify-center">Official Source Document</div>
+              <div className="flex-1 bg-white">
+                {signedUrl ? (
+                  <iframe 
+                    src={signedUrl} 
+                    className="w-full h-full border-0" 
+                    title="Document Evidence"
+                  />
+                ) : opportunity.storage_path?.startsWith('http') ? (
+                  <iframe 
+                    src={opportunity.storage_path} 
+                    className="w-full h-full border-0" 
+                    title="URL Evidence"
+                  />
+                ) : (
+                  <div className="flex flex-col h-full items-center justify-center text-muted-foreground gap-4 bg-muted/20">
+                    <BookOpen className="w-12 h-12 opacity-20" />
+                    <p className="text-step-1">Document viewer unavailable</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </TabsContent>

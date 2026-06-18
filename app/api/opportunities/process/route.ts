@@ -125,7 +125,12 @@ export async function POST(request: Request) {
         "risk_score": "Integer 0-100",
         "confidence_score": "Integer 0-100, your confidence in the extraction based on document clarity",
         "evidence_references": [
-          { "claim": "String", "quote_from_document": "String" }
+          {
+            "claim": "String, what the AI is claiming",
+            "quote_from_document": "String, exact verbatim quote from the text supporting the claim (use 'Not Found In Document' if not explicitly stated)",
+            "confidence_score": "Integer 0-100, your confidence in this specific claim based on the source quote",
+            "risk_assessment": "String, what happens to the user if this specific AI claim is wrong (e.g., 'Application rejected instantly', 'User misses deadline')"
+          }
         ],
         "action_checklist": [
           { "step_number": 1, "title": "String", "description": "String" }
@@ -196,7 +201,12 @@ export async function POST(request: Request) {
       funding_amount: z.coerce.number().catch(0),
       urgency_score: z.coerce.number().catch(0),
       deadline_days_remaining: z.coerce.number().catch(-1),
-      evidence_references: z.array(z.any()).catch([]),
+      evidence_references: z.array(z.object({
+        claim: z.string().catch("Unknown Claim"),
+        quote_from_document: z.string().catch("Not Found In Document"),
+        confidence_score: z.coerce.number().catch(0),
+        risk_assessment: z.string().catch("Unknown Risk")
+      })).catch([]),
       action_checklist: z.array(z.any()).catch([]),
     }).passthrough()
 
