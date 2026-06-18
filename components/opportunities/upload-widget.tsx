@@ -3,6 +3,7 @@
 import React, { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { UploadCloud, File, X, Link as LinkIcon } from 'lucide-react'
+import { getStudentProfile } from '@/lib/profile-store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
@@ -64,6 +65,10 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
       } else {
         payload = { url }
       }
+
+      // Inject profile into payload
+      const profile = getStudentProfile()
+      payload.profile = profile
 
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 35000)

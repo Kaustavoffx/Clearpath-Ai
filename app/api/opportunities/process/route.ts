@@ -12,6 +12,14 @@ import { extractJsonFromGeminiResponse } from '@/lib/utils'
 const processRequestSchema = z.object({
   filePath: z.string().min(1).optional(),
   url: z.string().url().optional(),
+  profile: z.object({
+    name: z.string().optional(),
+    gradeLevel: z.string().optional(),
+    state: z.string().optional(),
+    incomeRange: z.string().optional(),
+    category: z.string().optional(),
+    careerInterest: z.string().optional(),
+  }).optional()
 }).refine(data => data.filePath || data.url, {
   message: "Either filePath or url must be provided"
 });
@@ -26,7 +34,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid input payload' }, { status: 400 })
     }
 
-    const { filePath, url } = parsedBody.data
+    const { filePath, url, profile } = parsedBody.data
 
     const supabase = await createClient()
 
@@ -94,9 +102,25 @@ export async function POST(request: Request) {
     // 4. Prompt Injection Protection & Execution
     const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY })
 
+    const profileContext = profile ? `
+      IMPORTANT - STUDENT PROFILE CONTEXT:
+      - Grade/Academic Status: ${profile.gradeLevel || 'Unknown'}
+      - State/Region: ${profile.state || 'Unknown'}
+      - Income Range: ${profile.incomeRange || 'Unknown'}
+      - Social Category: ${profile.category || 'Unknown'}
+      - Career Interest: ${profile.careerInterest || 'Unknown'}
+      
+      When extracting "eligibility_analysis.requirements", you MUST cross-reference each document requirement against the Student Profile Context above.
+      Prefix every requirement with either "[MATCHED]" if the student clearly meets it, or "[MISMATCH]" if they clearly do not meet it. If ambiguous, prefix with "[MISMATCH]".
+      Append a brief reason to the string.
+      Example: "[MATCHED] Income below ₹2.5L (Student: ${profile.incomeRange || 'Unknown'})"
+      Example: "[MISMATCH] Must be Class 11 (Student: ${profile.gradeLevel || 'Unknown'})"
+    ` : ''
+
     const prompt = `
       You are an expert, highly precise educational consultant AI.
       Analyze the provided document (or text extracted from a URL) and extract structured information.
+      ${profileContext}
       
       CRITICAL RULES:
       - NEVER hallucinate or guess.

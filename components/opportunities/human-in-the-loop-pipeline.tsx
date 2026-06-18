@@ -2,20 +2,17 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { CheckCircle2, ShieldAlert, FileText, UserCheck, ArrowRight, Activity, Lock, Unlock } from 'lucide-react'
+import { ShieldAlert, FileText, UserCheck, ArrowRight, Activity, Lock, Unlock } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ApplicationAssistant } from './application-assistant'
 
-export function HumanInTheLoopPipeline({ checklist }: { checklist: { title: string, description: string }[] }) {
+export function HumanInTheLoopPipeline({ checklist, missingDocs = [] }: { checklist: { title: string, description: string }[], missingDocs?: string[] }) {
   const [currentStep, setCurrentStep] = useState(1)
   const [hasAcknowledgedEvidence, setHasAcknowledgedEvidence] = useState(false)
   const [hasConfirmed, setHasConfirmed] = useState(false)
 
   const handleNextStep = () => {
     if (currentStep < 4) setCurrentStep(prev => prev + 1)
-  }
-
-  const handleApply = () => {
-    alert("Redirecting to official application portal...")
   }
 
   return (
@@ -156,16 +153,8 @@ export function HumanInTheLoopPipeline({ checklist }: { checklist: { title: stri
         )}
 
         {currentStep === 4 && (
-          <div className="animate-in fade-in slide-in-from-right-4 duration-500 flex flex-col items-center justify-center h-full min-h-[300px] text-center">
-             <div className="w-20 h-20 bg-success/20 rounded-full flex items-center justify-center mb-6">
-               <CheckCircle2 className="w-10 h-10 text-success" />
-             </div>
-             <h2 className="text-step-4 font-bold tracking-tight mb-4">Pipeline Unlocked</h2>
-             <p className="text-step-1 text-muted-foreground mb-8 max-w-[400px]">You have successfully verified the AI output and taken human control of the process. You may now proceed.</p>
-             
-             <Button onClick={handleApply} className="h-16 px-12 text-step-2 font-bold shadow-elevation-2 bg-success hover:bg-success/90 text-success-foreground">
-               Execute Final Action <ArrowRight className="w-6 h-6 ml-2" />
-             </Button>
+          <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+            <ApplicationAssistant missingDocs={missingDocs} />
           </div>
         )}
 

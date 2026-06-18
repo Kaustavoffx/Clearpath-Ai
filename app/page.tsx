@@ -1,4 +1,4 @@
-import { Sparkles, ArrowRight, CheckCircle2, FileWarning, ShieldAlert, Cpu, Target, Award, Bug } from "lucide-react"
+import { Sparkles, ArrowRight, CheckCircle2, FileWarning, ShieldAlert, Cpu, Target, Award, Bug, X } from "lucide-react"
 import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -110,6 +110,69 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* 3.5 WHY NOT CHATGPT? */}
+        <section className="container-standard mb-32">
+          <div className="text-center mb-16">
+            <h2 className="text-step-4 font-bold tracking-tight mb-4">&quot;Why not just use ChatGPT?&quot;</h2>
+            <p className="text-step-1 text-muted-foreground max-w-[600px] mx-auto">
+              Because generic chatbots don&apos;t solve bureaucratic friction. They just summarize text. We built a deterministic action pipeline.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[900px] mx-auto">
+            {/* ChatGPT Column */}
+            <div className="decision-surface p-8 border-t-2 border-t-muted bg-muted/10 opacity-70">
+              <h3 className="text-step-2 font-bold mb-6 text-center text-muted-foreground">Standard Chatbots</h3>
+              <ul className="space-y-4">
+                <li className="flex items-center gap-3 text-step-0 text-muted-foreground">
+                  <X className="w-5 h-5 shrink-0" /> Requires prompt engineering
+                </li>
+                <li className="flex items-center gap-3 text-step-0 text-muted-foreground">
+                  <X className="w-5 h-5 shrink-0" /> Open-ended generic answers
+                </li>
+                <li className="flex items-center gap-3 text-step-0 text-muted-foreground">
+                  <X className="w-5 h-5 shrink-0" /> No Readiness Score
+                </li>
+                <li className="flex items-center gap-3 text-step-0 text-muted-foreground">
+                  <X className="w-5 h-5 shrink-0" /> No Evidence Matrix
+                </li>
+                <li className="flex items-center gap-3 text-step-0 text-muted-foreground">
+                  <X className="w-5 h-5 shrink-0" /> No Action Execution Layer
+                </li>
+              </ul>
+            </div>
+
+            {/* ClearPath Column */}
+            <div className="decision-surface p-8 border-t-2 border-t-primary shadow-elevation-2 relative">
+              <div className="absolute -top-3 right-4 px-3 py-1 bg-primary text-background text-[10px] font-bold uppercase tracking-widest rounded-full">
+                Winner
+              </div>
+              <h3 className="text-step-2 font-bold mb-6 text-center text-primary">ClearPath OS</h3>
+              <ul className="space-y-4">
+                <li className="flex items-center gap-3 text-step-0 font-medium">
+                  <CheckCircle2 className="w-5 h-5 text-primary shrink-0" /> Automatic deterministic extraction
+                </li>
+                <li className="flex items-center gap-3 text-step-0 font-medium">
+                  <CheckCircle2 className="w-5 h-5 text-primary shrink-0" /> Mathematical Readiness Engine
+                </li>
+                <li className="flex items-center gap-3 text-step-0 font-medium">
+                  <CheckCircle2 className="w-5 h-5 text-primary shrink-0" /> Missing Documents Detection
+                </li>
+                <li className="flex items-center gap-3 text-step-0 font-medium">
+                  <CheckCircle2 className="w-5 h-5 text-primary shrink-0" /> Opportunity Loss Simulator
+                </li>
+                <li className="flex items-center gap-3 text-step-0 font-medium">
+                  <CheckCircle2 className="w-5 h-5 text-primary shrink-0" /> Explicit Evidence Verification
+                </li>
+                <li className="flex items-center gap-3 text-step-0 font-medium">
+                  <CheckCircle2 className="w-5 h-5 text-primary shrink-0" /> Student Action Timeline
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
 
         {/* 4. RESPONSIBLE AI (THE STAR FEATURE) */}
         <section className="container-standard mb-32">

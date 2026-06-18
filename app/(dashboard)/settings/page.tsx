@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { revalidatePath } from "next/cache"
 import { UserCircle, Settings2, Sparkles } from "lucide-react"
+import { ProfileForm } from "@/components/profile/profile-form"
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -117,6 +118,9 @@ export default async function SettingsPage() {
           </div>
         </form>
       </div>
+
+      {/* New Local AI Context Profile Form */}
+      <ProfileForm />
     </div>
   )
 }

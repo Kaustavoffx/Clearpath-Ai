@@ -3,8 +3,12 @@ import { createClient } from '@/lib/supabase/server'
 import { rateLimit } from '@/lib/security/rate-limit'
 import { logger } from '@/lib/logger'
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    const rawBody = await request.json().catch(() => ({}))
+    const type = rawBody.type || 'scholarship'
+    const profile = rawBody.profile || {}
+    
     const supabase = await createClient()
 
     // 1. Authentication
@@ -14,20 +18,20 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // 2. Rate Limiting (Prevent DB spamming: 3 demo creations per minute)
-    const rateLimitResult = await rateLimit(`demo_api_${user.id}`, 3, 60000)
+    // 2. Rate Limiting
+    const rateLimitResult = await rateLimit(`demo_api_${user.id}`, 10, 60000)
     if (!rateLimitResult.success) {
       logger.warn({ userId: user.id }, 'Demo rate limit exceeded')
-      return NextResponse.json({ error: 'Too Many Requests. Please wait a minute before trying again.' }, { status: 429 })
+      return NextResponse.json({ error: 'Too Many Requests.' }, { status: 429 })
     }
 
-    logger.info({ userId: user.id }, 'Generating demo opportunity')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let oppData: any = {}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let stepsData: any[] = []
 
-    // Generate a realistic, highly complex demo opportunity
-    const { data: oppRecord, error: oppError } = await supabase
-      .from('opportunities')
-      .insert({
-        user_id: user.id,
+    if (type === 'scholarship') {
+      oppData = {
         title: 'National Merit STEM Scholarship & Apprenticeship Program 2026',
         category: 'SCHOLARSHIP',
         storage_path: 'demo-documents/national-merit-stem.pdf',
@@ -35,56 +39,100 @@ export async function POST() {
         deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
         eligibility_analysis: {
           requirements: [
-            "Current high school junior or senior",
-            "Minimum unweighted GPA of 3.8",
-            "Demonstrated leadership in STEM (e.g., Robotics Club, Science Olympiad)",
-            "US Citizen or Permanent Resident"
+            `[MATCHED] Current high school junior or senior (Student: ${profile.gradeLevel || 'Unknown'})`,
+            `[MISMATCH] Minimum unweighted GPA of 3.8 (Student: Not specified)`,
+            `[MATCHED] US Citizen or Permanent Resident (Student: Assumed)`
           ],
           is_student_eligible_by_default: null
         },
-        required_documents: [
-          "Official High School Transcript",
-          "3 Letters of Recommendation (2 from STEM teachers)",
-          "Personal Statement (1000 words)",
-          "Proof of US Citizenship"
-        ],
+        required_documents: ["Official High School Transcript", "3 Letters of Recommendation", "Personal Statement"],
         opportunity_value: "$40,000 over 4 years + Internship Stipend",
-        opportunity_loss_prediction: "Missing this opportunity means losing out on $40,000 in college funding and a direct pipeline to top-tier tech internships, which could significantly impact your early career trajectory.",
+        opportunity_loss_prediction: "Missing this means losing out on $40,000 in college funding.",
         readiness_score: 35,
-        risk_score: 85,
         confidence_score: 95,
-        risk_analysis: {
-          risks: [
-            "Requires 3 separate recommendation letters, which take time to coordinate.",
-            "Personal statement has a strict 1000-word limit and requires multiple drafts.",
-            "Highly competitive: historic acceptance rate is < 5%."
-          ],
-          complexity: "HIGH"
-        },
         evidence_references: [
-           { claim: "Provides $10,000 per year", quote_from_document: "The scholarship guarantees a $10,000 annual disbursement for up to 4 years." },
-           { claim: "3.8 GPA Required", quote_from_document: "Applicants must hold a minimum unweighted GPA of 3.8 at the time of application." }
-        ],
-        status: 'PROCESSED'
+           { claim: "Provides $10,000 per year", quote_from_document: "The scholarship guarantees a $10,000 annual disbursement." }
+        ]
+      }
+      stepsData = [
+        { step_number: 1, title: "Request Recommendations", description: "Email your AP Math and AP Science teachers." },
+        { step_number: 2, title: "Draft Personal Statement", description: "Write the first draft of your 1000-word essay." },
+        { step_number: 3, title: "Submit Final Application", description: "Upload all documents." }
+      ]
+    } else if (type === 'scheme') {
+      oppData = {
+        title: 'State Digital Empowerment Grant 2026',
+        category: 'SCHEME',
+        storage_path: 'demo-documents/state-digital-grant.pdf',
+        simplified_summary: 'A government scheme providing free laptops to students from lower-income families who are entering college.',
+        deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15).toISOString(),
+        eligibility_analysis: {
+          requirements: [
+            `[MATCHED] State resident for at least 5 years (Student: ${profile.state || 'Unknown'})`,
+            `[MATCHED] Family income below ₹2.5L (Student: ${profile.incomeRange || 'Unknown'})`,
+            `[MISMATCH] Enrolled in a recognized public university (Student: Need proof of enrollment)`
+          ],
+          is_student_eligible_by_default: null
+        },
+        required_documents: ["Income Certificate", "Aadhaar Card", "College Admission Letter"],
+        opportunity_value: "Free Laptop worth ₹45,000",
+        opportunity_loss_prediction: "You will have to purchase a laptop out of pocket for your college studies.",
+        readiness_score: 60,
+        confidence_score: 90,
+        evidence_references: [
+           { claim: "Income must be below ₹2.5L", quote_from_document: "Gross annual family income must not exceed ₹2,50,000." }
+        ]
+      }
+      stepsData = [
+        { step_number: 1, title: "Verify Income Certificate", description: "Ensure your income certificate is valid for the current financial year." },
+        { step_number: 2, title: "Get College Admission Letter", description: "Download the official admission offer letter." },
+        { step_number: 3, title: "Apply on State Portal", description: "Submit the online form with Aadhaar linked." }
+      ]
+    } else if (type === 'circular') {
+      oppData = {
+        title: 'Emergency Circular: Board Exam Center Reallocation',
+        category: 'CIRCULAR',
+        storage_path: 'demo-documents/board-exam-circular.pdf',
+        simplified_summary: 'Due to unforeseen circumstances, the board exam center for District A has been changed. You must download a new admit card before the 15th.',
+        deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5).toISOString(),
+        eligibility_analysis: {
+          requirements: [
+            `[MATCHED] Student appearing for Board Exams (Student: ${profile.gradeLevel || 'Unknown'})`,
+            `[MATCHED] Originally assigned to District A Centers (Student: ${profile.state || 'Unknown'})`
+          ],
+          is_student_eligible_by_default: null
+        },
+        required_documents: ["Old Admit Card", "School ID Card"],
+        opportunity_value: "Exam Access Guarantee",
+        opportunity_loss_prediction: "If you go to the old center, you will not be allowed to sit for the board examination.",
+        readiness_score: 10,
+        confidence_score: 99,
+        evidence_references: [
+           { claim: "Center changed", quote_from_document: "All candidates previously assigned to Center Code 405 must report to Center Code 802." }
+        ]
+      }
+      stepsData = [
+        { step_number: 1, title: "Check Center Code", description: "Look at your current admit card to see if your center code is 405." },
+        { step_number: 2, title: "Download New Admit Card", description: "Visit the board portal and print the revised admit card." },
+        { step_number: 3, title: "Verify New Route", description: "Plan your travel to the new center location 1 day before the exam." }
+      ]
+    }
+
+    const { data: oppRecord, error: oppError } = await supabase
+      .from('opportunities')
+      .insert({
+        user_id: user.id,
+        status: 'PROCESSED',
+        ...oppData
       })
       .select()
       .single()
 
     if (oppError || !oppRecord) {
-      logger.error({ error: oppError }, 'Failed to create demo opportunity')
       throw new Error('Failed to create demo opportunity')
     }
 
-    // Insert realistic action steps
-    const steps = [
-      { step_number: 1, title: "Request Recommendations", description: "Email your AP Math, AP Science, and one other teacher asking for a recommendation letter. Provide them with your resume." },
-      { step_number: 2, title: "Draft Personal Statement", description: "Write the first draft of your 1000-word essay focusing on a time you solved a complex problem." },
-      { step_number: 3, title: "Request Official Transcript", description: "Submit the transcript request form to your high school guidance counselor." },
-      { step_number: 4, title: "Review and Revise Essay", description: "Have your English teacher or counselor review your personal statement for feedback." },
-      { step_number: 5, title: "Final Submission", description: "Upload all documents and submit the final application via the portal." }
-    ]
-
-    const stepsToInsert = steps.map(step => ({
+    const stepsToInsert = stepsData.map(step => ({
       ...step,
       opportunity_id: oppRecord.id,
       status: 'PENDING'
@@ -92,12 +140,10 @@ export async function POST() {
 
     await supabase.from('action_steps').insert(stepsToInsert)
 
-    logger.info({ userId: user.id, demoId: oppRecord.id }, 'Successfully created demo opportunity')
     return NextResponse.json({ id: oppRecord.id })
 
   } catch (error: unknown) {
-    const err = error as Error
-    logger.error({ error: err.message }, 'Fatal Demo Route Error')
+    logger.error({ error }, 'Fatal Demo Route Error')
     return NextResponse.json({ error: 'An unexpected error occurred.' }, { status: 500 })
   }
 }

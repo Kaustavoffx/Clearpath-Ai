@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AlertTriangle, Clock, ArrowRight, Target, CheckCircle2, TrendingDown, BookOpen, Bug, Activity } from "lucide-react"
+import { AlertTriangle, Clock, ArrowRight, Target, CheckCircle2, TrendingDown, BookOpen, Bug, Activity, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { StressTranslator } from "@/components/ui/stress-translator"
@@ -250,12 +250,21 @@ export default async function OpportunityDetailsPage({
                 className="border-t-2 border-t-success"
               >
                 <ul className="space-y-4 pt-2">
-                  {(Array.isArray(opportunity.eligibility_analysis?.requirements) ? opportunity.eligibility_analysis.requirements : []).map((req: string, i: number) => (
-                    <li key={i} className="flex items-start gap-3 p-4 decision-surface-muted">
-                      <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />
-                      <span className="text-step-1 text-foreground leading-relaxed">{req}</span>
-                    </li>
-                  )) || <li className="text-step-1 text-muted-foreground">No explicit requirements detected.</li>}
+                  {(Array.isArray(opportunity.eligibility_analysis?.requirements) ? opportunity.eligibility_analysis.requirements : []).map((req: string, i: number) => {
+                    const isMismatch = req.startsWith('[MISMATCH]')
+                    const cleanReq = req.replace(/^\[(MATCHED|MISMATCH)\]\s*/, '')
+                    
+                    return (
+                      <li key={i} className={cn("flex items-start gap-3 p-4", isMismatch ? "decision-surface-danger border-danger/30" : "decision-surface-muted border-success/30", "border-l-4")}>
+                        {isMismatch ? (
+                          <XCircle className="w-5 h-5 text-danger shrink-0 mt-0.5" />
+                        ) : (
+                          <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />
+                        )}
+                        <span className={cn("text-step-1 leading-relaxed", isMismatch ? "text-danger" : "text-foreground")}>{cleanReq}</span>
+                      </li>
+                    )
+                  }) || <li className="text-step-1 text-muted-foreground">No explicit requirements detected.</li>}
                 </ul>
               </DecisionCard>
             </div>
@@ -264,7 +273,7 @@ export default async function OpportunityDetailsPage({
 
         {/* DO TAB */}
         <TabsContent value="do" className="pt-4 outline-none animate-in fade-in duration-500">
-          <HumanInTheLoopPipeline checklist={opportunity.action_steps} />
+          <HumanInTheLoopPipeline checklist={opportunity.action_steps} missingDocs={missingDocs} />
         </TabsContent>
 
         {/* MISS TAB (Opportunity Loss Simulator) */}

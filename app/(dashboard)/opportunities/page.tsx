@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils"
 import { FileText, ArrowRight, Clock, Target } from "lucide-react"
 import Link from "next/link"
 import { DecisionCard } from "@/components/ui/decision-card"
+import { DemoShowcase } from "@/components/opportunities/demo-showcase"
 
 export default async function OpportunitiesPage() {
   const supabase = await createClient()
@@ -25,6 +26,8 @@ export default async function OpportunitiesPage() {
           Analyze New Document
         </Link>
       </div>
+
+      <DemoShowcase />
 
       <div className="grid gap-6">
         {opportunities && opportunities.length > 0 ? (
