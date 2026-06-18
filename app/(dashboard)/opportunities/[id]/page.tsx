@@ -212,9 +212,9 @@ export default async function OpportunityDetailsPage({
           <Tabs defaultValue="do" className="w-full">
             <TabsList className="w-full md:w-auto flex flex-wrap md:inline-flex h-auto p-1.5 bg-glass-surface rounded-[12px] border border-glass-border shadow-sm gap-1 mb-8">
               <TabsTrigger value="do" className="rounded-[8px] data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3 px-6 font-semibold transition-spring text-[13px] uppercase tracking-wider">ACTION PLAN</TabsTrigger>
-              <TabsTrigger value="explain" className="rounded-[8px] data-[state=active]:bg-background data-[state=active]:text-foreground py-3 px-6 font-semibold transition-spring data-[state=active]:shadow-sm text-[13px] uppercase tracking-wider">UNDERSTAND</TabsTrigger>
+              <TabsTrigger value="explain" className="rounded-[8px] data-[state=active]:bg-glass-surface data-[state=active]:text-foreground py-3 px-6 font-semibold transition-spring data-[state=active]:shadow-sm text-[13px] uppercase tracking-wider">UNDERSTAND</TabsTrigger>
               <TabsTrigger value="impact" className="rounded-[8px] data-[state=active]:bg-danger data-[state=active]:text-white py-3 px-6 font-semibold transition-spring data-[state=active]:shadow-sm text-[13px] uppercase tracking-wider">OPPORTUNITY IMPACT</TabsTrigger>
-              <TabsTrigger value="evidence" className="rounded-[8px] data-[state=active]:bg-background data-[state=active]:text-foreground py-3 px-6 font-semibold transition-spring data-[state=active]:shadow-sm text-[13px] uppercase tracking-wider ml-auto flex items-center gap-2">
+              <TabsTrigger value="evidence" className="rounded-[8px] data-[state=active]:bg-glass-surface data-[state=active]:text-foreground py-3 px-6 font-semibold transition-spring data-[state=active]:shadow-sm text-[13px] uppercase tracking-wider ml-auto flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4" /> VERIFY EVIDENCE
               </TabsTrigger>
             </TabsList>
@@ -247,7 +247,7 @@ export default async function OpportunityDetailsPage({
                     <p className="text-[18px] opacity-80 text-foreground max-w-[500px] mx-auto leading-relaxed">Here is exactly what happens if you ignore this document.</p>
                   </div>
 
-                  <div className="liquid-glass-card p-8 bg-background/50 border-danger/20">
+                  <div className="liquid-glass-card p-8 border-danger/20">
                     <h3 className="text-[20px] font-semibold mb-4 text-foreground">The Impact:</h3>
                     <p className="text-[18px] leading-relaxed text-muted-foreground mb-10">
                       {opportunity.opportunity_loss_prediction || "You may permanently lose out on the guaranteed funding, certification, or career advancement explicitly outlined in this notice."}
@@ -309,7 +309,7 @@ export default async function OpportunityDetailsPage({
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 h-[800px]">
                 <div className="lg:col-span-1 space-y-6 overflow-y-auto pr-4 pb-12 custom-scrollbar">
-                  <h2 className="text-[24px] font-semibold sticky top-0 bg-background/95 backdrop-blur-sm py-6 z-10 border-b border-glass-border mb-6 text-foreground">Evidence Matrix</h2>
+                  <h2 className="text-[24px] font-semibold sticky top-0 bg-glass-surface/95 backdrop-blur-sm py-6 z-10 border-b border-glass-border mb-6 text-foreground">Evidence Matrix</h2>
                   
                   <div className="space-y-6">
                     {Array.isArray(opportunity.evidence_references) && opportunity.evidence_references.length > 0 ? (

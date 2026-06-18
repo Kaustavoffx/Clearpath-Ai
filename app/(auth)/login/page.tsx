@@ -14,7 +14,7 @@ export default async function LoginPage({
   const error = Array.isArray(errorParam) ? errorParam[0] : errorParam
 
   return (
-    <div className="flex min-h-screen w-full flex-col lg:flex-row bg-background font-sans">
+    <div className="flex min-h-screen w-full flex-col lg:flex-row font-sans">
       
       {/* Left Panel - Trust / Mission-first */}
       <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 bg-glass-surface/10 border-r border-glass-border relative overflow-hidden">
@@ -50,7 +50,7 @@ export default async function LoginPage({
 
       {/* Right Panel - Form */}
       <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12">
-        <div className="w-full max-w-[380px] liquid-glass-card p-8 bg-background/50 border-glass-border">
+        <div className="w-full max-w-[380px] liquid-glass-card p-8 border-glass-border">
           
           <div className="flex lg:hidden items-center gap-2 mb-10">
             <div className="w-8 h-8 rounded-lg bg-foreground flex items-center justify-center">
@@ -73,7 +73,7 @@ export default async function LoginPage({
                 type="email"
                 placeholder="name@example.com"
                 required
-                className="h-11 bg-background border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px] shadow-sm transition-crisp text-[15px]"
+                className="h-11 bg-glass-surface/50 border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px] shadow-sm transition-crisp text-[15px]"
               />
             </div>
             <div className="grid gap-2">
@@ -88,7 +88,7 @@ export default async function LoginPage({
                 name="password" 
                 type="password" 
                 required 
-                className="h-11 bg-background border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px] shadow-sm transition-crisp text-[15px]"
+                className="h-11 bg-glass-surface/50 border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px] shadow-sm transition-crisp text-[15px]"
               />
             </div>
 

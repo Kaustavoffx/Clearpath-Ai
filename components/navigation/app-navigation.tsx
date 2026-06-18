@@ -12,7 +12,6 @@ export function AppNavigation() {
   const searchParams = useSearchParams()
   const isJudgeMode = searchParams.get('judge') === 'true'
   
-  const [isHovered, setIsHovered] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   // Items
@@ -24,37 +23,25 @@ export function AppNavigation() {
     { name: 'Judge Mode', href: '?judge=true', icon: Bug, isActiveOverride: isJudgeMode },
   ]
 
-  // Liquid glass classes
-  const glassClasses = "bg-background/60 backdrop-blur-2xl border border-white/10 dark:border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
-
   return (
     <>
-      {/* DESKTOP FLOATING RAIL */}
+      {/* DESKTOP FULL-HEIGHT SIDEBAR */}
       <nav 
-        className={cn(
-          "hidden md:flex flex-col justify-between fixed top-6 bottom-6 left-6 z-50 rounded-3xl transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden group",
-          glassClasses,
-          isHovered ? "w-[260px]" : "w-[84px]"
-        )}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        className="hidden md:flex flex-col h-screen w-[260px] fixed left-0 top-0 border-r border-glass-border bg-glass-surface backdrop-blur-xl z-50 transition-all duration-500"
       >
         <div className="flex flex-col gap-8 p-6">
           {/* Logo / Brand */}
-          <div className="flex items-center gap-4 whitespace-nowrap overflow-hidden">
-            <div className="h-10 w-10 shrink-0 rounded-full bg-primary flex items-center justify-center shadow-[0_0_20px_rgba(var(--primary),0.6)]">
-              <span className="text-primary-foreground font-bold text-lg">C</span>
+          <div className="flex items-center gap-4 whitespace-nowrap overflow-hidden pt-2">
+            <div className="h-10 w-10 shrink-0 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center shadow-[0_0_20px_rgba(var(--primary),0.3)]">
+              <span className="text-primary font-bold text-lg">C</span>
             </div>
-            <span className={cn(
-              "font-bold tracking-tight text-xl transition-opacity duration-300",
-              isHovered ? "opacity-100" : "opacity-0"
-            )}>
+            <span className="font-bold tracking-tight text-xl text-foreground">
               ClearPath OS
             </span>
           </div>
 
           {/* Nav Links */}
-          <div className="flex flex-col gap-2 relative">
+          <div className="flex flex-col gap-2 flex-1 relative">
             {navItems.map((item, index) => {
               const isActive = item.isActiveOverride !== undefined ? item.isActiveOverride : pathname === item.href
               return (
@@ -62,22 +49,13 @@ export function AppNavigation() {
                   key={index} 
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-4 px-3 py-3 rounded-2xl transition-all duration-300 group/item relative overflow-hidden",
-                    isActive ? "text-primary-foreground" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                    "flex items-center gap-4 px-4 py-3 rounded-[12px] transition-all duration-300 group/item relative overflow-hidden",
+                    isActive ? "bg-primary/10 border border-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.1)] text-primary" : "text-muted-foreground hover:bg-glass-layer hover:text-foreground border border-transparent"
                   )}
                 >
-                  {/* Active Indicator Background */}
-                  {isActive && (
-                    <div className="absolute inset-0 bg-primary/90 shadow-[0_0_20px_rgba(var(--primary),0.4)] transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]" />
-                  )}
+                  <item.icon className={cn("w-5 h-5 shrink-0 relative z-10 transition-transform duration-300 group-hover/item:scale-110", isActive && "text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]")} />
                   
-                  <item.icon className={cn("w-6 h-6 shrink-0 relative z-10 transition-transform duration-300 group-hover/item:scale-110", isActive && "text-primary-foreground")} />
-                  
-                  <span className={cn(
-                    "font-semibold whitespace-nowrap relative z-10 transition-all duration-300",
-                    isHovered ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4",
-                    isActive && "text-primary-foreground"
-                  )}>
+                  <span className="font-semibold whitespace-nowrap relative z-10 text-[15px]">
                     {item.name}
                   </span>
                 </Link>
@@ -87,29 +65,26 @@ export function AppNavigation() {
         </div>
 
         {/* Bottom Profile / Settings */}
-        <div className="p-6 flex flex-col gap-4 border-t border-white/10 dark:border-white/5">
-          <div className="flex items-center justify-between w-full overflow-hidden whitespace-nowrap transition-opacity duration-300" style={{ opacity: isHovered ? 1 : 0, pointerEvents: isHovered ? 'auto' : 'none' }}>
-            <span className="text-sm font-semibold text-muted-foreground">Theme</span>
+        <div className="mt-auto p-6 flex flex-col gap-4 border-t border-glass-border bg-glass-surface/30">
+          <div className="flex items-center justify-between w-full">
+            <span className="text-[13px] font-semibold text-muted-foreground uppercase tracking-widest">Theme</span>
             <ThemeToggle />
           </div>
-          <Link href="/settings" className="flex items-center gap-4 px-3 py-3 rounded-2xl hover:bg-muted/50 transition-colors whitespace-nowrap overflow-hidden">
-             <div className="w-10 h-10 shrink-0 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border border-white/20">
-               <span className="text-white font-bold text-sm">JS</span>
+          <Link href="/settings" className="flex items-center gap-4 px-3 py-3 rounded-[12px] hover:bg-glass-layer transition-colors border border-transparent hover:border-glass-border">
+             <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center border border-primary/30 shadow-[0_0_10px_rgba(var(--primary),0.2)]">
+               <span className="text-primary font-bold text-sm">JS</span>
              </div>
-             <div className={cn("flex flex-col transition-all duration-300", isHovered ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4")}>
+             <div className="flex flex-col">
                <span className="font-bold text-sm leading-tight text-foreground">John Student</span>
-               <span className="text-xs text-muted-foreground">Free Plan</span>
+               <span className="text-[11px] uppercase tracking-wider text-muted-foreground mt-0.5">Free Plan</span>
              </div>
           </Link>
         </div>
       </nav>
 
-      {/* MOBILE FLOATING DOCK */}
-      <nav className="md:hidden fixed bottom-6 left-4 right-4 z-50">
-        <div className={cn(
-          "flex items-center justify-around p-2 rounded-full",
-          glassClasses
-        )}>
+      {/* MOBILE EDGE-TO-EDGE BOTTOM NAV */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-glass-border bg-glass-surface backdrop-blur-xl supports-[backdrop-filter]:bg-glass-surface/80">
+        <div className="flex items-center justify-between px-6 py-3 pb-safe">
           {navItems.slice(0, 4).map((item, index) => {
             const isActive = item.isActiveOverride !== undefined ? item.isActiveOverride : pathname === item.href
             return (
@@ -117,43 +92,38 @@ export function AppNavigation() {
                 key={index}
                 href={item.href}
                 className={cn(
-                  "relative p-3 rounded-full flex flex-col items-center justify-center transition-all duration-300",
-                  isActive ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground active:scale-95"
+                  "relative p-2 rounded-[12px] flex flex-col items-center justify-center transition-all duration-300",
+                  isActive ? "text-primary bg-primary/10 border border-primary/20 shadow-[0_0_10px_rgba(var(--primary),0.1)]" : "text-muted-foreground hover:text-foreground active:scale-95 border border-transparent"
                 )}
               >
-                {isActive && (
-                  <div className="absolute inset-0 bg-primary shadow-[0_0_20px_rgba(var(--primary),0.5)] rounded-full transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]" />
-                )}
-                <item.icon className="w-6 h-6 relative z-10" />
+                <item.icon className={cn("w-6 h-6", isActive && "drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]")} />
               </Link>
             )
           })}
           
           <button 
             onClick={() => setIsMobileMenuOpen(true)}
-            className="relative p-3 rounded-full flex flex-col items-center justify-center text-muted-foreground transition-all duration-300 active:scale-95 hover:bg-muted/50"
+            className="relative p-2 rounded-[12px] flex flex-col items-center justify-center text-muted-foreground transition-all duration-300 active:scale-95 hover:bg-glass-layer border border-transparent"
           >
-            <Menu className="w-6 h-6 relative z-10" />
+            <Menu className="w-6 h-6" />
           </button>
         </div>
       </nav>
 
       {/* MOBILE FULL SCREEN MENU */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-[100] bg-background/95 backdrop-blur-3xl animate-in fade-in duration-300">
-          <div className="p-6 flex justify-end">
-            <button onClick={() => setIsMobileMenuOpen(false)} className="p-3 rounded-full bg-muted/50 text-foreground active:scale-95 transition-transform">
+        <div className="md:hidden fixed inset-0 z-[100] bg-glass-surface/95 backdrop-blur-3xl animate-in fade-in duration-300 flex flex-col">
+          <div className="p-6 flex justify-end border-b border-glass-border/50">
+            <button onClick={() => setIsMobileMenuOpen(false)} className="p-3 rounded-full bg-glass-layer text-foreground active:scale-95 transition-transform border border-glass-border">
               <X className="w-6 h-6" />
             </button>
           </div>
-          <div className="flex flex-col gap-6 px-8 py-4">
-             <div className="flex justify-between items-center mb-8 border-b border-border pb-8">
-               <div className="flex items-center gap-4">
-                 <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center shadow-[0_0_20px_rgba(var(--primary),0.6)]">
-                   <span className="text-primary-foreground font-bold text-xl">C</span>
-                 </div>
-                 <span className="font-bold tracking-tight text-2xl">ClearPath OS</span>
+          <div className="flex flex-col gap-2 px-6 py-6 flex-1 overflow-y-auto">
+             <div className="flex items-center gap-4 mb-8 pb-8 border-b border-glass-border">
+               <div className="h-12 w-12 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center shadow-[0_0_20px_rgba(var(--primary),0.3)]">
+                 <span className="text-primary font-bold text-xl">C</span>
                </div>
+               <span className="font-bold tracking-tight text-2xl text-foreground">ClearPath OS</span>
              </div>
              
              {navItems.map((item, index) => (
@@ -161,7 +131,7 @@ export function AppNavigation() {
                   key={index} 
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-between py-4 text-xl font-bold text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex items-center justify-between p-4 rounded-[16px] text-[18px] font-bold text-muted-foreground hover:text-foreground hover:bg-glass-layer border border-transparent hover:border-glass-border transition-all"
                 >
                   <div className="flex items-center gap-4">
                     <item.icon className="w-6 h-6" />
@@ -170,11 +140,22 @@ export function AppNavigation() {
                   <ChevronRight className="w-6 h-6 opacity-50" />
                 </Link>
              ))}
-
-             <div className="mt-8 pt-8 border-t border-border flex items-center justify-between">
-               <span className="text-lg font-bold text-foreground">Theme</span>
+          </div>
+          
+          <div className="p-6 mt-auto border-t border-glass-border bg-glass-surface/50">
+             <div className="flex items-center justify-between mb-6">
+               <span className="text-[13px] font-semibold text-muted-foreground uppercase tracking-widest">Theme</span>
                <ThemeToggle />
              </div>
+             <Link href="/settings" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-[16px] bg-glass-layer border border-glass-border transition-colors">
+               <div className="w-12 h-12 shrink-0 rounded-full bg-primary/10 flex items-center justify-center border border-primary/30 shadow-[0_0_10px_rgba(var(--primary),0.2)]">
+                 <span className="text-primary font-bold">JS</span>
+               </div>
+               <div className="flex flex-col">
+                 <span className="font-bold text-[16px] leading-tight text-foreground">John Student</span>
+                 <span className="text-[12px] uppercase tracking-wider text-muted-foreground mt-1">Free Plan</span>
+               </div>
+             </Link>
           </div>
         </div>
       )}

@@ -14,7 +14,7 @@ export default async function RegisterPage({
   const error = Array.isArray(errorParam) ? errorParam[0] : errorParam
 
   return (
-    <div className="flex min-h-screen w-full flex-col lg:flex-row bg-background font-sans">
+    <div className="flex min-h-screen w-full flex-col lg:flex-row font-sans">
       
       {/* Left Panel - Trust / Mission-first */}
       <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 bg-glass-surface/10 border-r border-glass-border relative overflow-hidden">
@@ -48,7 +48,7 @@ export default async function RegisterPage({
 
       {/* Right Panel - Form (Onboarding) */}
       <div className="flex w-full lg:w-1/2 items-center justify-center p-6 sm:p-12 overflow-y-auto">
-        <div className="w-full max-w-[440px] liquid-glass-card p-8 bg-background/50 border-glass-border my-8">
+        <div className="w-full max-w-[440px] liquid-glass-card p-8 border-glass-border my-8">
           
           <div className="flex lg:hidden items-center gap-2 mb-10">
             <div className="w-8 h-8 rounded-lg bg-foreground flex items-center justify-center">
@@ -71,7 +71,7 @@ export default async function RegisterPage({
                   name="email"
                   type="email"
                   required
-                  className="h-11 bg-background border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px]"
+                  className="h-11 bg-glass-surface/50 border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px]"
                 />
               </div>
               <div className="grid gap-2">
@@ -81,7 +81,7 @@ export default async function RegisterPage({
                   name="password" 
                   type="password" 
                   required 
-                  className="h-11 bg-background border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px]"
+                  className="h-11 bg-glass-surface/50 border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px]"
                 />
               </div>
             </div>
@@ -96,7 +96,7 @@ export default async function RegisterPage({
                 name="grade"
                 placeholder="e.g. 12th Grade, Undergraduate"
                 required
-                className="h-11 bg-background border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px]"
+                className="h-11 bg-glass-surface/50 border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px]"
               />
             </div>
 
@@ -108,7 +108,7 @@ export default async function RegisterPage({
                   name="state"
                   placeholder="e.g. California"
                   required
-                  className="h-11 bg-background border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px]"
+                  className="h-11 bg-glass-surface/50 border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px]"
                 />
               </div>
               <div className="grid gap-2">
@@ -116,7 +116,7 @@ export default async function RegisterPage({
                 <select 
                   id="income_range" 
                   name="income_range" 
-                  className="h-11 px-3 bg-background border border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px] text-[15px]"
+                  className="h-11 px-3 bg-glass-surface/50 border border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px] text-[15px]"
                   required
                 >
                   <option value="">Select Range</option>
@@ -134,7 +134,7 @@ export default async function RegisterPage({
                 <select 
                   id="category" 
                   name="category" 
-                  className="h-11 px-3 bg-background border border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px] text-[15px]"
+                  className="h-11 px-3 bg-glass-surface/50 border border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px] text-[15px]"
                   required
                 >
                   <option value="">Select Category</option>
@@ -151,7 +151,7 @@ export default async function RegisterPage({
                   name="career_interest"
                   placeholder="e.g. Engineering, Arts"
                   required
-                  className="h-11 bg-background border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px]"
+                  className="h-11 bg-glass-surface/50 border-glass-border focus-visible:ring-2 focus-visible:ring-primary rounded-[8px]"
                 />
               </div>
             </div>

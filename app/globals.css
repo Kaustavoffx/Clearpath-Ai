@@ -43,7 +43,7 @@
   --shadow-elevation-1: 0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.02);
   --shadow-elevation-2: 0 4px 12px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.02);
   --shadow-elevation-3: 0 12px 32px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.03);
-  --shadow-glass-card: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+  --shadow-glass-card: 0 8px 40px rgba(0,0,0,0.35);
 }
 
 :root {
@@ -53,16 +53,16 @@
   --muted: #E2E8F0;
   --muted-foreground: #64748B;
   
-  --primary: #2563EB;
+  --primary: #F97316;
   --primary-foreground: #FFFFFF;
 
-  --border: rgba(255,255,255,0.7);
+  --border: rgba(255,255,255,0.08);
 
   /* Liquid Glass - Light Mode */
-  --glass-surface: rgba(255,255,255,0.65);
-  --glass-layer: rgba(255,255,255,0.8);
-  --glass-border: rgba(255,255,255,0.7);
-  --glass-highlight: rgba(255,255,255,0.9);
+  --glass-surface: rgba(255,255,255,0.04);
+  --glass-layer: rgba(255,255,255,0.06);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-highlight: rgba(255,255,255,0.18);
 }
 
 .dark {
@@ -72,15 +72,15 @@
   --muted: #0F172A;
   --muted-foreground: #94A3B8;
   
-  --primary: #2563EB;
+  --primary: #F97316;
   --primary-foreground: #FFFFFF;
 
-  --border: rgba(255,255,255,0.12);
+  --border: rgba(255,255,255,0.08);
 
   /* Liquid Glass - Dark Mode */
   --glass-surface: rgba(255,255,255,0.04);
   --glass-layer: rgba(255,255,255,0.06);
-  --glass-border: rgba(255,255,255,0.12);
+  --glass-border: rgba(255,255,255,0.08);
   --glass-highlight: rgba(255,255,255,0.18);
 }
 

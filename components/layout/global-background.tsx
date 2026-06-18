@@ -11,7 +11,7 @@ export function GlobalBackground() {
         }}
       />
       <div 
-        className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.55),rgba(247,249,252,0.72))] dark:bg-[linear-gradient(180deg,rgba(5,8,22,0.72),rgba(5,8,22,0.85))]"
+        className="absolute inset-0 bg-[rgba(0,0,0,0.55)] backdrop-blur-[2px]"
       />
     </div>
   );

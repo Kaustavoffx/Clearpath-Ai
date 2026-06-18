@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button"
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden flex flex-col font-sans selection:bg-primary/30">
+    <div className="min-h-screen relative overflow-hidden flex flex-col font-sans selection:bg-primary/30">
       
       {/* Background Ambience */}
       <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-primary/20 blur-[120px] pointer-events-none mix-blend-screen" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-primary/10 blur-[100px] pointer-events-none mix-blend-screen" />
 
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-background/50 backdrop-blur-3xl border-b border-border/50 transition-all duration-400">
+      <nav className="fixed top-0 w-full z-50 bg-glass-surface backdrop-blur-3xl border-b border-glass-border transition-all duration-400">
         <div className="container-wide h-[72px] flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-[12px] bg-foreground flex items-center justify-center transition-all duration-400 group-hover:bg-primary shadow-elevation-2">

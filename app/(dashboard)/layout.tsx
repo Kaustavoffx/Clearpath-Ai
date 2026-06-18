@@ -7,13 +7,13 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden bg-background">
-      <Suspense fallback={<div className="w-[84px] hidden md:block" />}>
+    <div className="relative flex min-h-screen flex-col overflow-hidden">
+      <Suspense fallback={<div className="w-[260px] hidden md:block" />}>
         <AppNavigation />
       </Suspense>
       
       {/* Immersive Main Content */}
-      <main className="flex-1 flex flex-col relative w-full min-h-screen md:pl-[116px] pb-28 md:pb-0 transition-all duration-500">
+      <main className="flex-1 flex flex-col relative w-full min-h-screen md:pl-[260px] pb-20 md:pb-0 transition-all duration-500">
         {children}
       </main>
     </div>
