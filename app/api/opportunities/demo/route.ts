@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       .insert({
         user_id: user.id,
         title: 'National Merit STEM Scholarship & Apprenticeship Program 2026',
-        category: 'SCHOLARSHIP',
+        category: 'Scholarship',
         storage_path: 'demo-documents/national-merit-stem.pdf',
         simplified_summary: 'This is a highly competitive scholarship that provides $10,000 per year and a guaranteed summer internship at a top tech company. You need to maintain a 3.8 GPA and submit three letters of recommendation.',
         deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),

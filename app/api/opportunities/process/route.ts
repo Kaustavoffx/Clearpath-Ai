@@ -106,7 +106,7 @@ export async function POST(request: Request) {
       Return ONLY a valid JSON object matching this schema perfectly:
       {
         "title": "String, name of the opportunity",
-        "category": "SCHOLARSHIP | CIRCULAR | SCHEME | INTERNSHIP | COMPETITION",
+        "category": "Scholarship | Internship | Government Program | School Circular | Competition | Financial Aid | Other",
         "document_type": "String, type of document analyzed",
         "plain_language_summary": "String, a simple 2-3 sentence explanation",
         "important_dates": {
@@ -156,7 +156,45 @@ export async function POST(request: Request) {
       throw new Error("Empty response from Gemini")
     }
 
-    const aiResult = JSON.parse(responseText)
+    let rawAiResult: any = {}
+    try {
+      rawAiResult = JSON.parse(responseText)
+    } catch (e) {
+      throw new Error("Failed to parse JSON from Gemini")
+    }
+
+    const aiResponseSchema = z.object({
+      title: z.string().optional(),
+      category: z.string().optional(),
+      plain_language_summary: z.string().optional(),
+      important_dates: z.any().optional(),
+      eligibility_analysis: z.any().optional(),
+      required_documents: z.any().optional(),
+      opportunity_value: z.string().optional(),
+      opportunity_loss_analysis: z.string().optional(),
+      readiness_score: z.number().optional(),
+      risk_score: z.number().optional(),
+      confidence_score: z.number().optional(),
+      evidence_references: z.any().optional(),
+      action_checklist: z.array(z.any()).optional(),
+    }).passthrough()
+
+    const aiResult = aiResponseSchema.parse(rawAiResult)
+
+    const validCategories = [
+      'Scholarship',
+      'Internship',
+      'Government Program',
+      'School Circular',
+      'Competition',
+      'Financial Aid',
+      'Other'
+    ]
+
+    let safeCategory = aiResult.category || 'Other'
+    if (!validCategories.includes(safeCategory)) {
+      safeCategory = 'Other'
+    }
 
     // 5. Output Sanitization (XSS Protection)
     const sanitizeOptions = { allowedTags: [], allowedAttributes: {} }
@@ -171,7 +209,7 @@ export async function POST(request: Request) {
       .insert({
         user_id: user.id,
         title: sanitizedTitle,
-        category: aiResult.category || 'CIRCULAR',
+        category: safeCategory,
         storage_path: filePath || url || 'url-input',
         simplified_summary: sanitizedSummary,
         deadline: aiResult.important_dates?.deadline !== 'Not Found In Document' ? new Date(aiResult.important_dates?.deadline).toISOString() : null,

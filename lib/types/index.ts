@@ -1,4 +1,4 @@
-export type Category = 'SCHOLARSHIP' | 'CIRCULAR' | 'SCHEME' | 'INTERNSHIP' | 'COMPETITION';
+export type Category = 'Scholarship' | 'Internship' | 'Government Program' | 'School Circular' | 'Competition' | 'Financial Aid' | 'Other';
 export type Status = 'PENDING' | 'PROCESSED' | 'ERROR';
 export type StepStatus = 'PENDING' | 'COMPLETED';
 
