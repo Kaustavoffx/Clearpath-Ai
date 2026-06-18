@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { UploadCloud, File, X, Link as LinkIcon, CheckCircle2 } from 'lucide-react'
+import { UploadCloud, File, X, Link as LinkIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
@@ -14,33 +14,14 @@ interface UploadWidgetProps {
   onUploadComplete?: (id: string) => void
 }
 
-const PROCESSING_STEPS = [
-  "Reading Document...",
-  "Finding Deadlines...",
-  "Checking Eligibility...",
-  "Finding Missing Documents...",
-  "Building Action Plan..."
-]
-
 export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
   const [mode, setMode] = useState<'file' | 'url'>('file')
   const [file, setFile] = useState<File | null>(null)
   const [url, setUrl] = useState('')
   const [isUploading, setIsUploading] = useState(false)
-  const [processingStep, setProcessingStep] = useState(0)
   const router = useRouter()
 
   const supabase = createClient()
-
-  // Simulate progress steps if actual API takes time
-  useEffect(() => {
-    if (isUploading) {
-      const interval = setInterval(() => {
-        setProcessingStep(prev => (prev < PROCESSING_STEPS.length - 1 ? prev + 1 : prev))
-      }, 1500)
-      return () => clearInterval(interval)
-    }
-  }, [isUploading])
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -62,7 +43,6 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
     if (mode === 'url' && !url) return
 
     setIsUploading(true)
-    setProcessingStep(0)
 
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -98,10 +78,7 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
 
       const result = await response.json()
 
-      // Force to last step for visual completion before redirect
-      setProcessingStep(PROCESSING_STEPS.length - 1)
-      
-      // Artificial delay to let user see "Action Plan Built"
+      // Artificial delay to let user see processing state
       await new Promise(r => setTimeout(r, 800))
 
       if (onUploadComplete) {
@@ -126,51 +103,51 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
   }
 
   return (
-    <div className="glass-thick rounded-apple-xl p-2 w-full shadow-apple-lg relative overflow-hidden border border-apple-glass-highlight transition-all duration-500 hover:shadow-apple-xl">
-      <div className="flex bg-muted/30 p-1.5 rounded-apple-lg border border-apple-glass-border mb-2 mx-2 mt-2 max-w-fit">
+    <div className="w-full relative overflow-hidden transition-crisp">
+      <div className="flex bg-muted p-1 rounded-lg border border-border mb-6 w-fit">
         <button
           onClick={() => setMode('file')}
-          className={`px-6 py-2 text-sm font-medium rounded-apple-md transition-all spring-transition ${mode === 'file' ? 'bg-background shadow-apple-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+          className={`px-6 py-2 text-step-0 font-medium rounded-md transition-crisp ${mode === 'file' ? 'bg-background shadow-elevation-1 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
         >
           Document
         </button>
         <button
           onClick={() => setMode('url')}
-          className={`px-6 py-2 text-sm font-medium rounded-apple-md transition-all spring-transition ${mode === 'url' ? 'bg-background shadow-apple-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+          className={`px-6 py-2 text-step-0 font-medium rounded-md transition-crisp ${mode === 'url' ? 'bg-background shadow-elevation-1 text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
         >
           Website URL
         </button>
       </div>
 
-      <div className="p-4 pt-2">
+      <div>
         {mode === 'file' ? (
           !file ? (
             <div
               {...getRootProps()}
-              className={`border-2 border-dashed rounded-apple-lg p-12 flex flex-col items-center justify-center text-center cursor-pointer transition-all spring-transition ${
-                isDragActive ? 'border-primary bg-primary/5 scale-[0.98]' : 'border-apple-glass-border bg-background/20 hover:bg-background/40 hover:border-primary/30'
+              className={`border-2 border-dashed rounded-xl p-12 flex flex-col items-center justify-center text-center cursor-pointer transition-crisp ${
+                isDragActive ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50 hover:border-foreground/30'
               }`}
             >
               <input {...getInputProps()} />
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 text-primary shadow-inner">
+              <div className="w-16 h-16 rounded-full bg-background border border-border shadow-elevation-1 flex items-center justify-center mb-6 text-foreground">
                 <UploadCloud className="h-8 w-8" />
               </div>
-              <p className="text-lg font-medium mb-2 text-foreground tracking-tight">
+              <p className="text-step-2 font-medium mb-2 text-foreground tracking-tight">
                 {isDragActive ? 'Drop to analyze' : 'Drag & drop a document'}
               </p>
-              <p className="text-sm text-muted-foreground max-w-[250px]">
+              <p className="text-step-0 text-muted-foreground max-w-[30ch]">
                 Supports PDF, PNG, JPG up to 10MB
               </p>
             </div>
           ) : (
-            <div className="bg-background/40 rounded-apple-lg p-6 flex items-center justify-between border border-apple-glass-border">
+            <div className="decision-surface-muted p-6 flex items-center justify-between">
               <div className="flex items-center space-x-4 overflow-hidden">
-                <div className="w-12 h-12 rounded-apple-md bg-primary/10 flex items-center justify-center shrink-0">
-                  <File className="h-6 w-6 text-primary" />
+                <div className="w-12 h-12 rounded-lg bg-background border border-border shadow-elevation-1 flex items-center justify-center shrink-0">
+                  <File className="h-6 w-6 text-foreground" />
                 </div>
                 <div className="truncate">
-                  <p className="font-medium truncate text-base">{file.name}</p>
-                  <p className="text-sm text-muted-foreground mt-0.5">
+                  <p className="font-medium truncate text-step-1 text-foreground">{file.name}</p>
+                  <p className="text-step-0 text-muted-foreground mt-0.5">
                     {(file.size / 1024 / 1024).toFixed(2)} MB
                   </p>
                 </div>
@@ -178,7 +155,7 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-muted-foreground hover:text-destructive flex-shrink-0 ml-4 rounded-full w-8 h-8"
+                className="text-muted-foreground hover:text-danger flex-shrink-0 ml-4 rounded-full w-8 h-8 transition-crisp"
                 onClick={() => setFile(null)}
               >
                 <X className="h-4 w-4" />
@@ -186,13 +163,13 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
             </div>
           )
         ) : (
-          <div className="flex flex-col gap-2 p-2">
+          <div className="flex flex-col gap-2">
             <div className="relative">
               <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="url"
                 placeholder="https://example.com/scholarship-details"
-                className="pl-12 h-16 text-base bg-background/40 border-apple-glass-border rounded-apple-lg shadow-inner focus-visible:ring-primary/50"
+                className="pl-12 h-16 text-step-1 bg-background border-border rounded-xl focus-visible:ring-1 focus-visible:ring-foreground transition-crisp"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
               />
@@ -200,11 +177,11 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
           </div>
         )}
 
-        <div className="mt-6 flex justify-end">
+        <div className="mt-8 flex justify-end">
           <Button 
             onClick={handleUpload} 
             disabled={(mode === 'file' && !file) || (mode === 'url' && !url)}
-            className="w-full sm:w-auto h-12 px-8 rounded-apple-md font-medium text-base shadow-apple-sm group spring-active transition-all"
+            className="w-full sm:w-auto h-12 px-8 rounded-md font-medium text-step-1 shadow-elevation-1 transition-crisp"
           >
             Generate Action Plan
           </Button>
