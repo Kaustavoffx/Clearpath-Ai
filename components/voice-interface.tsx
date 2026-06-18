@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 import { VoiceOrb } from '@/components/ui/voice-orb'
 import { toast } from 'sonner'
 import { UploadWidget } from '@/components/opportunities/upload-widget'
@@ -15,7 +15,6 @@ export function VoiceInterface() {
   const [documentContext, setDocumentContext] = useState<string | null>(null)
   const router = useRouter()
   
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null)
 

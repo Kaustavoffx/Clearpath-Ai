@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { rateLimit } from '@/lib/security/rate-limit'
 import { logger } from '@/lib/logger'
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     const supabase = await createClient()
 

@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React from 'react'
 import { cn } from '@/lib/utils'
-import { Mic, MicOff, Loader2 } from 'lucide-react'
+import { Mic, Loader2 } from 'lucide-react'
 
 interface VoiceOrbProps {
   isListening: boolean

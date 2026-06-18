@@ -3,15 +3,20 @@ import { createClient } from '@/lib/supabase/server'
 import { GoogleGenAI } from '@google/genai'
 import OpenAI from 'openai'
 import { env } from '@/lib/env'
+import { rateLimit } from '@/lib/security/rate-limit'
 import { logger } from '@/lib/logger'
 
 // Initialize AI clients
-const gemini = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY })
+const gemini = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY || 'dummy' })
 const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY || 'dummy' })
 
 export async function POST(request: Request) {
   try {
     const { transcript, activeDocumentContext } = await request.json()
+    
+    if (!env.GEMINI_API_KEY || env.GEMINI_API_KEY === 'dummy') {
+      return NextResponse.json({ text: "I'm currently undergoing maintenance (missing AI keys). Please try again later.", audioBase64: null, intent: "ERROR" })
+    }
     
     if (!transcript) {
       return NextResponse.json({ error: 'Transcript is required' }, { status: 400 })
@@ -19,6 +24,15 @@ export async function POST(request: Request) {
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const rateLimitResult = await rateLimit(`orchestrator_api_${user.id}`, 10, 60000)
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ error: 'Too Many Requests' }, { status: 429 })
+    }
     
     // 1. Conversation Agent: Understand Intent
     logger.info({ transcript }, 'Orchestrating user intent')

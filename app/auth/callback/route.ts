@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { getBaseUrl } from '@/lib/utils'
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
@@ -12,10 +11,10 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error) {
-      return NextResponse.redirect(`${getBaseUrl()}${next}`)
+      return NextResponse.redirect(new URL(next, request.url))
     }
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(`${getBaseUrl()}/login?error=Could not authenticate user`)
+  return NextResponse.redirect(new URL('/login?error=Could not authenticate user', request.url))
 }

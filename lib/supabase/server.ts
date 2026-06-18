@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export async function createClient() {
@@ -18,7 +18,9 @@ export async function createClient() {
   }
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error("Your project's URL and API key are required to create a Supabase client")
+    console.warn("⚠️ Supabase URL or Anon Key is missing. Using placeholders to prevent crash.")
+    supabaseUrl = supabaseUrl || 'https://placeholder.supabase.co'
+    supabaseAnonKey = supabaseAnonKey || 'placeholder'
   }
 
   return createServerClient(
@@ -34,7 +36,7 @@ export async function createClient() {
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options)
             })
-          } catch (error) {
+          } catch {
             // The `set` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
             // user sessions.

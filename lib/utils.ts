@@ -18,14 +18,10 @@ export function getBaseUrl() {
     return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
   }
 
-  if (process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production') {
-    return 'https://clearpath-ai-five.vercel.app';
-  }
-
-  return 'http://localhost:3000';
+  return 'https://clearpath-ai-five.vercel.app';
 }
 
-export function extractJsonFromGeminiResponse(rawResponse: string): { data: any, error: string | null, raw: string } {
+export function extractJsonFromGeminiResponse(rawResponse: string): { data: unknown, error: string | null, raw: string } {
   if (!rawResponse || typeof rawResponse !== 'string') {
     return { data: null, error: "Empty or invalid response type", raw: rawResponse }
   }
@@ -52,7 +48,7 @@ export function extractJsonFromGeminiResponse(rawResponse: string): { data: any,
       const candidate = text.substring(firstBrace, lastBrace + 1)
       try {
         return { data: JSON.parse(candidate), error: null, raw: rawResponse }
-      } catch (innerError) {
+      } catch {
         // Keep falling through
       }
     }
@@ -65,7 +61,7 @@ export function extractJsonFromGeminiResponse(rawResponse: string): { data: any,
       const candidate = text.substring(firstBracket, lastBracket + 1)
       try {
         return { data: JSON.parse(candidate), error: null, raw: rawResponse }
-      } catch (innerError) {
+      } catch {
         // Keep falling through
       }
     }
