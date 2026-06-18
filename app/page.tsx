@@ -1,8 +1,5 @@
-"use client"
-
-import { Sparkles, ArrowRight, ShieldAlert, FileText, CheckCircle, Clock } from "lucide-react"
+import { Sparkles, ArrowRight, ShieldCheck, FileSearch, CheckCircle, Zap } from "lucide-react"
 import Link from "next/link"
-import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ClearPathAmbientBackground } from "@/components/layout/clearpath-ambient-background"
 import { Suspense } from "react"
@@ -11,169 +8,166 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col font-sans selection:bg-primary/30">
       
-      {/* Background Ambience */}
       <Suspense fallback={null}>
         <ClearPathAmbientBackground variant="landing" />
       </Suspense>
 
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-glass-surface backdrop-blur-3xl border-b border-glass-border transition-all duration-400">
-        <div className="container-wide h-[72px] flex items-center justify-between">
+      {/* ─── NAVIGATION ─── */}
+      <nav className="fixed top-0 w-full z-50 border-b border-white/[0.04] bg-[#030712]/60" style={{ backdropFilter: 'blur(12px)' }}>
+        <div className="container-wide h-[64px] flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-[12px] bg-foreground flex items-center justify-center transition-all duration-400 group-hover:bg-primary shadow-elevation-2">
-              <Sparkles className="w-5 h-5 text-background" />
+            <div className="w-9 h-9 rounded-[10px] bg-[#858AE3] flex items-center justify-center transition-spring group-hover:scale-105">
+              <Sparkles className="w-4 h-4 text-[#030712]" />
             </div>
-            <span className="font-semibold text-[18px] tracking-[-0.02em]">ClearPath OS</span>
+            <span className="font-semibold text-[16px] tracking-[-0.01em] text-foreground">ClearPath OS</span>
           </Link>
-          <div className="flex items-center gap-6">
-            <Link href="/login" className="text-[15px] font-medium text-muted-foreground hover:text-foreground transition-all duration-150">Sign In</Link>
+          <div className="flex items-center gap-5">
+            <Link href="/login" className="text-[14px] font-medium text-muted-foreground hover:text-foreground transition-crisp">Sign In</Link>
             <Link href="/register">
-              <Button size="sm">Try Live Demo</Button>
+              <Button size="sm" className="h-9 px-5 text-[13px]">Try Live Demo</Button>
             </Link>
           </div>
         </div>
       </nav>
 
-      <main className="flex-1 pt-[160px] pb-[96px] relative z-10 flex flex-col gap-[160px]">
+      {/* ─── HERO ─── */}
+      <main className="flex-1 pt-[140px] pb-[80px] relative z-10 flex flex-col gap-[120px]">
         
-        {/* 1. HERO SECTION */}
         <section className="container-wide text-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="flex flex-col items-center"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-[999px] bg-primary/10 border border-primary/20 mb-8 text-[13px] font-medium tracking-[0.01em] text-primary backdrop-blur-md">
-              <Sparkles className="w-4 h-4" /> USAII Global AI Hackathon Submission
+          <div className="flex flex-col items-center animate-fadeInUp">
+            
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#858AE3]/8 border border-[#858AE3]/15 mb-8 text-[12px] font-medium tracking-[0.02em] text-[#97DFFC]">
+              <Sparkles className="w-3.5 h-3.5" /> USAII Global AI Hackathon 2026
             </div>
-            <h1 className="text-hero text-balance text-foreground mb-6">
-              You were never bad at applications.<br />
-              <span className="text-muted-foreground">The system was designed to be impossible.</span>
+            
+            {/* Headline */}
+            <h1 className="text-display text-foreground mb-5 max-w-[800px]">
+              You were never bad at applications.
+              <br />
+              <span className="text-muted-foreground">The system was.</span>
             </h1>
-            <p className="text-step-2 text-muted-foreground text-balance max-w-[800px] mb-12">
-              ClearPath OS translates bureaucratic jargon into a personalized action plan. 
-              We turn 40-page PDFs into a 60-second execution timeline.
+            
+            {/* Subheadline */}
+            <p className="text-[17px] md:text-[19px] text-muted-foreground text-balance max-w-[640px] mb-10 leading-[1.7] font-normal">
+              ClearPath OS converts bureaucratic complexity into executable action. 
+              40-page PDFs become 60-second timelines.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+            
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto mb-14">
               <Link href="/register" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full text-[16px]">
-                  Launch Demo <ArrowRight className="ml-2 w-5 h-5" />
+                <Button size="lg" className="w-full text-[15px] h-12 px-8">
+                  Launch Live Demo <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </Link>
-              <a href="#rubric" className="w-full sm:w-auto">
-                <Button variant="secondary" size="lg" className="w-full text-[16px]">
-                  Read Judge Rubric
+              <a href="#architecture" className="w-full sm:w-auto">
+                <Button variant="secondary" size="lg" className="w-full text-[15px] h-12 px-8">
+                  View Architecture
                 </Button>
               </a>
             </div>
-          </motion.div>
-        </section>
 
-        {/* 2. STORYTELLING FLOW: PROBLEM -> SOLUTION -> IMPACT */}
-        <section className="container-wide">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            {/* Problem */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="liquid-glass-card p-8 flex flex-col gap-6"
-            >
-              <div className="w-12 h-12 rounded-[16px] bg-danger/10 border border-danger/20 flex items-center justify-center">
-                <FileText className="w-6 h-6 text-danger" />
+            {/* Trust Row */}
+            <div className="flex flex-wrap items-center justify-center gap-8 text-[13px] text-muted-foreground font-medium">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-[#97DFFC]" />
+                <span>60s Processing</span>
               </div>
-              <div>
-                <h3 className="text-step-3 mb-2">The Problem</h3>
-                <p className="text-step-1 text-muted-foreground">
-                  Students face immense cognitive overload reading 40-page PDFs filled with dense legal jargon. 
-                  They abandon life-changing opportunities out of fear of making a mistake.
-                </p>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#93CAF6]" />
+                <span>Evidence-Backed</span>
               </div>
-            </motion.div>
-
-            {/* Solution */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="liquid-glass-card p-8 flex flex-col gap-6 md:scale-105 z-10 shadow-elevation-3 border-primary/30"
-            >
-              <div className="w-12 h-12 rounded-[16px] bg-primary/10 border border-primary/20 flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-primary" />
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-[#8EB5F0]" />
+                <span>Human-Verified</span>
               </div>
-              <div>
-                <h3 className="text-step-3 mb-2">The Solution</h3>
-                <p className="text-step-1 text-muted-foreground">
-                  Our determinisic Readiness Engine instantly extracts requirements, builds a missing documents checklist, and maps out a timeline—all backed by exact quotes from the source document.
-                </p>
-              </div>
-            </motion.div>
-
-            {/* Impact */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="liquid-glass-card p-8 flex flex-col gap-6"
-            >
-              <div className="w-12 h-12 rounded-[16px] bg-success/10 border border-success/20 flex items-center justify-center">
-                <Clock className="w-6 h-6 text-success" />
-              </div>
-              <div>
-                <h3 className="text-step-3 mb-2">The Impact</h3>
-                <p className="text-step-1 text-muted-foreground">
-                  What used to take 45 minutes of stressful reading now takes 60 seconds of actionable execution. We drastically reduce friction and prevent opportunity loss.
-                </p>
-              </div>
-            </motion.div>
-
+            </div>
           </div>
         </section>
 
-        {/* 3. RESPONSIBLE AI */}
-        <section id="rubric" className="container-standard">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="decision-surface p-[64px] flex flex-col items-center text-center"
-          >
-            <ShieldAlert className="w-16 h-16 text-primary mb-8" />
-            <h2 className="text-step-4 mb-6">Built on Responsible AI</h2>
-            <p className="text-step-2 text-muted-foreground max-w-[700px] mb-12">
-              AI hallucinations in bureaucratic applications are dangerous. ClearPath OS enforces a rigid <strong>Evidence Layer</strong> and mandates a <strong>Human-in-the-Loop</strong> review before any application is finalized.
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full text-left">
-              <div className="p-6 bg-background/50 rounded-[16px] border border-glass-border">
-                <div className="flex items-center gap-3 mb-2">
-                  <CheckCircle className="w-5 h-5 text-success" />
-                  <h4 className="font-semibold text-[16px]">Strict JSON Extraction</h4>
-                </div>
-                <p className="text-[14px] text-muted-foreground">No open-ended chat. We force Gemini to output deterministic structured data.</p>
+        {/* ─── PROBLEM → SOLUTION → IMPACT ─── */}
+        <section className="container-wide">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            {/* Problem */}
+            <div className="liquid-glass-card p-7 flex flex-col gap-5 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+              <div className="w-10 h-10 rounded-[12px] bg-[#7364D2]/10 border border-[#7364D2]/15 flex items-center justify-center">
+                <FileSearch className="w-5 h-5 text-[#7364D2]" />
               </div>
-              <div className="p-6 bg-background/50 rounded-[16px] border border-glass-border">
-                <div className="flex items-center gap-3 mb-2">
-                  <CheckCircle className="w-5 h-5 text-success" />
-                  <h4 className="font-semibold text-[16px]">Quote-Backed Claims</h4>
-                </div>
-                <p className="text-[14px] text-muted-foreground">Every AI claim includes an exact verbatim quote from the original PDF.</p>
+              <div>
+                <h3 className="text-card-title text-foreground mb-2">The Problem</h3>
+                <p className="text-body-text text-[14px]">
+                  Students face cognitive overload reading dense PDFs filled with legal jargon. 
+                  They abandon life-changing opportunities out of confusion.
+                </p>
               </div>
             </div>
-          </motion.div>
+
+            {/* Solution */}
+            <div className="liquid-glass-card p-7 flex flex-col gap-5 border-[#858AE3]/20 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+              <div className="w-10 h-10 rounded-[12px] bg-[#858AE3]/10 border border-[#858AE3]/15 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-[#858AE3]" />
+              </div>
+              <div>
+                <h3 className="text-card-title text-foreground mb-2">The Solution</h3>
+                <p className="text-body-text text-[14px]">
+                  Our deterministic Readiness Engine extracts requirements, builds missing-document checklists, and maps timelines — all cited from the source.
+                </p>
+              </div>
+            </div>
+
+            {/* Impact */}
+            <div className="liquid-glass-card p-7 flex flex-col gap-5 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+              <div className="w-10 h-10 rounded-[12px] bg-[#97DFFC]/10 border border-[#97DFFC]/15 flex items-center justify-center">
+                <Zap className="w-5 h-5 text-[#97DFFC]" />
+              </div>
+              <div>
+                <h3 className="text-card-title text-foreground mb-2">The Impact</h3>
+                <p className="text-body-text text-[14px]">
+                  45 minutes of stressful reading becomes 60 seconds of actionable execution. We eliminate friction and prevent opportunity loss.
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
 
-        {/* 4. CTA */}
+        {/* ─── RESPONSIBLE AI ─── */}
+        <section id="architecture" className="container-standard">
+          <div className="decision-surface p-12 md:p-16 flex flex-col items-center text-center animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
+            <ShieldCheck className="w-12 h-12 text-[#858AE3] mb-6" />
+            <h2 className="text-section-title text-foreground mb-4">Built on Responsible AI</h2>
+            <p className="text-body-text text-center max-w-[600px] mb-10">
+              AI hallucinations in bureaucratic applications are dangerous. ClearPath OS enforces a rigid Evidence Layer and mandates Human-in-the-Loop review.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full text-left">
+              <div className="p-5 rounded-2xl border border-glass-border bg-[#071225]/60">
+                <div className="flex items-center gap-3 mb-2">
+                  <CheckCircle className="w-4 h-4 text-[#93CAF6]" />
+                  <h4 className="font-medium text-[15px] text-foreground">Strict JSON Extraction</h4>
+                </div>
+                <p className="text-[13px] text-muted-foreground leading-relaxed">No open-ended chat. Gemini outputs deterministic structured data only.</p>
+              </div>
+              <div className="p-5 rounded-2xl border border-glass-border bg-[#071225]/60">
+                <div className="flex items-center gap-3 mb-2">
+                  <CheckCircle className="w-4 h-4 text-[#93CAF6]" />
+                  <h4 className="font-medium text-[15px] text-foreground">Quote-Backed Claims</h4>
+                </div>
+                <p className="text-[13px] text-muted-foreground leading-relaxed">Every AI claim includes an exact verbatim quote from the original document.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── FINAL CTA ─── */}
         <section className="container-wide text-center">
-          <h2 className="text-step-5 mb-8">Experience True Clarity.</h2>
+          <h2 className="text-hero-title text-foreground mb-6">Experience True Clarity.</h2>
+          <p className="text-body-text text-center mx-auto mb-8">
+            Confusion → Clarity → Action. In under 60 seconds.
+          </p>
           <Link href="/register">
-            <Button size="lg" className="h-[64px] px-[48px] text-[18px]">
+            <Button size="lg" className="h-14 px-12 text-[16px]">
               Launch Live Demo
             </Button>
           </Link>

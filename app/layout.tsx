@@ -40,8 +40,8 @@ export default function RootLayout({
       <body className={`${cmGeom.variable} font-sans antialiased text-foreground min-h-screen flex flex-col relative`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          forcedTheme="dark"
           disableTransitionOnChange
         >
           <div className="relative z-10 flex-1 flex flex-col w-full h-full">

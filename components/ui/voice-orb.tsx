@@ -12,51 +12,52 @@ interface VoiceOrbProps {
 }
 
 export function VoiceOrb({ isListening, isProcessing, isSpeaking, onToggleListen }: VoiceOrbProps) {
-  // We use CSS variables to drive the glow based on state
   
-  let stateClass = "border-[#858AE3]/20 shadow-[0_0_40px_rgba(133,138,227,0.2)]"
-  let icon = <Mic className="w-8 h-8 text-[#858AE3]" />
+  let stateClass = "border-[#858AE3]/15 shadow-[0_0_40px_rgba(133,138,227,0.12)]"
+  let icon = <Mic className="w-8 h-8 text-[#858AE3]/80" />
   
   if (isListening) {
-    stateClass = "border-[#97DFFC]/50 shadow-[0_0_80px_rgba(151,223,252,0.5)]"
-    icon = <Mic className="w-8 h-8 text-[#97DFFC] animate-pulse" />
+    stateClass = "border-[#97DFFC]/40 shadow-[0_0_60px_rgba(151,223,252,0.3)]"
+    icon = <Mic className="w-8 h-8 text-[#97DFFC]" />
   } else if (isProcessing) {
-    stateClass = "border-[#613DC1]/50 shadow-[0_0_60px_rgba(97,61,193,0.4)]"
-    icon = <Loader2 className="w-8 h-8 text-[#613DC1] animate-spin" />
+    stateClass = "border-[#613DC1]/30 shadow-[0_0_50px_rgba(97,61,193,0.25)]"
+    icon = <Loader2 className="w-8 h-8 text-[#858AE3] animate-spin" style={{ animationDuration: '2s' }} />
   } else if (isSpeaking) {
-    stateClass = "border-[#858AE3]/50 shadow-[0_0_80px_rgba(133,138,227,0.5)] scale-105"
-    // We could put a waveform here, but an icon is simpler for now
+    stateClass = "border-[#858AE3]/30 shadow-[0_0_60px_rgba(133,138,227,0.3)] scale-[1.03]"
     icon = (
-      <div className="flex items-end justify-center gap-1 h-8">
-        <div className="w-1.5 bg-[#858AE3] rounded-full animate-[bounce_1s_infinite_100ms] h-full" />
-        <div className="w-1.5 bg-[#858AE3] rounded-full animate-[bounce_1s_infinite_300ms] h-4/5" />
-        <div className="w-1.5 bg-[#858AE3] rounded-full animate-[bounce_1s_infinite_200ms] h-full" />
-        <div className="w-1.5 bg-[#858AE3] rounded-full animate-[bounce_1s_infinite_400ms] h-3/5" />
+      <div className="flex items-end justify-center gap-[3px] h-8">
+        <div className="w-[3px] bg-[#858AE3] rounded-full h-4 animate-[wave_1.2s_ease-in-out_infinite_0ms]" />
+        <div className="w-[3px] bg-[#858AE3] rounded-full h-6 animate-[wave_1.2s_ease-in-out_infinite_150ms]" />
+        <div className="w-[3px] bg-[#97DFFC] rounded-full h-8 animate-[wave_1.2s_ease-in-out_infinite_300ms]" />
+        <div className="w-[3px] bg-[#858AE3] rounded-full h-6 animate-[wave_1.2s_ease-in-out_infinite_450ms]" />
+        <div className="w-[3px] bg-[#858AE3] rounded-full h-4 animate-[wave_1.2s_ease-in-out_infinite_600ms]" />
       </div>
     )
   }
 
   return (
-    <div className="relative group cursor-pointer" onClick={onToggleListen}>
-      {/* Outer Glow / Ripple Effect */}
+    <div className="relative group cursor-pointer gpu-accelerate" onClick={onToggleListen}>
+      {/* Outer ambient glow */}
       <div className={cn(
-        "absolute inset-0 rounded-full transition-all duration-700 ease-in-out opacity-50 blur-xl",
-        isListening ? "bg-[#97DFFC]/30 scale-150" : 
-        isProcessing ? "bg-[#613DC1]/30 scale-110" : 
-        isSpeaking ? "bg-[#858AE3]/40 scale-150" : 
-        "bg-[#858AE3]/20 scale-100 group-hover:scale-110"
-      )} />
+        "absolute inset-0 rounded-full transition-all duration-700 ease-in-out opacity-40 gpu-accelerate",
+        isListening ? "bg-[#97DFFC]/20 scale-[1.6]" : 
+        isProcessing ? "bg-[#613DC1]/15 scale-110" : 
+        isSpeaking ? "bg-[#858AE3]/20 scale-[1.5]" : 
+        "bg-[#858AE3]/10 scale-100 group-hover:scale-110"
+      )} style={{ filter: 'blur(30px)' }} />
       
       {/* Core Orb */}
       <div className={cn(
-        "relative flex items-center justify-center w-32 h-32 rounded-full glass-thick backdrop-blur-2xl transition-all duration-500 ease-in-out border-2 overflow-hidden",
+        "relative flex items-center justify-center w-36 h-36 rounded-full transition-all duration-500 ease-out border-2 overflow-hidden gpu-accelerate",
+        "bg-gradient-to-br from-[#071225] via-[#0B1020] to-[#071225]",
+        !isListening && !isProcessing && !isSpeaking && "animate-breathe",
         stateClass
       )}>
-        {/* Subtle inner reflection */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/10 to-white/40 opacity-50 pointer-events-none" />
+        {/* Inner reflection */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.08] pointer-events-none" />
         
         {/* Icon */}
-        <div className="relative z-10 transition-transform duration-300">
+        <div className="relative z-10">
           {icon}
         </div>
       </div>

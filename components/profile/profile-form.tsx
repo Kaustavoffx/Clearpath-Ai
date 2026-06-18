@@ -25,90 +25,88 @@ export function ProfileForm() {
   }
 
   return (
-    <div className="glass-thick rounded-apple-xl border border-apple-glass-border shadow-apple-md relative overflow-hidden mt-8">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none translate-x-1/2 -translate-y-1/2" />
-      
-      <div className="p-8 sm:p-10">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-6 border-b border-apple-glass-border pb-8 mb-8">
-          <div className="h-20 w-20 shrink-0 rounded-full bg-background/50 border border-apple-glass-highlight flex items-center justify-center shadow-inner relative group cursor-pointer">
-            <UserCircle className="h-12 w-12 text-muted-foreground group-hover:text-primary transition-colors" />
-            <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
-              <Sparkles className="w-3 h-3" />
+    <div className="liquid-glass-card overflow-hidden">
+      <div className="p-7">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-5 border-b border-glass-border pb-6 mb-6">
+          <div className="h-16 w-16 shrink-0 rounded-full bg-[#071225] border border-glass-border flex items-center justify-center relative">
+            <UserCircle className="h-9 w-9 text-muted-foreground" />
+            <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[#858AE3] flex items-center justify-center">
+              <Sparkles className="w-2.5 h-2.5 text-[#030712]" />
             </div>
           </div>
           <div>
-            <h3 className="text-xl font-semibold tracking-tight">AI Evaluation Profile</h3>
-            <p className="text-muted-foreground text-sm mt-1 max-w-md leading-relaxed">
-              We use this local data to match your context against bureaucratic eligibility criteria.
+            <h3 className="text-[18px] font-semibold tracking-[-0.01em]">AI Evaluation Profile</h3>
+            <p className="text-muted-foreground text-[13px] mt-0.5 max-w-md leading-relaxed">
+              Local data used to match your context against eligibility criteria.
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl">
-          <div className="grid gap-3">
-            <Label className="text-sm font-medium text-foreground ml-1">Legal Name</Label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
+          <div className="grid gap-2">
+            <Label className="text-[13px] font-medium text-foreground">Legal Name</Label>
             <Input 
               value={profile.name} 
               onChange={e => setProfile({...profile, name: e.target.value})}
-              className="h-12 bg-background/50 border-apple-glass-border focus-visible:ring-primary rounded-apple-md px-4 shadow-inner"
+              className="h-11 bg-[#071225]/40 border-glass-border focus-visible:ring-[#858AE3] rounded-xl px-4 text-[14px]"
             />
           </div>
           
-          <div className="grid gap-3">
-            <Label className="text-sm font-medium text-foreground ml-1">Academic Status</Label>
+          <div className="grid gap-2">
+            <Label className="text-[13px] font-medium text-foreground">Academic Status</Label>
             <Input 
               value={profile.gradeLevel} 
               onChange={e => setProfile({...profile, gradeLevel: e.target.value})}
               placeholder="e.g. Class 12, Undergraduate" 
-              className="h-12 bg-background/50 border-apple-glass-border focus-visible:ring-primary rounded-apple-md px-4 shadow-inner"
+              className="h-11 bg-[#071225]/40 border-glass-border focus-visible:ring-[#858AE3] rounded-xl px-4 text-[14px]"
             />
           </div>
 
-          <div className="grid gap-3">
-            <Label className="text-sm font-medium text-foreground ml-1">State / Region</Label>
+          <div className="grid gap-2">
+            <Label className="text-[13px] font-medium text-foreground">State / Region</Label>
             <Input 
               value={profile.state} 
               onChange={e => setProfile({...profile, state: e.target.value})}
               placeholder="e.g. West Bengal" 
-              className="h-12 bg-background/50 border-apple-glass-border focus-visible:ring-primary rounded-apple-md px-4 shadow-inner"
+              className="h-11 bg-[#071225]/40 border-glass-border focus-visible:ring-[#858AE3] rounded-xl px-4 text-[14px]"
             />
           </div>
 
-          <div className="grid gap-3">
-            <Label className="text-sm font-medium text-foreground ml-1">Family Income Range</Label>
+          <div className="grid gap-2">
+            <Label className="text-[13px] font-medium text-foreground">Family Income Range</Label>
             <Input 
               value={profile.incomeRange} 
               onChange={e => setProfile({...profile, incomeRange: e.target.value})}
               placeholder="e.g. Below ₹2.5L" 
-              className="h-12 bg-background/50 border-apple-glass-border focus-visible:ring-primary rounded-apple-md px-4 shadow-inner"
+              className="h-11 bg-[#071225]/40 border-glass-border focus-visible:ring-[#858AE3] rounded-xl px-4 text-[14px]"
             />
           </div>
 
-          <div className="grid gap-3">
-            <Label className="text-sm font-medium text-foreground ml-1">Social Category</Label>
+          <div className="grid gap-2">
+            <Label className="text-[13px] font-medium text-foreground">Social Category</Label>
             <Input 
               value={profile.category} 
               onChange={e => setProfile({...profile, category: e.target.value})}
               placeholder="e.g. General, OBC, SC/ST" 
-              className="h-12 bg-background/50 border-apple-glass-border focus-visible:ring-primary rounded-apple-md px-4 shadow-inner"
+              className="h-11 bg-[#071225]/40 border-glass-border focus-visible:ring-[#858AE3] rounded-xl px-4 text-[14px]"
             />
           </div>
 
-          <div className="grid gap-3">
-            <Label className="text-sm font-medium text-foreground ml-1">Career Interest</Label>
+          <div className="grid gap-2">
+            <Label className="text-[13px] font-medium text-foreground">Career Interest</Label>
             <Input 
               value={profile.careerInterest} 
               onChange={e => setProfile({...profile, careerInterest: e.target.value})}
               placeholder="e.g. Engineering, Arts" 
-              className="h-12 bg-background/50 border-apple-glass-border focus-visible:ring-primary rounded-apple-md px-4 shadow-inner"
+              className="h-11 bg-[#071225]/40 border-glass-border focus-visible:ring-[#858AE3] rounded-xl px-4 text-[14px]"
             />
           </div>
         </div>
       </div>
       
-      <div className="bg-muted/10 border-t border-apple-glass-border px-8 sm:px-10 py-6 flex justify-end items-center gap-4">
-        {saved && <span className="text-success text-sm font-medium flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Profile Updated</span>}
-        <Button onClick={handleSave} className="h-12 px-8 rounded-apple-md font-medium text-base shadow-apple-sm spring-active">
+      <div className="border-t border-glass-border px-7 py-5 flex justify-end items-center gap-4 bg-[#071225]/30">
+        {saved && <span className="text-[#93CAF6] text-[13px] font-medium flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> Profile Updated</span>}
+        <Button onClick={handleSave} className="h-10 px-6 rounded-xl font-medium text-[14px]">
           Save AI Context
         </Button>
       </div>
