@@ -46,8 +46,8 @@ export async function checkAndIncrementUsage(userId: string, feature: FeatureTyp
     return { hasFreeUsage: true, hasProviderConnected: false, count: 0, provider: providerName };
   }
 
-  const currentCount = usage[countColumn] as number;
-  const isProviderConnected = usage[providerColumn] as boolean;
+  const currentCount = (usage as any)[countColumn] as number;
+  const isProviderConnected = (usage as any)[providerColumn] as boolean;
   
   const hasFreeUsage = currentCount < 3;
 

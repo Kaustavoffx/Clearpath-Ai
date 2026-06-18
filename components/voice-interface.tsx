@@ -5,7 +5,7 @@ import { VoiceOrb } from '@/components/ui/voice-orb'
 import { toast } from 'sonner'
 import { UploadWidget } from '@/components/opportunities/upload-widget'
 import { useRouter } from 'next/navigation'
-import { Brain, User as UserIcon, Activity, Target, Shield, X, Mic, Cpu } from 'lucide-react'
+import { Brain, User as UserIcon, Activity, Target, Shield, X, Mic, Cpu, RefreshCw } from 'lucide-react'
 
 // Mock Data for Context Widgets
 const MOCK_CONTEXT = {

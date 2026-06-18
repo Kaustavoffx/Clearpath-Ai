@@ -72,7 +72,7 @@ export async function POST(request: Request) {
 
     if (profile) {
       profileData = {
-        name: profile.full_name || user.user_metadata?.full_name || "Student",
+        name: profile.first_name ? `${profile.first_name} ${profile.last_name}`.trim() : "Student",
         state: profile.state || user.user_metadata?.state || "Not set",
         income_range: profile.income_range || user.user_metadata?.income_range || "Not set",
         category: profile.category || user.user_metadata?.category || "General",
