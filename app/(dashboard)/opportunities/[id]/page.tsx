@@ -2,13 +2,13 @@ import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AlertTriangle, Clock, ArrowRight, Target, CheckCircle2, TrendingDown, BookOpen, Bug, FileText, Activity } from "lucide-react"
+import { AlertTriangle, Clock, ArrowRight, Target, CheckCircle2, TrendingDown, BookOpen, Bug, Activity } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { StressTranslator } from "@/components/ui/stress-translator"
 import { cn } from "@/lib/utils"
 import { DecisionCard } from "@/components/ui/decision-card"
-import { HumanReviewAction } from "@/components/opportunities/human-review-action"
+import { HumanInTheLoopPipeline } from "@/components/opportunities/human-in-the-loop-pipeline"
 import { ShieldAlert } from "lucide-react"
 
 import { Metadata } from "next"
@@ -55,7 +55,6 @@ export default async function OpportunityDetailsPage({
 
   const rawDocs = opportunity.required_documents
   const missingDocs = Array.isArray(rawDocs) ? rawDocs : (typeof rawDocs === 'string' ? [rawDocs] : [])
-  const hasMissingDocs = missingDocs.length > 0
   
   // Deterministic Transparent Scoring Algorithm
   const baseCompletedItems = ["Eligibility Verified", "Identity Proof"]
@@ -230,14 +229,13 @@ export default async function OpportunityDetailsPage({
             </div>
           </div>
         </div>
-        <HumanReviewAction />
       </div>
 
       {/* NEW TABS SYSTEM: Explain / Do / Miss */}
       <Tabs defaultValue="explain" className="w-full mt-4">
         <TabsList className="w-full md:w-auto flex flex-wrap md:inline-flex h-auto p-1 bg-muted rounded-lg border border-border mb-8 shadow-elevation-1 gap-1">
           <TabsTrigger value="explain" className="rounded-md data-[state=active]:bg-background data-[state=active]:text-foreground py-2.5 px-6 font-semibold transition-crisp data-[state=active]:shadow-elevation-1 text-step-0 uppercase tracking-wider">UNDERSTAND</TabsTrigger>
-          <TabsTrigger value="do" className="rounded-md data-[state=active]:bg-background data-[state=active]:text-foreground py-2.5 px-6 font-semibold transition-crisp data-[state=active]:shadow-elevation-1 text-step-0 uppercase tracking-wider">ACT NOW</TabsTrigger>
+          <TabsTrigger value="do" className="rounded-md data-[state=active]:bg-background data-[state=active]:text-foreground py-2.5 px-6 font-semibold transition-crisp data-[state=active]:shadow-elevation-1 text-step-0 uppercase tracking-wider">DECISION PIPELINE</TabsTrigger>
           <TabsTrigger value="miss" className="rounded-md data-[state=active]:bg-danger data-[state=active]:text-white py-2.5 px-6 font-semibold transition-crisp data-[state=active]:shadow-elevation-1 text-step-0 uppercase tracking-wider">IF YOU IGNORE THIS</TabsTrigger>
           <TabsTrigger value="evidence" className="rounded-md data-[state=active]:bg-background data-[state=active]:text-foreground py-2.5 px-6 font-semibold transition-crisp data-[state=active]:shadow-elevation-1 text-step-0 uppercase tracking-wider ml-auto">VERIFY</TabsTrigger>
         </TabsList>
@@ -290,64 +288,7 @@ export default async function OpportunityDetailsPage({
 
         {/* DO TAB */}
         <TabsContent value="do" className="pt-4 outline-none animate-in fade-in duration-500">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2">
-              <h2 className="text-step-3 tracking-tight mb-2 flex items-center gap-2">
-                <FileText className="w-6 h-6 text-foreground" /> Smart Action Timeline
-              </h2>
-              <p className="text-step-1 text-muted-foreground mb-12">Follow these steps sequentially to guarantee success.</p>
-              
-              <div className="relative border-l border-border ml-6 space-y-12 pb-8">
-                {Array.isArray(opportunity.action_steps) && opportunity.action_steps.length > 0 ? (
-                  [...opportunity.action_steps].sort((a: { step_number: number }, b: { step_number: number }) => (a.step_number || 0) - (b.step_number || 0)).map((step: { id: string, step_number: number, title: string, description: string }, idx) => (
-                    <div key={step.id || `step-${idx}`} className="relative pl-12 group">
-                      <div className="absolute -left-[16.5px] top-0 w-8 h-8 rounded-full bg-background border-2 border-border flex items-center justify-center text-step-0 font-bold text-foreground shadow-elevation-1 transition-crisp group-hover:border-foreground group-hover:bg-foreground group-hover:text-background">
-                        {step.step_number || (idx + 1)}
-                      </div>
-                      <div className="decision-surface p-6 transition-crisp hover:shadow-elevation-3">
-                        <h3 className="text-step-2 font-bold mb-3">{step.title}</h3>
-                        <p className="text-step-1 text-muted-foreground leading-relaxed">{step.description}</p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="p-12 text-center text-muted-foreground border border-dashed border-border rounded-xl">
-                    No action steps could be generated.
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Missing Documents Column */}
-            <div className="space-y-6">
-              <h2 className="text-step-3 tracking-tight mb-2 flex items-center gap-2">
-                <AlertTriangle className="w-6 h-6 text-warning" /> Missing Documents
-              </h2>
-              <div className={cn("decision-surface p-8 border-t-2", hasMissingDocs ? "border-t-warning bg-warning/5" : "border-t-success bg-success/5")}>
-                {hasMissingDocs ? (
-                  <>
-                    <p className="text-step-1 text-warning mb-8 leading-relaxed">
-                      You cannot complete this application until you acquire the following {missingDocs.length} documents:
-                    </p>
-                    <ul className="space-y-4">
-                      {missingDocs.map((doc: string, i: number) => (
-                        <li key={i} className="flex gap-4 decision-surface-muted p-4">
-                          <div className="w-6 h-6 rounded-full bg-warning/20 text-warning flex items-center justify-center font-bold text-[11px] shrink-0">{i+1}</div>
-                          <span className="font-medium text-step-0 text-foreground pt-0.5">{doc}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-center py-10">
-                    <CheckCircle2 className="w-16 h-16 text-success mb-6" />
-                    <p className="text-step-2 font-bold text-foreground">You have everything you need.</p>
-                    <p className="text-step-1 mt-2 text-muted-foreground">Proceed with the action timeline immediately.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          <HumanInTheLoopPipeline checklist={opportunity.action_steps} />
         </TabsContent>
 
         {/* MISS TAB (Opportunity Loss Simulator) */}
