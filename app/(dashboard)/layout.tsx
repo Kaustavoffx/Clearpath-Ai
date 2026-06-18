@@ -1,5 +1,5 @@
-import { ThemeToggle } from "@/components/theme-toggle"
-
+import { AppNavigation } from "@/components/navigation/app-navigation"
+import { Suspense } from "react"
 
 export default function DashboardLayout({
   children,
@@ -8,21 +8,12 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-background">
-      {/* Absolute Header for essentials */}
-      <header className="absolute top-0 w-full z-50 p-6 flex justify-between items-center bg-transparent">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center shadow-[0_0_15px_rgba(var(--primary),0.5)]">
-            <span className="text-primary-foreground font-bold text-sm">C</span>
-          </div>
-          <span className="font-bold tracking-tight text-lg">ClearPath OS</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <ThemeToggle />
-        </div>
-      </header>
+      <Suspense fallback={<div className="w-[84px] hidden md:block" />}>
+        <AppNavigation />
+      </Suspense>
       
       {/* Immersive Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center relative w-full h-screen">
+      <main className="flex-1 flex flex-col relative w-full min-h-screen md:pl-[116px] pb-28 md:pb-0 transition-all duration-500">
         {children}
       </main>
     </div>
