@@ -53,7 +53,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <GlobalBackground />
-          <div className="relative z-1 flex-1 flex flex-col w-full h-full">
+          <div className="relative z-10 flex-1 flex flex-col w-full h-full">
             {children}
           </div>
         </ThemeProvider>
