@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
-import { buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button-variants"
 import { cn } from "@/lib/utils"
 import { FileText, ArrowRight, Clock, Target } from "lucide-react"
 import Link from "next/link"
