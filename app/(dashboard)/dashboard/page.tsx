@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { UploadWidget } from "@/components/opportunities/upload-widget"
-import { ShieldCheck, FileText, Zap } from "lucide-react"
+import { ShieldCheck, Command, FolderArchive } from "lucide-react"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -12,62 +12,77 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="w-full min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-6 lg:p-12">
+    <div className="w-full min-h-[calc(100vh-5rem)] flex flex-col p-6 lg:p-12 max-w-7xl mx-auto mt-16">
       
-      {/* Hero Section */}
-      <div className="text-center max-w-3xl mx-auto mb-12 relative z-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-thin mb-8">
-          <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">System Online & Ready</span>
-        </div>
-        
-        <h1 className="text-hero mb-6 text-balance">
-          Understand Any Scholarship, Notice, Internship or Scheme in <span className="text-primary">Seconds</span>
+      <div className="mb-12 border-b border-apple-glass-border pb-8">
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+          <Command className="w-8 h-8 text-primary" /> Command Center
         </h1>
-        
-        <p className="text-section text-muted-foreground text-balance mx-auto max-w-2xl">
-          Upload a PDF, image, screenshot or website. We tell you exactly what to do next.
+        <p className="text-muted-foreground mt-2 text-lg">
+          Ingest documents, generate action plans, and track your active opportunities.
         </p>
       </div>
 
-      {/* Upload Widget Area */}
-      <div className="w-full max-w-2xl relative z-20 mb-16">
-        <UploadWidget />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        
+        {/* Left Column: Upload & Processing Engine */}
+        <div className="lg:col-span-2 space-y-8">
+          <div className="glass-thick rounded-apple-xl p-8 border border-apple-glass-highlight shadow-apple-lg relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl" />
+            <h2 className="text-xl font-semibold mb-6">Decision Engine</h2>
+            <UploadWidget />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="glass-thin rounded-apple-lg p-6 border-l-4 border-l-emerald-500 hover:glass-regular transition-all spring-transition group">
+              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-500" /> Evidence-Based Analysis
+              </h3>
+              <p className="text-sm text-muted-foreground">Every deadline and requirement extracted is strictly cited back to the original source text.</p>
+            </div>
+            <div className="glass-thin rounded-apple-lg p-6 border-l-4 border-l-amber-500 hover:glass-regular transition-all spring-transition group">
+              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <FolderArchive className="w-4 h-4 text-amber-500" /> Auto-Archival
+              </h3>
+              <p className="text-sm text-muted-foreground">Passed deadlines are automatically archived to keep your command center clutter-free.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Status & Intelligence */}
+        <div className="space-y-6">
+          <div className="glass-regular rounded-apple-lg p-6 border border-apple-glass-border">
+            <div className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">System Status</div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Gemini Intelligence</span>
+                <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Online
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Document Vault</span>
+                <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Secure
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Action Pipelines</span>
+                <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Ready
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="glass-thin rounded-apple-lg p-6 border border-apple-glass-border opacity-80 hover:opacity-100 transition-opacity">
+            <div className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Pro Tip</div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              If a document mentions an obscure dependency (like Annexure C), the AI will automatically cross-reference whether you have it ready.
+            </p>
+          </div>
+        </div>
       </div>
-
-      {/* Trust & Examples Area */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full relative z-10">
-        <div className="glass-thin p-6 rounded-apple-lg flex flex-col items-center text-center group hover:glass-regular transition-all spring-transition">
-          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 spring-transition">
-            <FileText className="w-6 h-6 text-primary" />
-          </div>
-          <h3 className="font-semibold mb-2 text-card-title">Supported Formats</h3>
-          <p className="text-metadata text-balance">
-            PDF circulars, PNG/JPG screenshots, or paste any website URL.
-          </p>
-        </div>
-
-        <div className="glass-thin p-6 rounded-apple-lg flex flex-col items-center text-center group hover:glass-regular transition-all spring-transition">
-          <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 group-hover:scale-110 spring-transition">
-            <Zap className="w-6 h-6 text-emerald-500" />
-          </div>
-          <h3 className="font-semibold mb-2 text-card-title">Instant Analysis</h3>
-          <p className="text-metadata text-balance">
-            Powered by Gemini 2.5 Flash for lightning-fast, highly accurate extraction.
-          </p>
-        </div>
-
-        <div className="glass-thin p-6 rounded-apple-lg flex flex-col items-center text-center group hover:glass-regular transition-all spring-transition">
-          <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mb-4 group-hover:scale-110 spring-transition">
-            <ShieldCheck className="w-6 h-6 text-blue-500" />
-          </div>
-          <h3 className="font-semibold mb-2 text-card-title">Zero Hallucinations</h3>
-          <p className="text-metadata text-balance">
-            Strictly grounded in your document. We never invent deadlines.
-          </p>
-        </div>
-      </div>
-
     </div>
   )
 }

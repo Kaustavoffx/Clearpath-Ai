@@ -10,7 +10,8 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const { error } = await searchParams
+  const { error: errorParam } = await searchParams
+  const error = Array.isArray(errorParam) ? errorParam[0] : errorParam
 
   return (
     <div className="flex min-h-screen w-full flex-col lg:flex-row bg-background">
