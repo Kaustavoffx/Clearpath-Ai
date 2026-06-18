@@ -33,11 +33,12 @@ export default function LandingPage() {
             ClearPath OS 2.0 Early Access
           </div>
           <h1 className="text-step-5 mb-6 text-balance text-foreground">
-            Decipher bureaucracy.<br />
-            <span className="text-muted-foreground">Guarantee action.</span>
+            You were never bad at applications.<br />
+            <span className="text-muted-foreground">The documents were impossible to understand.</span>
           </h1>
           <p className="text-step-2 text-muted-foreground text-balance mx-auto mb-10 leading-relaxed">
-            The mission-critical decision engine for students. Upload any dense circular or scholarship notice, and get a structured, step-by-step action plan instantly.
+            Upload any scholarship notice, circular, or government document.<br />
+            ClearPath converts confusion into an action plan in under 60 seconds.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/register" className={cn(buttonVariants({ size: "lg" }), "h-12 px-8 text-step-1 rounded-md w-full sm:w-auto shadow-elevation-1 hover:shadow-elevation-2 transition-crisp")}>

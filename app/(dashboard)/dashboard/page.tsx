@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { UploadWidget } from "@/components/opportunities/upload-widget"
-import { ShieldCheck, Command, FolderArchive } from "lucide-react"
+import { ShieldCheck, Command, FolderArchive, Target, Clock, AlertTriangle, IndianRupee } from "lucide-react"
 import { DecisionCard } from "@/components/ui/decision-card"
 
 export default async function DashboardPage() {
@@ -15,13 +15,52 @@ export default async function DashboardPage() {
   return (
     <div className="container-standard min-h-[calc(100vh-5rem)] flex flex-col py-12 mt-8">
       
-      <div className="mb-12 border-b border-border pb-8">
+      <div className="mb-8 border-b border-border pb-8">
         <h1 className="text-step-4 flex items-center gap-3">
-          <Command className="w-8 h-8 text-foreground" /> Command Center
+          <Target className="w-8 h-8 text-foreground" /> Your Mission Control
         </h1>
         <p className="text-muted-foreground mt-2 text-step-2">
           Ingest documents, generate action plans, and track your active opportunities.
         </p>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="decision-surface p-6 border-l-2 border-l-warning">
+          <div className="flex items-center gap-2 text-muted-foreground mb-3">
+            <AlertTriangle className="w-4 h-4 text-warning" />
+            <span className="text-[11px] font-bold uppercase tracking-wider">Critical</span>
+          </div>
+          <div className="text-step-4 font-bold text-foreground">2</div>
+          <div className="text-step-0 text-muted-foreground mt-1">Opportunities</div>
+        </div>
+
+        <div className="decision-surface p-6 border-l-2 border-l-danger">
+          <div className="flex items-center gap-2 text-muted-foreground mb-3">
+            <Clock className="w-4 h-4 text-danger" />
+            <span className="text-[11px] font-bold uppercase tracking-wider">Urgent</span>
+          </div>
+          <div className="text-step-4 font-bold text-foreground">1</div>
+          <div className="text-step-0 text-muted-foreground mt-1">Deadline This Week</div>
+        </div>
+
+        <div className="decision-surface p-6 border-l-2 border-l-primary">
+          <div className="flex items-center gap-2 text-muted-foreground mb-3">
+            <FolderArchive className="w-4 h-4 text-primary" />
+            <span className="text-[11px] font-bold uppercase tracking-wider">Action</span>
+          </div>
+          <div className="text-step-4 font-bold text-foreground">8</div>
+          <div className="text-step-0 text-muted-foreground mt-1">Missing Documents</div>
+        </div>
+
+        <div className="decision-surface p-6 border-l-2 border-l-success">
+          <div className="flex items-center gap-2 text-muted-foreground mb-3">
+            <IndianRupee className="w-4 h-4 text-success" />
+            <span className="text-[11px] font-bold uppercase tracking-wider">Value</span>
+          </div>
+          <div className="text-step-4 font-bold text-success">₹50k</div>
+          <div className="text-step-0 text-muted-foreground mt-1">Potential Funding</div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
