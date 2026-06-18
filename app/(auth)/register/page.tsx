@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { Sparkles, ShieldCheck } from 'lucide-react'
+import { ClearPathAmbientBackground } from '@/components/layout/clearpath-ambient-background'
+import { Suspense } from 'react'
 
 export default async function RegisterPage({
   searchParams,
@@ -15,10 +17,12 @@ export default async function RegisterPage({
 
   return (
     <div className="flex min-h-screen w-full flex-col lg:flex-row font-sans">
+      <Suspense fallback={null}>
+        <ClearPathAmbientBackground variant="auth" />
+      </Suspense>
       
       {/* Left Panel - Trust / Mission-first */}
       <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 bg-glass-surface/10 border-r border-glass-border relative overflow-hidden">
-        <div className="absolute top-[-20%] left-[-20%] w-[50vw] h-[50vw] rounded-full bg-primary/10 blur-[120px] pointer-events-none mix-blend-screen" />
         <div className="relative z-10">
           <Link href="/" className="flex items-center gap-2 group mb-16">
             <div className="w-10 h-10 rounded-[12px] bg-foreground flex items-center justify-center transition-spring group-hover:bg-primary shadow-elevation-2">

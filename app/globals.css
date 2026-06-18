@@ -25,10 +25,10 @@
   --color-glass-highlight: var(--glass-highlight);
   
   /* Trust & Quality Colors */
-  --color-success: #E8EB68;
-  --color-warning: #D58A3A;
-  --color-danger: #D58A3A;
-  --color-info: #E8EB68;
+  --color-success: #93CAF6;
+  --color-warning: #858AE3;
+  --color-danger: #613DC1;
+  --color-info: #8EB5F0;
   
   /* Semantic spacing (8pt grid) */
   --spacing-sys-1: 8px;
@@ -47,25 +47,25 @@
 }
 
 :root {
-  --background: #07111D;
+  --background: #0B1E2E;
   --foreground: #F8FAFC;
   
-  --muted: #0B1E2E;
+  --muted: #112840;
   --muted-foreground: rgba(248, 250, 252, 0.6);
   
-  --primary: #E8EB68;
-  --primary-foreground: #07111D;
+  --primary: #858AE3;
+  --primary-foreground: #FFFFFF;
 
-  --secondary: #D58A3A;
-  --secondary-foreground: #FFFFFF;
+  --secondary: #97DFFC;
+  --secondary-foreground: #0B1E2E;
 
   --border: rgba(255,255,255,0.08);
 
-  /* Liquid Glass - Light Mode */
-  --glass-surface: rgba(11, 30, 46, 0.4);
-  --glass-layer: rgba(11, 30, 46, 0.6);
-  --glass-border: rgba(232, 235, 104, 0.1);
-  --glass-highlight: rgba(232, 235, 104, 0.15);
+  /* Liquid Glass - Light Mode (Usually matches dark in this OS) */
+  --glass-surface: rgba(255, 255, 255, 0.04);
+  --glass-layer: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(133, 138, 227, 0.15);
 }
 
 .dark {
@@ -75,19 +75,19 @@
   --muted: #0B1E2E;
   --muted-foreground: rgba(248, 250, 252, 0.6);
   
-  --primary: #E8EB68;
-  --primary-foreground: #07111D;
+  --primary: #858AE3;
+  --primary-foreground: #FFFFFF;
 
-  --secondary: #D58A3A;
-  --secondary-foreground: #FFFFFF;
+  --secondary: #97DFFC;
+  --secondary-foreground: #07111D;
 
   --border: rgba(255,255,255,0.08);
 
   /* Liquid Glass - Dark Mode */
-  --glass-surface: rgba(11, 30, 46, 0.4);
-  --glass-layer: rgba(11, 30, 46, 0.6);
-  --glass-border: rgba(232, 235, 104, 0.1);
-  --glass-highlight: rgba(232, 235, 104, 0.15);
+  --glass-surface: rgba(255, 255, 255, 0.04);
+  --glass-layer: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(133, 138, 227, 0.15);
 }
 
 @layer base {

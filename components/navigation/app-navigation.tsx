@@ -28,7 +28,7 @@ export function AppNavigation() {
     <>
       {/* DESKTOP FULL-HEIGHT SIDEBAR */}
       <nav 
-        className="hidden md:flex flex-col h-screen w-[260px] fixed left-0 top-0 bg-gradient-to-b from-primary/40 to-secondary/40 border-r border-glass-border backdrop-blur-xl z-50 transition-all duration-500"
+        className="hidden md:flex flex-col h-screen w-[260px] fixed left-0 top-0 bg-[#3D0E61]/20 border-r border-glass-border backdrop-blur-xl z-50 transition-all duration-500"
       >
         <div className="flex flex-col gap-8 p-6">
           {/* Logo / Brand */}

@@ -1,5 +1,6 @@
 import { AppNavigation } from "@/components/navigation/app-navigation"
 import { AdvisorFloatingButton } from "@/components/advisor/advisor-floating-button"
+import { ClearPathAmbientBackground } from "@/components/layout/clearpath-ambient-background"
 import { Suspense } from "react"
 
 export default function DashboardLayout({
@@ -9,6 +10,10 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden">
+      <Suspense fallback={null}>
+        <ClearPathAmbientBackground variant="dashboard" />
+      </Suspense>
+
       <Suspense fallback={<div className="w-[260px] hidden md:block" />}>
         <AppNavigation />
       </Suspense>

@@ -27,8 +27,6 @@ export const metadata: Metadata = {
   },
 };
 
-import { GlobalBackground } from "@/components/layout/global-background";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -37,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="preload" as="image" href="/background.webp" />
+        {/* Ambient background manages its own rendering without heavy image preloads */}
       </head>
       <body className={`${cmGeom.variable} font-sans antialiased text-foreground min-h-screen flex flex-col relative`}>
         <ThemeProvider
@@ -46,7 +44,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <GlobalBackground />
           <div className="relative z-10 flex-1 flex flex-col w-full h-full">
             {children}
           </div>

@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { StressTranslator } from '@/components/ui/stress-translator'
+import { AIProcessingConstellation } from '@/components/opportunities/ai-processing-constellation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
@@ -114,8 +115,9 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
 
   if (isUploading) {
     return (
-      <div className="w-full">
-        <StressTranslator simplifiedText="Hang tight, we're building your personalized action plan..." isProcessing={true} />
+      <div className="w-full flex flex-col items-center gap-6">
+        <AIProcessingConstellation />
+        <p className="text-[14px] text-muted-foreground animate-pulse">Building your personalized action plan...</p>
       </div>
     )
   }

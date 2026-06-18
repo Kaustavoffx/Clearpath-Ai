@@ -6,7 +6,7 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_rgba(232,235,104,0.1)] hover:bg-primary/20 hover:border-primary/40 hover:shadow-[0_0_25px_rgba(232,235,104,0.25)]",
+          "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_rgba(133,138,227,0.15)] hover:bg-[#97DFFC]/15 hover:text-[#97DFFC] hover:border-[#97DFFC]/30 hover:shadow-[0_0_25px_rgba(151,223,252,0.25)] active:bg-[#7364D2]/20 active:text-[#7364D2] active:border-[#7364D2]/40",
         outline:
           "border border-glass-border bg-glass-surface text-foreground shadow-sm hover:bg-glass-layer hover:border-glass-highlight hover:shadow-[0_0_15px_rgba(255,255,255,0.05)]",
         secondary:
@@ -14,7 +14,7 @@ export const buttonVariants = cva(
         ghost:
           "hover:bg-glass-surface hover:text-foreground hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:border hover:border-glass-border",
         destructive:
-          "bg-danger/10 text-danger hover:bg-danger/20 border border-danger/20 hover:shadow-[0_0_20px_rgba(213,138,58,0.2)]",
+          "bg-danger/10 text-danger hover:bg-danger/20 border border-danger/20 hover:shadow-[0_0_20px_rgba(97,61,193,0.2)]",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

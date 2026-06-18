@@ -4,14 +4,17 @@ import { Sparkles, ArrowRight, ShieldAlert, FileText, CheckCircle, Clock } from 
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
+import { ClearPathAmbientBackground } from "@/components/layout/clearpath-ambient-background"
+import { Suspense } from "react"
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col font-sans selection:bg-primary/30">
       
       {/* Background Ambience */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-primary/20 blur-[120px] pointer-events-none mix-blend-screen" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[30vw] h-[30vw] rounded-full bg-primary/10 blur-[100px] pointer-events-none mix-blend-screen" />
+      <Suspense fallback={null}>
+        <ClearPathAmbientBackground variant="landing" />
+      </Suspense>
 
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-glass-surface backdrop-blur-3xl border-b border-glass-border transition-all duration-400">
