@@ -106,7 +106,7 @@ export async function POST(request: Request) {
       Return ONLY a valid JSON object matching this schema perfectly:
       {
         "title": "String, name of the opportunity",
-        "category": "SCHOLARSHIP | CIRCULAR | SCHEME | INTERNSHIP | COMPETITION | OTHER",
+        "category": "Scholarship | Circular | School Circular | Government Scheme | Scheme | Internship | Competition | Other",
         "document_type": "String, type of document analyzed",
         "plain_language_summary": "String, a simple 2-3 sentence explanation",
         "important_dates": {
@@ -181,6 +181,21 @@ export async function POST(request: Request) {
 
     const aiResult = aiResponseSchema.parse(rawAiResult)
 
+    const rawCategory = aiResult.category || 'Unknown'
+    const normalizedCategory = rawCategory.toUpperCase().trim()
+
+    const categoryMapping: Record<string, string> = {
+      'SCHOLARSHIP': 'SCHOLARSHIP',
+      'CIRCULAR': 'CIRCULAR',
+      'SCHOOL CIRCULAR': 'CIRCULAR',
+      'GOVERNMENT SCHEME': 'SCHEME',
+      'SCHEME': 'SCHEME',
+      'INTERNSHIP': 'INTERNSHIP',
+      'COMPETITION': 'COMPETITION',
+    }
+
+    let finalCategory = categoryMapping[normalizedCategory] || 'OTHER'
+
     const validCategories = [
       'SCHOLARSHIP',
       'CIRCULAR',
@@ -190,10 +205,15 @@ export async function POST(request: Request) {
       'OTHER'
     ]
 
-    let safeCategory = aiResult.category || 'OTHER'
-    if (!validCategories.includes(safeCategory)) {
-      safeCategory = 'OTHER'
+    if (!validCategories.includes(finalCategory)) {
+      finalCategory = 'OTHER'
     }
+
+    logger.info({ 
+      rawCategory, 
+      normalizedCategory, 
+      finalDatabaseCategory: finalCategory 
+    }, 'Category Normalization')
 
     // 5. Output Sanitization (XSS Protection)
     const sanitizeOptions = { allowedTags: [], allowedAttributes: {} }
@@ -208,7 +228,7 @@ export async function POST(request: Request) {
       .insert({
         user_id: user.id,
         title: sanitizedTitle,
-        category: safeCategory,
+        category: finalCategory,
         storage_path: filePath || url || 'url-input',
         simplified_summary: sanitizedSummary,
         deadline: aiResult.important_dates?.deadline !== 'Not Found In Document' ? new Date(aiResult.important_dates?.deadline).toISOString() : null,
