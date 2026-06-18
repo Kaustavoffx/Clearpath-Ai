@@ -2,6 +2,7 @@ import { Sparkles, ShieldCheck, Heart, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+
 export default function MissionPage() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -20,7 +21,7 @@ export default function MissionPage() {
         </Link>
         <div className="flex items-center gap-4">
           <Link href="/login" className="text-sm font-medium hover:text-primary transition-colors">Sign In</Link>
-          <Link href="/register" className={cn(buttonVariants({ variant: "default" }), "rounded-apple-md font-medium shadow-apple-sm")}>
+          <Link href="/register" className={cn(buttonVariants(), "rounded-apple-md font-medium shadow-apple-sm")}>
             Get Started
           </Link>
         </div>
@@ -99,7 +100,7 @@ export default function MissionPage() {
           <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-blue-500/10" />
           <div className="relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-6">Stop reading circulars.<br/>Start winning opportunities.</h2>
-            <Link href="/register" className={cn(buttonVariants({ variant: "default" }), "h-14 px-8 text-lg rounded-apple-lg shadow-apple-md spring-active")}>
+            <Link href="/register" className={cn(buttonVariants(), "h-14 px-8 text-lg rounded-apple-lg shadow-apple-md spring-active")}>
               Join ClearPath OS Today <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </div>

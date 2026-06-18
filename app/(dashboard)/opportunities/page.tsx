@@ -1,9 +1,9 @@
 import { createClient } from "@/lib/supabase/server"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { FileText, ArrowRight, Clock, Target, ShieldCheck } from "lucide-react"
 import Link from "next/link"
-import { cn } from "@/lib/utils"
 
 export default async function OpportunitiesPage() {
   const supabase = await createClient()
@@ -25,7 +25,7 @@ export default async function OpportunitiesPage() {
             Monitor and execute your guaranteed action plans.
           </p>
         </div>
-        <Link href="/dashboard" className={cn(buttonVariants({ variant: "default" }), "h-12 px-6 rounded-apple-md font-medium text-base shadow-apple-sm spring-active")}>
+        <Link href="/dashboard" className={cn(buttonVariants(), "h-12 px-6 rounded-apple-md font-medium text-base shadow-apple-sm spring-active")}>
           Analyze New Document
         </Link>
       </div>
@@ -71,7 +71,7 @@ export default async function OpportunitiesPage() {
                     <div className="text-3xl font-bold tracking-tighter text-emerald-600 dark:text-emerald-400">{opp.readiness_score || 0}%</div>
                     <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-1">Readiness</div>
                   </div>
-                  <Link href={`/opportunities/${opp.id}`} className={cn(buttonVariants({ variant: "default" }), "h-12 px-6 rounded-apple-md font-medium bg-foreground text-background hover:bg-foreground/90 shadow-apple-sm group/btn spring-active w-full md:w-auto")}>
+                  <Link href={`/opportunities/${opp.id}`} className={cn(buttonVariants(), "h-12 px-6 rounded-apple-md font-medium bg-foreground text-background hover:bg-foreground/90 shadow-apple-sm group/btn spring-active w-full md:w-auto")}>
                     View Plan <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
                   </Link>
                 </div>
@@ -87,7 +87,7 @@ export default async function OpportunitiesPage() {
             <p className="text-muted-foreground max-w-sm mb-8 leading-relaxed">
               Upload your first circular, scholarship, or scheme document to generate a personalized action plan instantly.
             </p>
-            <Link href="/dashboard" className={cn(buttonVariants({ variant: "default" }), "h-12 px-8 rounded-apple-md font-medium text-base shadow-apple-sm spring-active")}>
+            <Link href="/dashboard" className={cn(buttonVariants(), "h-12 px-8 rounded-apple-md font-medium text-base shadow-apple-sm spring-active")}>
               Upload Document
             </Link>
           </div>

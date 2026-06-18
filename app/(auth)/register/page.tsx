@@ -6,8 +6,8 @@ export default async function RegisterPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const { error } = await searchParams
-  const errorMessage = Array.isArray(error) ? error[0] : error
+  const { error: errorParam } = await searchParams
+  const error = Array.isArray(errorParam) ? errorParam[0] : errorParam
 
   return (
     <div className="flex min-h-screen w-full flex-col lg:flex-row bg-background">
@@ -64,7 +64,7 @@ export default async function RegisterPage({
 
       {/* Right Panel - Authentication */}
       <div className="flex w-full lg:w-1/2 items-center justify-center p-8 sm:p-12 lg:p-24 relative">
-        <RegisterForm error={errorMessage} />
+        <RegisterForm error={error} />
       </div>
     </div>
   )

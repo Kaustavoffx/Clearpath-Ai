@@ -15,8 +15,7 @@ export function createClient() {
   }
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn("⚠️ Supabase URL or Anon Key is missing. Using placeholders to prevent crash.")
-    return createBrowserClient(supabaseUrl || 'https://placeholder.supabase.co', supabaseAnonKey || 'placeholder')
+    throw new Error("Your project's URL and API key are required to create a Supabase client")
   }
 
   return createBrowserClient(supabaseUrl, supabaseAnonKey)

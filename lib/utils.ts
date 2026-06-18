@@ -18,7 +18,11 @@ export function getBaseUrl() {
     return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
   }
 
-  return 'https://clearpath-ai-five.vercel.app';
+  if (process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production') {
+    return 'https://clearpath-ai-five.vercel.app';
+  }
+
+  return 'http://localhost:3000';
 }
 
 export function extractJsonFromGeminiResponse(rawResponse: string): { data: unknown, error: string | null, raw: string } {

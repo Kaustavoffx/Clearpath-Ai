@@ -41,11 +41,7 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
     }
   }, [isUploading])
 
-  const onDrop = useCallback((acceptedFiles: File[], fileRejections: any[]) => {
-    if (fileRejections.length > 0) {
-      toast.error('File rejected. Please ensure it is a supported format and under 10MB.')
-      return
-    }
+  const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       setFile(acceptedFiles[0])
     }
@@ -58,15 +54,14 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
       'image/*': ['.png', '.jpg', '.jpeg']
     },
     maxFiles: 1,
-    maxSize: 10 * 1024 * 1024,
   })
 
   const handleUpload = async () => {
     if (mode === 'file' && !file) return
     if (mode === 'url' && !url) return
 
-    setProcessingStep(0)
     setIsUploading(true)
+    setProcessingStep(0)
 
     try {
       const { data: { user } } = await supabase.auth.getUser()

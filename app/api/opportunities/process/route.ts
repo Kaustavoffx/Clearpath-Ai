@@ -79,16 +79,6 @@ export async function POST(request: Request) {
         mimeType: filePath.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg'
       }
     } else if (url) {
-      const parsedUrl = new URL(url)
-      if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
-        return NextResponse.json({ error: 'Invalid URL protocol' }, { status: 400 })
-      }
-      
-      const hostname = parsedUrl.hostname
-      if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('10.') || hostname.startsWith('192.168.') || hostname.startsWith('169.254.')) {
-        return NextResponse.json({ error: 'Fetching from this host is not allowed' }, { status: 400 })
-      }
-
       logger.info({ userId: user.id, url }, 'Fetching external URL')
       const res = await fetch(url)
       const html = await res.text()
@@ -102,9 +92,6 @@ export async function POST(request: Request) {
     }
 
     // 4. Prompt Injection Protection & Execution
-    if (!env.GEMINI_API_KEY || env.GEMINI_API_KEY === 'dummy') {
-      return NextResponse.json({ error: 'AI processing is currently disabled due to missing configuration.' }, { status: 503 })
-    }
     const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY })
 
     const prompt = `
