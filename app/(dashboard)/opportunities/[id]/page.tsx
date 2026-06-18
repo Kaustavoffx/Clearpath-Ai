@@ -11,14 +11,15 @@ import { HumanInTheLoopPipeline } from "@/components/opportunities/human-in-the-
 import { JudgeArchitectureFlow } from "@/components/opportunities/judge-architecture-flow"
 import { Metadata } from "next"
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
   const supabase = await createClient()
-  const { data: opp } = await supabase.from('opportunities').select('title, simplified_summary').eq('id', params.id).single()
+  const { data: opp } = await supabase.from('opportunities').select('title, simplified_summary').eq('id', id).single()
   
   if (!opp) return { title: 'Opportunity Not Found' }
   
   return {
-    title: opp.title,
+    title: opp.title || 'Opportunity',
     description: opp.simplified_summary || "View your action plan.",
   }
 }
@@ -46,10 +47,13 @@ export default async function OpportunityDetailsPage({
     notFound()
   }
 
-  const { data } = await supabase.storage
-    .from('opportunities')
-    .createSignedUrl(opportunity.storage_path, 3600)
-  const signedUrl = data?.signedUrl
+  let signedUrl = null
+  if (opportunity.storage_path) {
+    const { data } = await supabase.storage
+      .from('opportunities')
+      .createSignedUrl(opportunity.storage_path, 3600)
+    signedUrl = data?.signedUrl
+  }
 
   const rawDocs = opportunity.required_documents
   const missingDocs = Array.isArray(rawDocs) ? rawDocs : (typeof rawDocs === 'string' ? [rawDocs] : [])

@@ -33,6 +33,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { GlobalBackground } from "@/components/layout/global-background";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -40,14 +42,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased bg-background text-foreground`}>
+      <head>
+        <link rel="preload" as="image" href="/background.webp" />
+      </head>
+      <body className={`${inter.variable} font-sans antialiased text-foreground min-h-screen flex flex-col relative`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <GlobalBackground />
+          <div className="relative z-1 flex-1 flex flex-col w-full h-full">
+            {children}
+          </div>
         </ThemeProvider>
       </body>
     </html>

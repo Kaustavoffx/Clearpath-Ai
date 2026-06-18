@@ -86,7 +86,7 @@
 
 @layer base {
   body {
-    background-color: var(--background);
+    background-color: transparent;
     color: var(--foreground);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
