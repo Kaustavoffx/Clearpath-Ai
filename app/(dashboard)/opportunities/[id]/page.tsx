@@ -9,6 +9,7 @@ import { StressTranslator } from "@/components/ui/stress-translator"
 import { cn } from "@/lib/utils"
 import { DecisionCard } from "@/components/ui/decision-card"
 import { HumanInTheLoopPipeline } from "@/components/opportunities/human-in-the-loop-pipeline"
+import { JudgeArchitectureFlow } from "@/components/opportunities/judge-architecture-flow"
 import { ShieldAlert } from "lucide-react"
 
 import { Metadata } from "next"
@@ -85,40 +86,25 @@ export default async function OpportunityDetailsPage({
           )}
         >
           <Bug className="w-3 h-3" />
-          {isJudgeMode ? "Viewing Impact Narrative" : "Why This Matters"}
+          {isJudgeMode ? "Exit Judge Mode" : "Judge Mode: View Architecture"}
         </Link>
       </div>
 
-      {/* RAI WARNING BANNER */}
-      <div className="bg-warning/10 border border-warning/30 text-warning px-4 py-3 rounded-lg flex items-center justify-center gap-3 text-sm font-medium shadow-elevation-1">
-        <ShieldAlert className="w-5 h-5 shrink-0" />
-        <span><strong>Verify Before Acting:</strong> This action plan is AI-generated. Always verify deadlines and requirements against the official source document.</span>
-      </div>
+      {isJudgeMode ? (
+        <JudgeArchitectureFlow />
+      ) : (
+        <div className="flex flex-col gap-8">
+          {/* RAI WARNING BANNER */}
+          <div className="bg-warning/10 border border-warning/30 text-warning px-4 py-3 rounded-lg flex items-center justify-center gap-3 text-sm font-medium shadow-elevation-1">
+            <ShieldAlert className="w-5 h-5 shrink-0" />
+            <span><strong>Verify Before Acting:</strong> This action plan is AI-generated. Always verify deadlines and requirements against the official source document.</span>
+          </div>
 
-      {/* TOP SECTION: Hero & Readiness */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* TOP SECTION: Hero & Readiness */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left: Title */}
         <div className="lg:col-span-2 decision-surface p-8 lg:p-10 flex flex-col justify-between border-t-2 border-t-foreground relative overflow-hidden">
-          {isJudgeMode && (
-            <div className="absolute inset-0 bg-background/95 backdrop-blur-md border-2 border-warning/30 z-50 flex flex-col p-8 animate-in fade-in duration-300">
-              <div className="flex items-center justify-between mb-8">
-                <h3 className="text-step-3 text-warning font-bold flex items-center gap-3"><Bug className="w-6 h-6" /> Hackathon Judge Impact</h3>
-                <Link href="?judge=false" className="text-warning hover:text-warning/80"><span className="text-step-2 font-bold">&times;</span></Link>
-              </div>
-              <div className="grid grid-cols-2 gap-8 h-full">
-                <div className="space-y-6">
-                  <div><span className="text-[11px] font-bold uppercase tracking-wider text-warning/80 mb-1 block">Problem:</span><p className="text-step-1 font-medium text-foreground">Students miss opportunities because documents are complex.</p></div>
-                  <div><span className="text-[11px] font-bold uppercase tracking-wider text-warning/80 mb-1 block">AI Action:</span><p className="text-step-1 font-medium text-foreground">ClearPath extracts requirements automatically.</p></div>
-                  <div><span className="text-[11px] font-bold uppercase tracking-wider text-warning/80 mb-1 block">Result:</span><p className="text-step-1 font-medium text-foreground">Student gets personalized action plan.</p></div>
-                </div>
-                <div className="space-y-6">
-                  <div><span className="text-[11px] font-bold uppercase tracking-wider text-warning/80 mb-1 block">Evidence:</span><p className="text-step-1 font-medium text-foreground">Every recommendation linked to source text.</p></div>
-                  <div className="p-6 bg-warning/10 rounded-lg border border-warning/30 mt-4"><span className="text-[11px] font-bold uppercase tracking-wider text-warning mb-1 block">Impact:</span><p className="text-step-3 font-bold text-warning">Reduces decision time from 45 min → 60 sec</p></div>
-                </div>
-              </div>
-            </div>
-          )}
           <div>
             <div className="flex items-center gap-3 mb-6">
               <Badge variant="outline" className="bg-background text-foreground uppercase tracking-widest border-border shadow-elevation-1 px-3 py-1 text-[11px] font-bold">
@@ -244,9 +230,6 @@ export default async function OpportunityDetailsPage({
         <TabsContent value="explain" className="pt-4 outline-none animate-in fade-in duration-500">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div className="space-y-6 relative">
-              {isJudgeMode && (
-                <div className="absolute -left-4 top-0 bottom-0 w-1 bg-warning rounded-full" />
-              )}
               <div>
                 <h2 className="text-step-3 tracking-tight mb-2">AI Stress Translator</h2>
                 <p className="text-step-1 text-muted-foreground mb-8">We read the bureaucratic mess so you don&apos;t have to.</p>
@@ -255,13 +238,6 @@ export default async function OpportunityDetailsPage({
                   simplifiedText={opportunity.simplified_summary} 
                 />
               </div>
-
-              {isJudgeMode && (
-                <div className="bg-warning/10 border border-warning/20 p-4 rounded-lg mt-4 font-mono text-[11px] text-warning/80">
-                  <span className="font-bold block mb-1">PROMPT:</span>
-                  You are a stress-translator for students. Take the following dense text and reduce it to its absolute core meaning. Do not hallucinate.
-                </div>
-              )}
             </div>
 
             <div className="space-y-6">
@@ -436,8 +412,9 @@ export default async function OpportunityDetailsPage({
             </div>
           </div>
         </TabsContent>
-
       </Tabs>
+        </div>
+      )}
     </div>
   )
 }
