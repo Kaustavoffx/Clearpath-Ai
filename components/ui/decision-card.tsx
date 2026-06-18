@@ -14,22 +14,22 @@ interface DecisionCardProps {
 export function DecisionCard({ title, label, icon, children, footer, isActive, className }: DecisionCardProps) {
   return (
     <div className={cn(
-      "decision-surface flex flex-col transition-crisp",
-      isActive ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : "hover:border-foreground/20",
+      "liquid-glass-card flex flex-col transition-spring hover:-translate-y-1",
+      isActive ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : "hover:border-glass-highlight/30",
       className
     )}>
-      <div className="px-6 py-5 border-b border-border bg-muted/30 flex items-center justify-between">
+      <div className="px-6 py-5 border-b border-glass-border bg-glass-surface/50 flex items-center justify-between">
         <div className="flex items-center gap-3">
           {icon && <div className="text-muted-foreground">{icon}</div>}
-          <h3 className="text-step-1 font-semibold text-foreground">{title}</h3>
+          <h3 className="text-[18px] font-semibold text-foreground tracking-[-0.015em]">{title}</h3>
         </div>
-        {label && <span className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground bg-muted px-2 py-1 rounded-sm border border-border">{label}</span>}
+        {label && <span className="text-[11px] font-medium uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-[999px] border border-primary/20">{label}</span>}
       </div>
-      <div className="p-6 flex-1 text-step-1 text-muted-foreground">
+      <div className="p-6 flex-1 text-[16px] text-muted-foreground leading-[24px]">
         {children}
       </div>
       {footer && (
-        <div className="px-6 py-4 border-t border-border bg-muted/10 text-step-0">
+        <div className="px-6 py-4 border-t border-glass-border bg-glass-surface/30 text-[14px]">
           {footer}
         </div>
       )}

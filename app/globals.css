@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "SF Pro Display", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   
   --color-primary: var(--primary);
@@ -17,6 +17,12 @@
   --color-muted-foreground: var(--muted-foreground);
 
   --color-border: var(--border);
+
+  /* Liquid Glass System Colors */
+  --color-glass-surface: var(--glass-surface);
+  --color-glass-layer: var(--glass-layer);
+  --color-glass-border: var(--glass-border);
+  --color-glass-highlight: var(--glass-highlight);
   
   /* Trust & Quality Colors */
   --color-success: oklch(0.65 0.15 150);
@@ -37,32 +43,45 @@
   --shadow-elevation-1: 0 1px 2px rgba(0,0,0,0.04), 0 1px 1px rgba(0,0,0,0.02);
   --shadow-elevation-2: 0 4px 12px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.02);
   --shadow-elevation-3: 0 12px 32px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.03);
+  --shadow-glass-card: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
 }
 
 :root {
-  --background: oklch(0.99 0.005 250);
-  --foreground: oklch(0.12 0 0);
+  --background: #F7F9FC;
+  --foreground: #050816;
   
-  --muted: oklch(0.96 0.005 250);
-  --muted-foreground: oklch(0.45 0 0);
+  --muted: #E2E8F0;
+  --muted-foreground: #64748B;
   
-  --primary: oklch(0.12 0 0);
-  --primary-foreground: oklch(0.98 0 0);
+  --primary: #2563EB;
+  --primary-foreground: #FFFFFF;
 
-  --border: oklch(0.92 0.005 250);
+  --border: rgba(255,255,255,0.7);
+
+  /* Liquid Glass - Light Mode */
+  --glass-surface: rgba(255,255,255,0.65);
+  --glass-layer: rgba(255,255,255,0.8);
+  --glass-border: rgba(255,255,255,0.7);
+  --glass-highlight: rgba(255,255,255,0.9);
 }
 
 .dark {
-  --background: oklch(0.12 0 0);
-  --foreground: oklch(0.98 0 0);
+  --background: #050816;
+  --foreground: #F8FAFC;
   
-  --muted: oklch(0.16 0 0);
-  --muted-foreground: oklch(0.65 0 0);
+  --muted: #0F172A;
+  --muted-foreground: #94A3B8;
   
-  --primary: oklch(0.98 0 0);
-  --primary-foreground: oklch(0.12 0 0);
+  --primary: #2563EB;
+  --primary-foreground: #FFFFFF;
 
-  --border: oklch(0.2 0 0);
+  --border: rgba(255,255,255,0.12);
+
+  /* Liquid Glass - Dark Mode */
+  --glass-surface: rgba(255,255,255,0.04);
+  --glass-layer: rgba(255,255,255,0.06);
+  --glass-border: rgba(255,255,255,0.12);
+  --glass-highlight: rgba(255,255,255,0.18);
 }
 
 @layer base {
@@ -71,7 +90,6 @@
     color: var(--foreground);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Optimize legibility */
     text-rendering: optimizeLegibility;
   }
 }
@@ -85,45 +103,55 @@
     @apply w-full max-w-[1024px] mx-auto px-6 md:px-12;
   }
   .container-wide {
-    @apply w-full max-w-[1280px] mx-auto px-6 md:px-12;
+    @apply w-full max-w-[1440px] mx-auto px-6 md:px-12;
   }
 
   /* Typography Scale */
   .text-step-0 {
-    /* Metadata, fine print */
     @apply text-[13px] leading-[20px] font-medium tracking-[0.01em];
   }
   .text-step-1 {
-    /* Standard body */
-    @apply text-[15px] leading-[24px] font-normal tracking-[-0.01em];
+    @apply text-[16px] leading-[24px] font-normal tracking-[-0.01em];
   }
   .text-step-2 {
-    /* Large body, intros */
     @apply text-[18px] leading-[28px] font-medium tracking-[-0.015em];
   }
   .text-step-3 {
-    /* H3, section headers */
     @apply text-[24px] leading-[32px] font-semibold tracking-[-0.02em];
   }
   .text-step-4 {
-    /* H2, major section */
     @apply text-[32px] leading-[40px] font-bold tracking-[-0.025em];
   }
   .text-step-5 {
-    /* H1, page title */
     @apply text-[48px] md:text-[56px] leading-[1.1] font-bold tracking-[-0.03em];
+  }
+  .text-hero {
+    @apply text-[72px] md:text-[88px] leading-[1.05] font-extrabold tracking-[-0.04em];
   }
 
   /* Structural/Visual Base */
   .decision-surface {
-    @apply bg-background border border-border shadow-elevation-2 rounded-2xl relative overflow-hidden;
+    @apply bg-glass-surface border border-glass-border shadow-glass-card rounded-2xl relative overflow-hidden backdrop-blur-xl;
   }
   .decision-surface-muted {
     @apply bg-muted border border-border rounded-2xl relative overflow-hidden;
   }
   
+  /* Liquid Glass Card Base */
+  .liquid-glass-card {
+    @apply relative overflow-hidden rounded-[24px] border border-glass-border bg-glass-surface backdrop-blur-2xl shadow-glass-card;
+  }
+  /* Optional inner highlight / caustic edge */
+  .liquid-glass-card::before {
+    content: '';
+    @apply absolute inset-0 rounded-[24px] border border-glass-highlight pointer-events-none opacity-50;
+  }
+
   /* Crisp linear transitions */
   .transition-crisp {
     @apply transition-all duration-150 ease-out;
+  }
+  .transition-spring {
+    @apply transition-all duration-400 ease-out;
   }
 }

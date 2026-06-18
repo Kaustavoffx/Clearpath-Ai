@@ -32,6 +32,11 @@ export async function signup(formData: FormData) {
     options: {
       data: {
         full_name: formData.get('full_name') as string,
+        grade: formData.get('grade') as string,
+        state: formData.get('state') as string,
+        income_range: formData.get('income_range') as string,
+        category: formData.get('category') as string,
+        career_interest: formData.get('career_interest') as string,
       },
       emailRedirectTo: `${getBaseUrl()}/auth/callback`,
     }
