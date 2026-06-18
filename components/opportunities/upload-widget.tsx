@@ -65,14 +65,20 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
         payload = { url }
       }
 
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 35000)
+
       const response = await fetch('/api/opportunities/process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        signal: controller.signal
       })
+      
+      clearTimeout(timeoutId)
 
       if (!response.ok) {
-        const errData = await response.json()
+        const errData = await response.json().catch(() => ({}))
         throw new Error(errData.error || 'Failed to process document')
       }
 
@@ -89,7 +95,12 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
       
     } catch (error: unknown) {
       const err = error as Error
-      toast.error(err.message || 'Something went wrong')
+      if (err.name === 'AbortError') {
+        toast.error('The request timed out. The document might be too large.')
+      } else {
+        toast.error(err.message || 'Something went wrong')
+      }
+    } finally {
       setIsUploading(false)
     }
   }

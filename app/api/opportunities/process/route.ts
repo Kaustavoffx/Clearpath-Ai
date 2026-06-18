@@ -144,13 +144,20 @@ export async function POST(request: Request) {
 
     logger.info({ userId: user.id }, 'Initiating Gemini generation')
     
-    const response = await ai.models.generateContent({
+    const generatePromise = ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: contents,
       config: {
         responseMimeType: "application/json"
       }
     })
+
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('AI Request Timed Out')), 28000)
+    )
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const response = await Promise.race([generatePromise, timeoutPromise]) as any;
 
     const responseText = response.text
     if (!responseText) {
@@ -175,22 +182,22 @@ export async function POST(request: Request) {
     }
 
     const aiResponseSchema = z.object({
-      title: z.string().optional(),
-      category: z.string().optional(),
-      plain_language_summary: z.string().optional(),
-      important_dates: z.any().optional(),
-      eligibility_analysis: z.any().optional(),
-      required_documents: z.any().optional(),
-      opportunity_value: z.string().optional(),
-      opportunity_loss_analysis: z.string().optional(),
-      readiness_score: z.coerce.number().optional(),
-      risk_score: z.coerce.number().optional(),
-      confidence_score: z.coerce.number().optional(),
-      funding_amount: z.coerce.number().optional(),
-      urgency_score: z.coerce.number().optional(),
-      deadline_days_remaining: z.coerce.number().optional(),
-      evidence_references: z.any().optional(),
-      action_checklist: z.array(z.any()).optional(),
+      title: z.string().catch("Unknown Opportunity"),
+      category: z.string().catch("OTHER"),
+      plain_language_summary: z.string().catch("Summary could not be generated."),
+      important_dates: z.any().catch({ deadline: "Not Found In Document" }),
+      eligibility_analysis: z.any().catch({ requirements: [] }),
+      required_documents: z.array(z.string()).catch([]),
+      opportunity_value: z.string().catch("Not Found In Document"),
+      opportunity_loss_analysis: z.string().catch("Loss analysis unavailable."),
+      readiness_score: z.coerce.number().catch(0),
+      risk_score: z.coerce.number().catch(0),
+      confidence_score: z.coerce.number().catch(0),
+      funding_amount: z.coerce.number().catch(0),
+      urgency_score: z.coerce.number().catch(0),
+      deadline_days_remaining: z.coerce.number().catch(-1),
+      evidence_references: z.array(z.any()).catch([]),
+      action_checklist: z.array(z.any()).catch([]),
     }).passthrough()
 
     const parsedAiResult = aiResponseSchema.safeParse(rawAiResult)

@@ -5,7 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AlertTriangle, Clock, ArrowRight, Target, CheckCircle2, TrendingDown, BookOpen, Bug, FileText, Activity } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { ReadinessRing } from "@/components/ui/readiness-ring"
 import { StressTranslator } from "@/components/ui/stress-translator"
 import { cn } from "@/lib/utils"
 import { DecisionCard } from "@/components/ui/decision-card"
@@ -52,10 +51,10 @@ export default async function OpportunityDetailsPage({
     .createSignedUrl(opportunity.storage_path, 3600)
   const signedUrl = data?.signedUrl
 
-  const readinessScore = opportunity.readiness_score || 0
-  const completionProbability = Math.min(100, readinessScore + 15) // Predictive boost
+  const readinessScore = Number(opportunity.readiness_score) || 0
   
-  const missingDocs = opportunity.required_documents || []
+  const rawDocs = opportunity.required_documents
+  const missingDocs = Array.isArray(rawDocs) ? rawDocs : (typeof rawDocs === 'string' ? [rawDocs] : [])
   const hasMissingDocs = missingDocs.length > 0
 
   return (
@@ -106,7 +105,11 @@ export default async function OpportunityDetailsPage({
               </Badge>
               <span className="text-step-0 flex items-center gap-1.5 font-medium bg-muted px-3 py-1 rounded-md border border-border">
                 <Clock className="w-4 h-4" /> 
-                {opportunity.deadline ? new Date(opportunity.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'No Deadline Found'}
+                {(() => {
+                  if (!opportunity.deadline) return 'No Deadline Found';
+                  const d = new Date(opportunity.deadline);
+                  return isNaN(d.getTime()) ? 'No Deadline Found' : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                })()}
               </span>
             </div>
             <h1 className="text-step-4 mb-4 text-balance">
@@ -236,7 +239,7 @@ export default async function OpportunityDetailsPage({
                 className="border-t-2 border-t-success"
               >
                 <ul className="space-y-4 pt-2">
-                  {opportunity.eligibility_analysis?.requirements?.map((req: string, i: number) => (
+                  {(Array.isArray(opportunity.eligibility_analysis?.requirements) ? opportunity.eligibility_analysis.requirements : []).map((req: string, i: number) => (
                     <li key={i} className="flex items-start gap-3 p-4 decision-surface-muted">
                       <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />
                       <span className="text-step-1 text-foreground leading-relaxed">{req}</span>
@@ -258,11 +261,11 @@ export default async function OpportunityDetailsPage({
               <p className="text-step-1 text-muted-foreground mb-12">Follow these steps sequentially to guarantee success.</p>
               
               <div className="relative border-l border-border ml-6 space-y-12 pb-8">
-                {opportunity.action_steps && opportunity.action_steps.length > 0 ? (
-                  opportunity.action_steps.sort((a: { step_number: number }, b: { step_number: number }) => a.step_number - b.step_number).map((step: { id: string, step_number: number, title: string, description: string }) => (
-                    <div key={step.id} className="relative pl-12 group">
+                {Array.isArray(opportunity.action_steps) && opportunity.action_steps.length > 0 ? (
+                  [...opportunity.action_steps].sort((a: { step_number: number }, b: { step_number: number }) => (a.step_number || 0) - (b.step_number || 0)).map((step: { id: string, step_number: number, title: string, description: string }, idx) => (
+                    <div key={step.id || `step-${idx}`} className="relative pl-12 group">
                       <div className="absolute -left-[16.5px] top-0 w-8 h-8 rounded-full bg-background border-2 border-border flex items-center justify-center text-step-0 font-bold text-foreground shadow-elevation-1 transition-crisp group-hover:border-foreground group-hover:bg-foreground group-hover:text-background">
-                        {step.step_number}
+                        {step.step_number || (idx + 1)}
                       </div>
                       <div className="decision-surface p-6 transition-crisp hover:shadow-elevation-3">
                         <h3 className="text-step-2 font-bold mb-3">{step.title}</h3>
@@ -338,7 +341,11 @@ export default async function OpportunityDetailsPage({
                   <div className="decision-surface-muted p-5 border-l-2 border-l-danger">
                     <div className="text-[11px] uppercase font-bold tracking-wider text-muted-foreground mb-2">Time Left</div>
                     <div className="font-bold text-step-2 text-danger">
-                      {opportunity.deadline ? new Date(opportunity.deadline).toLocaleDateString() : 'Immediate'}
+                      {(() => {
+                        if (!opportunity.deadline) return 'Immediate';
+                        const d = new Date(opportunity.deadline);
+                        return isNaN(d.getTime()) ? 'Immediate' : d.toLocaleDateString();
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -355,7 +362,7 @@ export default async function OpportunityDetailsPage({
               <p className="text-step-1 text-muted-foreground mb-8">Every AI claim is strictly backed by the document.</p>
               
               <div className="space-y-4">
-                {opportunity.evidence_references && opportunity.evidence_references.length > 0 ? (
+                {Array.isArray(opportunity.evidence_references) && opportunity.evidence_references.length > 0 ? (
                   opportunity.evidence_references.map((ref: { claim: string, quote_from_document: string }, i: number) => (
                     <div key={i} className="decision-surface p-6">
                       <div className="font-bold text-step-0 mb-4">{ref.claim}</div>

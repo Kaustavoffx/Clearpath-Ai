@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { UploadWidget } from "@/components/opportunities/upload-widget"
-import { ShieldCheck, Command, FolderArchive, Target, Clock, AlertTriangle, IndianRupee } from "lucide-react"
+import { ShieldCheck, FolderArchive, Target, Clock, AlertTriangle, IndianRupee } from "lucide-react"
 import { DecisionCard } from "@/components/ui/decision-card"
 
 export default async function DashboardPage() {
