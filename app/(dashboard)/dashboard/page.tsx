@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { UploadWidget } from "@/components/opportunities/upload-widget"
-import { ShieldCheck, FolderArchive, Target, Clock, AlertTriangle, IndianRupee } from "lucide-react"
+import { ShieldCheck, FolderArchive, Target } from "lucide-react"
 import { DecisionCard } from "@/components/ui/decision-card"
 import { MorningBriefing } from "@/components/advisor/morning-briefing"
 
@@ -12,15 +12,6 @@ export default async function DashboardPage() {
   if (!user) {
     redirect('/login')
   }
-
-  // Fetch real profile for personalized greeting
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name')
-    .eq('id', user.id)
-    .single()
-
-  const displayName = profile?.full_name || user.user_metadata?.full_name || 'there'
 
   return (
     <div className="container-wide min-h-[calc(100vh-5rem)] flex flex-col py-10 mt-6 animate-fadeInUp">
@@ -35,46 +26,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="mb-10">
-        <MorningBriefing userName={displayName} />
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-        <div className="liquid-glass-card p-5 border-l-2 border-l-[#858AE3] transition-spring hover:border-l-[#858AE3]/60 cursor-default">
-          <div className="flex items-center gap-2 text-muted-foreground mb-3">
-            <AlertTriangle className="w-4 h-4 text-[#858AE3]" />
-            <span className="text-card-label">Critical</span>
-          </div>
-          <div className="text-metric-number text-foreground">2</div>
-          <div className="text-helper-text mt-1.5">Opportunities</div>
-        </div>
-
-        <div className="liquid-glass-card p-5 border-l-2 border-l-[#7364D2] transition-spring hover:border-l-[#7364D2]/60 cursor-default">
-          <div className="flex items-center gap-2 text-muted-foreground mb-3">
-            <Clock className="w-4 h-4 text-[#7364D2]" />
-            <span className="text-card-label">Urgent</span>
-          </div>
-          <div className="text-metric-number text-foreground">1</div>
-          <div className="text-helper-text mt-1.5">Deadline This Week</div>
-        </div>
-
-        <div className="liquid-glass-card p-5 border-l-2 border-l-[#97DFFC] transition-spring hover:border-l-[#97DFFC]/60 cursor-default">
-          <div className="flex items-center gap-2 text-muted-foreground mb-3">
-            <FolderArchive className="w-4 h-4 text-[#97DFFC]" />
-            <span className="text-card-label">Action</span>
-          </div>
-          <div className="text-metric-number text-foreground">8</div>
-          <div className="text-helper-text mt-1.5">Missing Documents</div>
-        </div>
-
-        <div className="liquid-glass-card p-5 border-l-2 border-l-[#93CAF6] transition-spring hover:border-l-[#93CAF6]/60 cursor-default">
-          <div className="flex items-center gap-2 text-muted-foreground mb-3">
-            <IndianRupee className="w-4 h-4 text-[#93CAF6]" />
-            <span className="text-card-label">Value</span>
-          </div>
-          <div className="text-metric-number text-[#93CAF6]">₹50k</div>
-          <div className="text-helper-text mt-1.5">Potential Funding</div>
-        </div>
+        <MorningBriefing userId={user.id} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
