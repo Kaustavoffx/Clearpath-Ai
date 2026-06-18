@@ -6,9 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { createBrowserClient } from '@supabase/ssr'
-
-import { env } from '@/lib/env'
+import { createClient } from '@/lib/supabase/client'
 
 interface UploadWidgetProps {
   onUploadComplete?: (id: string) => void
@@ -21,10 +19,7 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
   const [isUploading, setIsUploading] = useState(false)
   const router = useRouter()
 
-  const supabase = createBrowserClient(
-    env.NEXT_PUBLIC_SUPABASE_URL || '',
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-  )
+  const supabase = createClient()
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {

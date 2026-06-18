@@ -2,7 +2,7 @@
 
 import { User } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { env } from "@/lib/env"
+import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -12,16 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { createBrowserClient } from "@supabase/ssr"
+
 import { useRouter } from "next/navigation"
 import { GlassPanel } from "@/components/ui/glass/glass-panel"
 
 export function Header() {
   const router = useRouter()
-  const supabase = createBrowserClient(
-    env.NEXT_PUBLIC_SUPABASE_URL || '',
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-  )
+  const supabase = createClient()
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
