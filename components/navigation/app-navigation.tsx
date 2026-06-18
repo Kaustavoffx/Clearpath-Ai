@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { LayoutDashboard, FileSearch, Target, User, Bug, Menu, X, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, FileSearch, Target, User, Bug, Menu, X, ChevronRight, Cpu } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
 
@@ -19,6 +19,7 @@ export function AppNavigation() {
     { name: 'Mission Control', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Analyze', href: '/dashboard', icon: FileSearch },
     { name: 'Opportunities', href: '/opportunities', icon: Target },
+    { name: 'AI Engines', href: '/ai-providers', icon: Cpu },
     { name: 'Profile', href: '/settings', icon: User },
     { name: 'Judge Mode', href: '?judge=true', icon: Bug, isActiveOverride: isJudgeMode },
   ]
