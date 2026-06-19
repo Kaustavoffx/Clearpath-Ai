@@ -7,7 +7,9 @@ import { cn } from '@/lib/utils'
 import { ApplicationAssistant } from './application-assistant'
 import { motion, AnimatePresence } from 'framer-motion'
 
-export function HumanInTheLoopPipeline({ checklist, missingDocs = [] }: { checklist: { title: string, description: string }[], missingDocs?: string[] }) {
+import { ActionStep } from '@/lib/types'
+
+export function HumanInTheLoopPipeline({ checklist, missingDocs = [] }: { checklist: ActionStep[], missingDocs?: string[] }) {
   const [currentStep, setCurrentStep] = useState(1)
   const [hasAcknowledgedEvidence, setHasAcknowledgedEvidence] = useState(false)
   const [hasConfirmed, setHasConfirmed] = useState(false)
@@ -77,13 +79,32 @@ export function HumanInTheLoopPipeline({ checklist, missingDocs = [] }: { checkl
               
               <div className="space-y-4 mb-10">
                 {checklist && checklist.length > 0 ? (
-                  checklist.map((item: { title: string, description: string }, i: number) => (
-                    <div key={i} className="p-5 border border-glass-border rounded-[16px] bg-glass-surface/50 flex items-start gap-5 shadow-sm">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold shrink-0 shadow-sm">{i+1}</div>
-                      <div>
-                        <div className="text-card-title text-[16px] mb-1.5 text-foreground">{item.title}</div>
-                        <div className="text-body-text text-muted-foreground">{item.description}</div>
+                  checklist.map((item: ActionStep, i: number) => (
+                    <div key={i} className="p-5 border border-glass-border rounded-[16px] bg-glass-surface/50 flex flex-col gap-3 shadow-sm">
+                      <div className="flex items-start gap-5">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold shrink-0 shadow-sm">{item.step_number || i+1}</div>
+                        <div className="flex-1">
+                          <div className="text-card-title text-[16px] mb-1.5 text-foreground">{item.title}</div>
+                          <div className="text-body-text text-muted-foreground">{item.description}</div>
+                        </div>
                       </div>
+                      
+                      {item.source_quote && (
+                        <div className="ml-13 mt-2 bg-background p-3 rounded-lg border border-glass-border shadow-sm">
+                          <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-1">Source Quote</div>
+                          <div className="text-[13px] font-mono text-foreground mb-2 italic">&quot;{item.source_quote}&quot;</div>
+                          <div className="flex gap-4">
+                            <div>
+                              <span className="text-[10px] uppercase text-muted-foreground mr-1">Page</span>
+                              <span className="text-[12px] font-semibold">{item.page_number || 'Unknown'}</span>
+                            </div>
+                            <div>
+                              <span className="text-[10px] uppercase text-muted-foreground mr-1">Confidence</span>
+                              <span className={cn("text-[12px] font-semibold", (item.confidence_score || 0) < 70 ? "text-warning" : "text-success")}>{item.confidence_score || 0}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))
                 ) : (

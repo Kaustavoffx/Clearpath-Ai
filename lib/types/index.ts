@@ -9,6 +9,13 @@ export interface Profile {
   created_at: string;
 }
 
+export interface EvidenceBackedInsight {
+  value: string;
+  source_quote: string;
+  page_number?: string | number;
+  confidence_score: number;
+}
+
 export interface Opportunity {
   id: string;
   user_id: string;
@@ -18,8 +25,8 @@ export interface Opportunity {
   simplified_summary: string;
   deadline: string | null;
   status: Status;
-  eligibility_analysis?: Record<string, unknown>;
-  required_documents?: string[];
+  eligibility_analysis?: { requirements?: EvidenceBackedInsight[] };
+  required_documents?: EvidenceBackedInsight[];
   opportunity_value?: string;
   opportunity_loss_prediction?: string;
   readiness_score?: number;
@@ -37,4 +44,7 @@ export interface ActionStep {
   title: string;
   description: string;
   status: StepStatus;
+  source_quote?: string;
+  page_number?: string | number;
+  confidence_score?: number;
 }

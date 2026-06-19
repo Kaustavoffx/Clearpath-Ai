@@ -1,64 +1,99 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 interface ReadinessRingProps {
-  score: number
+  score: number | 'Unknown'
   size?: number
   strokeWidth?: number
   className?: string
 }
 
-export function ReadinessRing({ score, size = 120, strokeWidth = 12, className }: ReadinessRingProps) {
-  const [progress, setProgress] = useState(0)
-  
-  useEffect(() => {
-    // Animate progress on mount
-    const timer = setTimeout(() => setProgress(score), 100)
-    return () => clearTimeout(timer)
-  }, [score])
-
+export function ReadinessRing({ 
+  score, 
+  size = 120, 
+  strokeWidth = 8,
+  className 
+}: ReadinessRingProps) {
   const radius = (size - strokeWidth) / 2
   const circumference = radius * 2 * Math.PI
-  const strokeDashoffset = circumference - (progress / 100) * circumference
+  
+  const isUnknown = score === 'Unknown'
+  const numericScore = isUnknown ? 0 : (score as number)
+  
+  // Calculate offset for the SVG stroke dasharray
+  const strokeDashoffset = circumference - (numericScore / 100) * circumference
 
-  let colorClass = "text-success"
-  if (score < 50) colorClass = "text-danger"
-  else if (score < 80) colorClass = "text-warning"
+  // Determine color based on score
+  let colorClass = "text-muted-foreground"
+  let glowColor = "rgba(142, 153, 184, 0.5)" // muted
+
+  if (!isUnknown) {
+    if (numericScore >= 80) {
+      colorClass = "text-success"
+      glowColor = "rgba(114, 241, 184, 0.6)"
+    } else if (numericScore >= 50) {
+      colorClass = "text-warning"
+      glowColor = "rgba(255, 209, 102, 0.6)"
+    } else {
+      colorClass = "text-danger"
+      glowColor = "rgba(255, 107, 138, 0.6)"
+    }
+  }
 
   return (
-    <div className={cn("relative flex items-center justify-center", className)} style={{ width: size, height: size }}>
-      {/* Background ring */}
-      <svg className="absolute inset-0 transform -rotate-90 w-full h-full">
+    <div 
+      className={cn("relative flex items-center justify-center", className)}
+      style={{ width: size, height: size }}
+    >
+      <svg
+        className="transform -rotate-90"
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+      >
+        {/* Background Track */}
         <circle
-          className="text-muted/20"
-          strokeWidth={strokeWidth}
-          stroke="currentColor"
-          fill="transparent"
-          r={radius}
           cx={size / 2}
           cy={size / 2}
+          r={radius}
+          stroke="rgba(255,255,255,0.05)"
+          strokeWidth={strokeWidth}
+          fill="none"
+          className="transition-all duration-300"
         />
-        {/* Progress ring */}
-        <circle
-          className={cn("transition-all duration-1000 ease-out", colorClass)}
-          strokeWidth={strokeWidth}
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          stroke="currentColor"
-          fill="transparent"
-          r={radius}
+        
+        {/* Progress Track */}
+        <motion.circle
           cx={size / 2}
           cy={size / 2}
+          r={radius}
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          fill="none"
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference}
+          strokeLinecap="round"
+          className={cn("transition-colors duration-300", colorClass)}
+          style={{ filter: `drop-shadow(0 0 8px ${glowColor})` }}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: isUnknown ? circumference : strokeDashoffset }}
+          transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
         />
       </svg>
       
-      {/* Score text */}
+      {/* Center Text */}
       <div className="absolute flex flex-col items-center justify-center text-center">
-        <span className="text-3xl font-semibold tracking-tighter">{progress}%</span>
-        <span className="text-[10px] uppercase font-semibold tracking-wider text-muted-foreground mt-0.5">Ready</span>
+        {isUnknown ? (
+          <span className="text-[20px] font-semibold tracking-tight text-muted-foreground">?</span>
+        ) : (
+          <span className={cn("text-[32px] font-semibold tracking-tight leading-none drop-shadow-md", colorClass)}>
+            {numericScore}
+            <span className="text-[18px]">%</span>
+          </span>
+        )}
       </div>
     </div>
   )

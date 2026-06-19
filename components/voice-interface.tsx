@@ -165,14 +165,14 @@ export function VoiceInterface() {
     return (
       <div 
         onClick={() => setIsActive(true)}
-        className="group relative flex items-center gap-4 bg-[#0B1E2E]/40 border border-white/10 p-4 rounded-[24px] cursor-pointer hover:bg-[#0B1E2E]/60 hover:border-primary/50 transition-all overflow-hidden"
+        className="group relative flex items-center gap-4 bg-glass-surface border border-glass-border p-4 rounded-[24px] cursor-pointer hover:bg-glass-layer hover:border-primary/50 transition-all overflow-hidden shadow-glass-card"
       >
         <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(133,138,227,0.3)]">
+        <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center shrink-0 shadow-twilight-glow">
           <Mic className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h4 className="text-[14px] font-semibold text-white">ClearPath Educational Copilot</h4>
+          <h4 className="text-[14px] font-semibold text-foreground">ClearPath Educational Copilot</h4>
           <p className="text-[12px] text-muted-foreground">Tap to start a voice session</p>
         </div>
       </div>
@@ -181,11 +181,11 @@ export function VoiceInterface() {
 
   // IMMERSIVE OVERLAY
   return (
-    <div className="fixed inset-0 z-[999] flex flex-col bg-[#030712]/80 backdrop-blur-xl animate-in fade-in duration-500 font-sans text-white overflow-hidden">
+    <div className="fixed inset-0 z-[999] flex flex-col bg-background/80 backdrop-blur-3xl animate-in fade-in duration-500 font-sans text-foreground overflow-hidden">
       
       {/* Dynamic Background Glow based on state */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[120px] pointer-events-none transition-colors duration-1000" 
-           style={{ backgroundColor: isSpeaking ? 'rgba(147, 202, 246, 0.15)' : isProcessing ? 'rgba(133, 138, 227, 0.2)' : isListening ? 'rgba(151, 223, 252, 0.15)' : 'rgba(255,255,255,0.02)' }} />
+           style={{ backgroundColor: isSpeaking ? 'rgba(183, 156, 237, 0.15)' : isProcessing ? 'rgba(149, 127, 239, 0.2)' : isListening ? 'rgba(149, 127, 239, 0.15)' : 'rgba(255,255,255,0.02)' }} />
 
       {/* Header */}
       <div className="flex items-center justify-between p-8 relative z-10">
@@ -198,9 +198,9 @@ export function VoiceInterface() {
             setIsActive(false)
             if (isSpeaking) { window.speechSynthesis.cancel(); setIsSpeaking(false); }
           }} 
-          className="p-3 rounded-full hover:bg-white/10 transition-colors border border-white/5 bg-white/5"
+          className="p-3 rounded-full hover:bg-glass-layer transition-colors border border-glass-border bg-glass-surface shadow-sm"
         >
-          <X className="w-5 h-5 text-muted-foreground hover:text-white" />
+          <X className="w-5 h-5 text-muted-foreground hover:text-foreground" />
         </button>
       </div>
 
@@ -211,34 +211,34 @@ export function VoiceInterface() {
         <div className="w-[300px] hidden lg:flex flex-col gap-4 animate-in slide-in-from-left-8 duration-700 fade-in delay-150">
            <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest mb-2 px-2">Live Context Memory</h3>
            
-           <div className="bg-white/5 border border-white/10 rounded-[16px] p-5 backdrop-blur-md">
-             <div className="flex items-center gap-3 mb-3 text-white/90">
-               <UserIcon className="w-4 h-4 text-[#93CAF6]" />
+           <div className="liquid-glass-card p-5">
+             <div className="flex items-center gap-3 mb-3 text-foreground">
+               <UserIcon className="w-4 h-4 text-primary" />
                <span className="text-[14px] font-medium">Profile Context</span>
              </div>
              <div className="text-[12px] text-muted-foreground space-y-2">
-                <div className="flex justify-between"><span>Readiness</span><span className="text-white">{MOCK_CONTEXT.profile.readiness}%</span></div>
-                <div className="flex justify-between"><span>Goal</span><span className="text-white">{MOCK_CONTEXT.profile.goal}</span></div>
+                <div className="flex justify-between"><span>Readiness</span><span className="text-foreground">{MOCK_CONTEXT.profile.readiness}%</span></div>
+                <div className="flex justify-between"><span>Goal</span><span className="text-foreground">{MOCK_CONTEXT.profile.goal}</span></div>
              </div>
            </div>
 
-           <div className="bg-white/5 border border-white/10 rounded-[16px] p-5 backdrop-blur-md">
-             <div className="flex items-center gap-3 mb-3 text-white/90">
+           <div className="liquid-glass-card p-5">
+             <div className="flex items-center gap-3 mb-3 text-foreground">
                <Target className="w-4 h-4 text-primary" />
                <span className="text-[14px] font-medium">Opportunity Context</span>
              </div>
              <div className="text-[12px] text-muted-foreground space-y-2">
-                <div className="flex justify-between"><span>Active</span><span className="text-white">{MOCK_CONTEXT.activeOpportunity.title}</span></div>
-                <div className="flex justify-between"><span>Deadline</span><span className="text-white">{MOCK_CONTEXT.activeOpportunity.deadline}</span></div>
+                <div className="flex justify-between"><span>Active</span><span className="text-foreground">{MOCK_CONTEXT.activeOpportunity.title}</span></div>
+                <div className="flex justify-between"><span>Deadline</span><span className="text-foreground">{MOCK_CONTEXT.activeOpportunity.deadline}</span></div>
              </div>
            </div>
 
-           <div className="bg-white/5 border border-white/10 rounded-[16px] p-5 backdrop-blur-md border-l-2 border-l-[#F87171]">
-             <div className="flex items-center gap-3 mb-3 text-white/90">
-               <Shield className="w-4 h-4 text-[#F87171]" />
-               <span className="text-[14px] font-medium text-[#F87171]">Missing Documents</span>
+           <div className="liquid-glass-card p-5 border-l-2 border-l-danger">
+             <div className="flex items-center gap-3 mb-3 text-danger">
+               <Shield className="w-4 h-4" />
+               <span className="text-[14px] font-medium">Missing Documents</span>
              </div>
-             <div className="text-[12px] text-white">
+             <div className="text-[12px] text-foreground">
                 {MOCK_CONTEXT.missingDoc}
              </div>
            </div>
@@ -251,16 +251,16 @@ export function VoiceInterface() {
             
             <div className="text-center space-y-6 w-full min-h-[160px] flex flex-col justify-end px-4">
               {transcript && !aiResponse && (
-                <div className="inline-block p-4 rounded-[20px] bg-white/5 backdrop-blur-md border border-white/10 mx-auto animate-in fade-in slide-in-from-bottom-4">
-                  <p className="text-[20px] text-white/90 leading-relaxed font-medium">
+                <div className="inline-block p-4 rounded-[20px] bg-glass-surface backdrop-blur-md border border-glass-border mx-auto animate-in fade-in slide-in-from-bottom-4 shadow-sm">
+                  <p className="text-[20px] text-foreground leading-relaxed font-medium">
                     &quot;{transcript}&quot;
                   </p>
                 </div>
               )}
               
               {aiResponse && (
-                <div className="inline-block p-6 rounded-[24px] bg-primary/10 backdrop-blur-md border border-primary/20 shadow-[0_0_40px_rgba(133,138,227,0.15)] mx-auto animate-in fade-in zoom-in-95 duration-500">
-                  <p className="text-[24px] font-medium tracking-tight leading-relaxed text-white">
+                <div className="inline-block p-6 rounded-[24px] bg-primary/10 backdrop-blur-md border border-primary/20 shadow-twilight-glow mx-auto animate-in fade-in zoom-in-95 duration-500">
+                  <p className="text-[24px] font-medium tracking-tight leading-relaxed text-foreground">
                     {aiResponse}
                   </p>
                 </div>
@@ -274,9 +274,9 @@ export function VoiceInterface() {
 
               {/* Status Indicator */}
               <div className="flex items-center justify-center gap-2 mt-4 text-[12px] uppercase tracking-widest font-bold">
-                {isListening && <span className="text-[#97DFFC] animate-pulse flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#97DFFC]" /> Listening...</span>}
-                {isProcessing && <span className="text-primary flex items-center gap-2"><RefreshCw className="w-3 h-3 animate-spin" /> Thinking...</span>}
-                {isSpeaking && <span className="text-[#93CAF6] flex items-center gap-2"><Activity className="w-3 h-3 animate-pulse" /> Speaking...</span>}
+                {isListening && <span className="text-primary animate-pulse flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-primary" /> Listening...</span>}
+                {isProcessing && <span className="text-wisteria flex items-center gap-2"><RefreshCw className="w-3 h-3 animate-spin" /> Thinking...</span>}
+                {isSpeaking && <span className="text-mauve flex items-center gap-2"><Activity className="w-3 h-3 animate-pulse" /> Speaking...</span>}
               </div>
             </div>
 
@@ -284,7 +284,7 @@ export function VoiceInterface() {
               {/* Dynamic sound wave background behind orb */}
               {(isListening || isSpeaking || isProcessing) && (
                 <div className="absolute inset-0 m-auto w-[250px] h-[250px] flex items-center justify-center pointer-events-none">
-                  <div className="absolute w-full h-full rounded-full border border-white/20 animate-ping" style={{ animationDuration: '3s' }} />
+                  <div className="absolute w-full h-full rounded-full border border-primary/20 animate-ping" style={{ animationDuration: '3s' }} />
                   <div className="absolute w-[80%] h-[80%] rounded-full border border-primary/30 animate-ping" style={{ animationDuration: '2s' }} />
                 </div>
               )}
@@ -305,24 +305,24 @@ export function VoiceInterface() {
         <div className="w-[280px] hidden lg:flex flex-col gap-4 animate-in slide-in-from-right-8 duration-700 fade-in delay-300">
            <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest mb-2 px-2 text-right">Engine Routing</h3>
            
-           <div className="bg-[#0B1E2E]/40 border border-white/5 rounded-[16px] p-5 ml-auto w-full">
+           <div className="liquid-glass-card p-5 ml-auto w-full">
              <div className="flex items-center justify-between mb-4">
-               <span className="text-[13px] text-white/80">Voice Input</span>
-               <div className="flex items-center gap-1.5 text-[11px] text-[#97DFFC] bg-[#97DFFC]/10 px-2 py-1 rounded-full border border-[#97DFFC]/20">
+               <span className="text-[13px] text-foreground">Voice Input</span>
+               <div className="flex items-center gap-1.5 text-[11px] text-primary bg-primary/10 px-2 py-1 rounded-full border border-primary/20">
                  <Cpu className="w-3 h-3" /> Deepgram
                </div>
              </div>
              
-             <div className="flex items-center justify-between mb-4 pt-4 border-t border-white/5">
-               <span className="text-[13px] text-white/80">Reasoning</span>
-               <div className="flex items-center gap-1.5 text-[11px] text-primary bg-primary/10 px-2 py-1 rounded-full border border-primary/20">
+             <div className="flex items-center justify-between mb-4 pt-4 border-t border-glass-border">
+               <span className="text-[13px] text-foreground">Reasoning</span>
+               <div className="flex items-center gap-1.5 text-[11px] text-wisteria bg-wisteria/10 px-2 py-1 rounded-full border border-wisteria/20">
                  <Brain className="w-3 h-3" /> OpenAI
                </div>
              </div>
              
-             <div className="flex items-center justify-between pt-4 border-t border-white/5">
-               <span className="text-[13px] text-white/80">Data Scope</span>
-               <div className="flex items-center gap-1.5 text-[11px] text-white/60 bg-white/5 px-2 py-1 rounded-full">
+             <div className="flex items-center justify-between pt-4 border-t border-glass-border">
+               <span className="text-[13px] text-foreground">Data Scope</span>
+               <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground bg-glass-surface px-2 py-1 rounded-full border border-glass-border">
                  <Shield className="w-3 h-3" /> Protected
                </div>
              </div>

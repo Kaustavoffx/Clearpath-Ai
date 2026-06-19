@@ -41,12 +41,12 @@ export default async function DashboardLayout({
         <ClearPathAmbientBackground variant="dashboard" />
       </Suspense>
 
-      <Suspense fallback={<div className="w-[80px] md:w-[280px] hidden md:block" />}>
+      <Suspense fallback={<div className="w-[80px] lg:w-[280px] hidden md:block" />}>
         <AppNavigation profile={profile} />
       </Suspense>
       
       {/* Immersive Main Content */}
-      <main className="flex-1 flex flex-col relative w-full min-h-screen md:pl-[80px] lg:pl-[280px] pb-20 md:pb-0 transition-all duration-300">
+      <main className="flex-1 flex flex-col relative w-full min-h-screen pt-6 md:pl-[120px] lg:pl-[328px] pr-6 pb-24 md:pb-6 transition-all duration-300">
         {children}
       </main>
 

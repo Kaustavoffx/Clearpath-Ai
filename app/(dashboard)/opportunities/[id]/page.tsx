@@ -10,7 +10,28 @@ import { DecisionCard } from "@/components/ui/decision-card"
 import { HumanInTheLoopPipeline } from "@/components/opportunities/human-in-the-loop-pipeline"
 import { JudgeArchitectureFlow } from "@/components/opportunities/judge-architecture-flow"
 import { ProcessingOrchestrator } from "@/components/opportunities/processing-orchestrator"
+import { ReadinessRing } from "@/components/ui/readiness-ring"
 import { Metadata } from "next"
+
+function EvidenceDisplay({ insight, quote, page, confidence }: { insight?: string, quote?: string, page?: string | number, confidence?: number }) {
+  if (!quote) return null;
+  return (
+    <div className="mt-3 bg-glass-surface/50 p-3 rounded-lg border border-glass-border">
+      <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-1">Source Quote</div>
+      <div className="text-[13px] font-mono text-foreground mb-2 italic">&quot;{quote}&quot;</div>
+      <div className="flex gap-4">
+        <div>
+          <span className="text-[10px] uppercase text-muted-foreground mr-1">Page</span>
+          <span className="text-[12px] font-semibold">{page || 'Unknown'}</span>
+        </div>
+        <div>
+          <span className="text-[10px] uppercase text-muted-foreground mr-1">Confidence</span>
+          <span className={cn("text-[12px] font-semibold", (confidence || 0) < 70 ? "text-warning" : "text-success")}>{confidence || 0}%</span>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
@@ -60,19 +81,49 @@ export default async function OpportunityDetailsPage({
     signedUrl = data?.signedUrl
   }
 
-  const rawDocs = opportunity.required_documents
-  const missingDocs = Array.isArray(rawDocs) ? rawDocs : (typeof rawDocs === 'string' ? [rawDocs] : [])
+  const rawDocs = opportunity.required_documents || []
+  const requiredDocsInsights = Array.isArray(rawDocs) ? rawDocs : []
+  const missingDocs = requiredDocsInsights.map((d: any) => d.value || String(d))
   
   // Deterministic Transparent Scoring Algorithm
-  const baseCompletedItems = ["Eligibility Verified", "Identity Proof"]
-  const completedCount = baseCompletedItems.length
-  const missingCount = missingDocs.length
-  const totalItems = completedCount + missingCount
-  const readinessScore = Math.round((completedCount / totalItems) * 100)
+  const eligibilityReqs = opportunity.eligibility_analysis?.requirements || []
+  
+  let completedCount = 0
+  let totalEligibilityReqs = eligibilityReqs.length
+  
+  eligibilityReqs.forEach((req: any) => {
+    if (req.value && req.value.includes('[MATCHED]')) {
+      completedCount++
+    }
+  })
+
+  const missingCount = requiredDocsInsights.length
+  const totalItems = totalEligibilityReqs + missingCount
+  
+  let readinessScore: string | number = 'Unknown'
+  let successProbability: string | number = 'Unknown'
+  
+  if (totalItems > 0) {
+    readinessScore = Math.round((completedCount / totalItems) * 100)
+    successProbability = Math.min(95, readinessScore + 10)
+  }
   
   const estimatedTimeMins = (missingCount * 15) + 10 // 15 mins per doc + 10 mins base form
-  
-  const successProbability = Math.min(95, readinessScore + 10)
+
+  if (opportunity.status === 'ERROR') {
+    return (
+      <div className="container-wide py-12 flex flex-col items-center justify-center min-h-[50vh] animate-in fade-in duration-700">
+        <AlertTriangle className="w-16 h-16 text-warning mb-6" />
+        <h1 className="text-hero-title mb-4">Analysis Incomplete</h1>
+        <p className="text-body-text text-muted-foreground max-w-[600px] text-center mb-8">
+          The system could not confidently determine eligibility, missing documents, or deadlines for this opportunity. Please review the source document manually.
+        </p>
+        <Link href="/opportunities" className="bg-glass-surface text-foreground px-6 py-3 rounded-full font-semibold border border-glass-border hover:bg-glass-layer transition-spring">
+          Return to Dashboard
+        </Link>
+      </div>
+    )
+  }
 
   return (
     <div className="container-wide py-12 flex flex-col gap-12 animate-in fade-in duration-700">
@@ -117,42 +168,34 @@ export default async function OpportunityDetailsPage({
           </div>
 
           {/* 1. APPLICATION READINESS ENGINE */}
-          <div className="liquid-glass-card p-10 flex flex-col md:flex-row gap-12 shadow-elevation-2 relative overflow-visible">
+          <div className="liquid-glass-card p-10 flex flex-col md:flex-row items-center gap-12 shadow-elevation-2 relative overflow-visible">
             {/* Soft backdrop glow behind readiness engine */}
-            <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-success/10 blur-[100px] pointer-events-none" />
+            <div className="absolute top-1/2 left-[15%] -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-primary/10 blur-[100px] pointer-events-none" />
 
-            <div className="flex-1 relative z-10 flex flex-col justify-center">
-              <div className="text-[12px] font-semibold mb-4 uppercase tracking-widest flex items-center gap-2 text-muted-foreground">
-                <Activity className="w-4 h-4" /> Application Readiness Engine
-              </div>
-              <div className="flex items-end gap-4 mb-4">
-                <div className="text-metric-number text-foreground">
-                  {readinessScore}% 
-                </div>
-                <span className="text-[16px] font-medium text-muted-foreground mb-3">
-                  Readiness Score
-                </span>
-              </div>
-              <div className="w-full h-3 bg-glass-surface rounded-full overflow-hidden border border-glass-border">
-                <div className="h-full bg-success transition-all duration-1000" style={{ width: `${readinessScore}%` }} />
+            <div className="relative z-10 flex flex-col items-center justify-center md:border-r md:border-glass-border md:pr-12">
+              <ReadinessRing score={readinessScore} size={180} strokeWidth={12} />
+              <div className="text-[13px] font-semibold mt-6 uppercase tracking-widest flex items-center gap-2 text-muted-foreground">
+                <Activity className="w-4 h-4 text-primary" /> Readiness Engine
               </div>
             </div>
 
-            <div className="flex-1 grid grid-cols-2 gap-4 relative z-10">
-              <div className="bg-glass-surface/50 p-5 rounded-[16px] border border-glass-border">
-                <div className="text-metric-number text-success">{successProbability}%</div>
+            <div className="flex-1 grid grid-cols-2 gap-4 relative z-10 w-full">
+              <div className="bg-glass-surface/50 p-6 rounded-[20px] border border-glass-border">
+                <div className="text-metric-number text-success">{successProbability}{successProbability !== 'Unknown' ? '%' : ''}</div>
+                <div className="text-[12px] uppercase font-semibold text-muted-foreground mt-3 tracking-wider">Success Probability</div>
               </div>
-              <div className="bg-glass-surface/50 p-5 rounded-[16px] border border-glass-border">
+              <div className="bg-glass-surface/50 p-6 rounded-[20px] border border-glass-border">
                 <div className="text-metric-number text-foreground">{estimatedTimeMins} min</div>
+                <div className="text-[12px] uppercase font-semibold text-muted-foreground mt-3 tracking-wider">Estimated Time</div>
               </div>
-              <div className="col-span-2 bg-glass-surface/50 p-5 rounded-[16px] border border-glass-border">
-                <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-3">Checklist Overview</div>
-                <div className="flex gap-6">
-                  <div className="flex items-center gap-2 text-[15px] font-medium text-success">
-                    <CheckCircle2 className="w-5 h-5" /> {completedCount} Completed
+              <div className="col-span-2 bg-glass-surface/50 p-6 rounded-[20px] border border-glass-border">
+                <div className="text-[12px] uppercase font-semibold text-muted-foreground mb-4 tracking-wider">Checklist Overview</div>
+                <div className="flex gap-8">
+                  <div className="flex items-center gap-2 text-[16px] font-medium text-success">
+                    <CheckCircle2 className="w-6 h-6" /> {completedCount} Completed
                   </div>
-                  <div className="flex items-center gap-2 text-[15px] font-medium text-danger">
-                    <XCircle className="w-5 h-5" /> {missingCount} Missing
+                  <div className="flex items-center gap-2 text-[16px] font-medium text-danger">
+                    <XCircle className="w-6 h-6" /> {missingCount} Missing
                   </div>
                 </div>
               </div>
@@ -167,15 +210,24 @@ export default async function OpportunityDetailsPage({
               className="border-t-2 border-t-warning"
             >
               <ul className="space-y-4 pt-2">
-                {missingDocs.length > 0 ? missingDocs.map((doc: string, i: number) => (
-                  <li key={i} className="flex items-start gap-3 p-4 bg-danger/5 rounded-[12px] border border-danger/20">
-                    <span className="text-danger mt-0.5 font-semibold">✗</span>
-                    <span className="text-[15px] font-medium text-foreground">{doc}</span>
+                {requiredDocsInsights.length > 0 ? requiredDocsInsights.map((doc: any, i: number) => (
+                  <li key={i} className="flex flex-col gap-2 p-4 bg-danger/5 rounded-[12px] border border-danger/20">
+                    <div className="flex items-start gap-3">
+                      <span className="text-danger mt-0.5 font-semibold">✗</span>
+                      <span className="text-[15px] font-medium text-foreground">{doc.value || String(doc)}</span>
+                    </div>
+                    {doc.source_quote && (
+                      <EvidenceDisplay 
+                        insight={doc.value} 
+                        quote={doc.source_quote} 
+                        page={doc.page_number} 
+                        confidence={doc.confidence_score} 
+                      />
+                    )}
                   </li>
                 )) : (
-                  <li className="flex items-center gap-3 p-4 bg-success/5 rounded-[12px] border border-success/20">
-                    <CheckCircle2 className="w-5 h-5 text-success" />
-                    <span className="text-[15px] font-medium text-foreground">You have all required documents!</span>
+                  <li className="p-10 text-center text-muted-foreground border-2 border-dashed border-glass-border rounded-[20px] text-[15px]">
+                    Unable to identify required documents.
                   </li>
                 )}
               </ul>
@@ -187,26 +239,55 @@ export default async function OpportunityDetailsPage({
               className="border-t-2 border-t-success"
             >
               <ul className="space-y-4 pt-2">
-                {(Array.isArray(opportunity.eligibility_analysis?.requirements) ? opportunity.eligibility_analysis.requirements : []).map((req: string, i: number) => {
-                  const isMismatch = req.startsWith('[MISMATCH]')
-                  const cleanReq = req.replace(/^\[(MATCHED|MISMATCH)\]\s*/, '')
+                {eligibilityReqs.length > 0 ? eligibilityReqs.map((req: any, i: number) => {
+                  const reqVal = req.value || String(req)
+                  const isMismatch = reqVal.startsWith('[MISMATCH]')
+                  const isMatch = reqVal.startsWith('[MATCHED]')
+                  const cleanReq = reqVal.replace(/^\[(MATCHED|MISMATCH)\]\s*/, '')
                   
+                  let statusColor = "text-muted-foreground"
+                  let bgColor = "bg-glass-surface/50 border-glass-border"
+                  let StatusIcon = Activity
+                  let statusText = "Unknown"
+                  
+                  if (isMismatch) {
+                    statusColor = "text-danger"
+                    bgColor = "bg-danger/5 border-danger/20"
+                    StatusIcon = XCircle
+                    statusText = "Mismatch"
+                  } else if (isMatch) {
+                    statusColor = "text-success"
+                    bgColor = "bg-success/5 border-success/20"
+                    StatusIcon = CheckCircle2
+                    statusText = "Matched"
+                  }
+
                   return (
-                    <li key={i} className={cn("flex items-start gap-3 p-4 rounded-[12px] border", isMismatch ? "bg-danger/5 border-danger/20" : "bg-success/5 border-success/20")}>
-                      {isMismatch ? (
-                        <XCircle className="w-5 h-5 text-danger shrink-0 mt-0.5" />
-                      ) : (
-                        <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />
-                      )}
-                      <div>
-                        <span className={cn("text-[13px] font-semibold uppercase tracking-wider mb-1 block", isMismatch ? "text-danger" : "text-success")}>
-                          {isMismatch ? 'Mismatch' : 'Matched'}
-                        </span>
-                        <span className={cn("text-[15px] font-medium leading-relaxed text-foreground")}>{cleanReq}</span>
+                    <li key={i} className={cn("flex flex-col gap-2 p-4 rounded-[12px] border", bgColor)}>
+                      <div className="flex items-start gap-3">
+                        <StatusIcon className={cn("w-5 h-5 shrink-0 mt-0.5", statusColor)} />
+                        <div>
+                          <span className={cn("text-[13px] font-semibold uppercase tracking-wider mb-1 block", statusColor)}>
+                            {statusText}
+                          </span>
+                          <span className={cn("text-[15px] font-medium leading-relaxed text-foreground")}>{cleanReq}</span>
+                        </div>
                       </div>
+                      {req.source_quote && (
+                        <EvidenceDisplay 
+                          insight={cleanReq} 
+                          quote={req.source_quote} 
+                          page={req.page_number} 
+                          confidence={req.confidence_score} 
+                        />
+                      )}
                     </li>
                   )
-                }) || <li className="text-[15px] text-muted-foreground">No explicit requirements detected.</li>}
+                }) : (
+                  <li className="p-10 text-center text-muted-foreground border-2 border-dashed border-glass-border rounded-[20px] text-[15px]">
+                    Eligibility cannot be determined from document.
+                  </li>
+                )}
               </ul>
             </DecisionCard>
           </div>

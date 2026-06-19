@@ -5,33 +5,48 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--twilight-900);
+  --color-foreground: var(--text-primary);
   --font-sans: var(--font-cm-geom), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "SF Pro Display", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--soft-periwinkle);
+  --color-primary-foreground: #ffffff;
   
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--twilight-800);
+  --color-secondary-foreground: var(--text-primary);
   
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--twilight-800);
+  --color-muted-foreground: var(--text-muted);
 
-  --color-border: var(--border);
+  --color-border: var(--glass-border);
 
   /* Glass System */
-  --color-glass-surface: var(--glass-surface);
-  --color-glass-layer: var(--glass-layer);
-  --color-glass-border: var(--glass-border);
-  --color-glass-highlight: var(--glass-highlight);
+  --color-glass-surface: rgba(255, 255, 255, 0.04);
+  --color-glass-layer: rgba(255, 255, 255, 0.06);
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+  --color-glass-highlight: rgba(149, 127, 239, 0.25);
   
-  /* Semantic Colors — Twilight Palette Only */
-  --color-success: #93CAF6;
-  --color-warning: #858AE3;
-  --color-danger: #7364D2;
-  --color-info: #8EB5F0;
+  /* Semantic Colors — Twilight Palette */
+  --color-success: #72F1B8;
+  --color-warning: #FFD166;
+  --color-danger: #FF6B8A;
+  --color-info: var(--soft-periwinkle);
+  
+  /* Twilight Specific Variables */
+  --color-powder-petal: #EFD9CE;
+  --color-mauve: #DEC0F1;
+  --color-wisteria: #B79CED;
+  --color-soft-periwinkle: #957FEF;
+  --color-medium-slate-blue: #7161EF;
+  
+  --color-twilight-900: #090D1A;
+  --color-twilight-800: #0D1326;
+  --color-twilight-700: #111B34;
+  
+  --color-text-primary: #F8FAFF;
+  --color-text-secondary: #C9D3F2;
+  --color-text-muted: #8E99B8;
   
   /* 8pt Grid */
   --spacing-sys-1: 8px;
@@ -46,61 +61,54 @@
   --shadow-elevation-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
   --shadow-elevation-2: 0 4px 16px rgba(0,0,0,0.16), 0 2px 4px rgba(0,0,0,0.08);
   --shadow-elevation-3: 0 12px 40px rgba(0,0,0,0.24), 0 4px 12px rgba(0,0,0,0.12);
-  --shadow-glass-card: 0 8px 32px rgba(0,0,0,0.4), 0 0 1px rgba(255,255,255,0.05);
+  --shadow-glass-card: 0 20px 60px rgba(0,0,0,0.35);
+  --shadow-twilight-glow: 0 0 40px rgba(149,127,239,0.25);
 }
 
-/* ══════════════════════════════════════════════
-   SURFACE SYSTEM — Deepest to lightest
-   ══════════════════════════════════════════════ */
-
 :root {
-  --background: #030712;
-  --foreground: #F0F2F5;
-  
-  --surface-1: #071225;
-  --surface-2: #0B1020;
-  --surface-3: #111827;
-  
-  --muted: #0B1020;
-  --muted-foreground: rgba(240, 242, 245, 0.55);
-  
-  --primary: #858AE3;
-  --primary-foreground: #030712;
+  --powder-petal: #EFD9CE;
+  --mauve: #DEC0F1;
+  --wisteria: #B79CED;
+  --soft-periwinkle: #957FEF;
+  --medium-slate-blue: #7161EF;
 
-  --secondary: #97DFFC;
-  --secondary-foreground: #030712;
+  --twilight-900: #090D1A;
+  --twilight-800: #0D1326;
+  --twilight-700: #111B34;
 
-  --border: rgba(255,255,255,0.06);
+  --text-primary: #F8FAFF;
+  --text-secondary: #C9D3F2;
+  --text-muted: #8E99B8;
+  
+  --success: #72F1B8;
+  --warning: #FFD166;
+  --danger: #FF6B8A;
 
-  --glass-surface: rgba(255, 255, 255, 0.03);
+  --background: var(--twilight-900);
+  --foreground: var(--text-primary);
+  
+  --surface-1: var(--twilight-800);
+  --surface-2: var(--twilight-700);
+  
+  --muted: var(--twilight-800);
+  --muted-foreground: var(--text-muted);
+  
+  --primary: var(--soft-periwinkle);
+  --primary-foreground: #ffffff;
+
+  --secondary: var(--twilight-800);
+  --secondary-foreground: var(--text-primary);
+
+  --border: rgba(255,255,255,0.08);
+
+  --glass-surface: rgba(255, 255, 255, 0.04);
   --glass-layer: rgba(255, 255, 255, 0.06);
-  --glass-border: rgba(255, 255, 255, 0.07);
-  --glass-highlight: rgba(133, 138, 227, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(149, 127, 239, 0.25);
 }
 
 .dark {
-  --background: #030712;
-  --foreground: #F0F2F5;
-  
-  --surface-1: #071225;
-  --surface-2: #0B1020;
-  --surface-3: #111827;
-
-  --muted: #0B1020;
-  --muted-foreground: rgba(240, 242, 245, 0.55);
-  
-  --primary: #858AE3;
-  --primary-foreground: #030712;
-
-  --secondary: #97DFFC;
-  --secondary-foreground: #030712;
-
-  --border: rgba(255,255,255,0.06);
-
-  --glass-surface: rgba(255, 255, 255, 0.03);
-  --glass-layer: rgba(255, 255, 255, 0.06);
-  --glass-border: rgba(255, 255, 255, 0.07);
-  --glass-highlight: rgba(133, 138, 227, 0.12);
+  /* Inherit all from root, UI is strictly dark-mode twilight */
 }
 
 /* ══════════════════════════════════════════════
@@ -116,8 +124,13 @@ html {
 
 @layer base {
   body {
-    background-color: var(--background);
-    color: var(--foreground);
+    background-color: var(--twilight-900);
+    background-image: 
+      radial-gradient(circle at top, rgba(149,127,239,0.20), transparent 40%),
+      radial-gradient(circle at bottom right, rgba(183,156,237,0.12), transparent 50%),
+      linear-gradient(180deg, #090D1A, #0D1326, #111B34);
+    background-attachment: fixed;
+    color: var(--text-primary);
     text-rendering: optimizeLegibility;
     line-height: 1.6;
   }
@@ -132,31 +145,31 @@ html {
 
   /* Display — Hero only, used once per page max */
   .text-display {
-    font-size: clamp(40px, 5vw, 56px);
-    line-height: 1.08;
-    letter-spacing: -0.035em;
+    font-size: clamp(48px, 6vw, 72px);
+    line-height: 1.05;
+    letter-spacing: -0.04em;
     font-weight: 600;
   }
 
   /* Hero Title — Page-level headline */
   .text-hero-title {
-    font-size: clamp(32px, 4vw, 48px);
-    line-height: 1.12;
+    font-size: clamp(48px, 6vw, 72px);
+    line-height: 1.1;
     letter-spacing: -0.03em;
     font-weight: 600;
   }
 
   /* Section Title */
   .text-section-title {
-    font-size: clamp(24px, 3vw, 36px);
+    font-size: clamp(28px, 3vw, 36px);
     line-height: 1.2;
     letter-spacing: -0.02em;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   /* Card Title */
   .text-card-title {
-    font-size: clamp(16px, 1.2vw, 20px);
+    font-size: clamp(20px, 2vw, 24px);
     line-height: 1.3;
     letter-spacing: -0.01em;
     font-weight: 500;
@@ -164,16 +177,16 @@ html {
 
   /* Body */
   .text-body-text {
-    font-size: clamp(14px, 1vw, 16px);
+    font-size: 16px;
     line-height: 1.65;
     max-width: 70ch;
     font-weight: 400;
-    color: rgba(240, 242, 245, 0.8);
+    color: var(--text-secondary);
   }
 
   /* Metric Number */
   .text-metric-number {
-    font-size: clamp(28px, 3vw, 40px);
+    font-size: clamp(32px, 4vw, 48px);
     line-height: 1;
     font-weight: 600;
     letter-spacing: -0.02em;
@@ -181,16 +194,16 @@ html {
 
   /* Label */
   .text-card-label {
-    font-size: 11px;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    font-weight: 500;
-    opacity: 0.7;
+    font-weight: 350;
+    color: var(--text-muted);
   }
 
   /* Status Badge */
   .text-status-badge {
-    font-size: 10px;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     font-weight: 500;
@@ -230,35 +243,43 @@ html {
 
   /* ══════════════════════════════════════════════
      CARD DEPTH SYSTEM
-     Floating glass cards with inner ambient glow
+     Premium Dust Glass
      ══════════════════════════════════════════════ */
 
   .liquid-glass-card {
     position: relative;
     overflow: hidden;
     border-radius: 20px;
-    border: 1px solid var(--glass-border);
-    background: linear-gradient(
-      135deg,
-      rgba(11, 16, 32, 0.8) 0%,
-      rgba(7, 18, 37, 0.6) 50%,
-      rgba(11, 16, 32, 0.8) 100%
-    );
-    box-shadow: var(--shadow-glass-card);
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    transition: all 250ms cubic-bezier(0.23, 1, 0.32, 1);
+    transform: translateZ(0); /* GPU accel */
   }
 
-  /* Inner ambient glow — the "floating" feel */
-  .liquid-glass-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 20px;
-    background: radial-gradient(
-      ellipse at 20% 20%,
-      rgba(133, 138, 227, 0.06) 0%,
-      transparent 50%
-    );
-    pointer-events: none;
+  /* Hover System: Layered Twilight Glow */
+  .liquid-glass-card:hover {
+    transform: translateY(-4px) scale(1.01) translateZ(0);
+    border-color: var(--soft-periwinkle);
+    box-shadow: 0 0 40px rgba(149,127,239,0.25), 0 20px 60px rgba(0,0,0,0.35);
+  }
+
+  /* Button System */
+  .btn-twilight {
+    background: linear-gradient(135deg, var(--medium-slate-blue), var(--soft-periwinkle), var(--wisteria));
+    color: #ffffff;
+    border: none;
+    transition: all 250ms cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 4px 15px rgba(113,97,239,0.2);
+    transform: translateZ(0);
+  }
+
+  .btn-twilight:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px) translateZ(0);
+    box-shadow: 0 10px 30px rgba(113,97,239,0.45);
   }
 
   /* Decision Surface — heavier glass */

@@ -7,9 +7,51 @@ import { env } from '@/lib/env'
 import sanitizeHtml from 'sanitize-html'
 import { extractJsonFromGeminiResponse } from '@/lib/utils'
 
-// Global Circuit Breaker (in-memory, resets on server restart or manually)
-let geminiCircuitBreakerOpen = false;
-let breakerResetTime = 0;
+
+export async function POST(request: Request) {
+  const startTime = Date.now();
+  
+  try {
+    const rawBody = await request.json();
+    const parsedBody = orchestratorSchema.safeParse(rawBody);
+
+    if (!parsedBody.success) {
+      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+    }
+
+    const { opportunityId, profile } = parsedBody.data;
+    const supabase = await createClient();
+
+    const { data: oppRecord } = await supabase.from('opportunities').select('*').eq('id', opportunityId).single();
+    if (!oppRecord) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+    const pathOrUrl = oppRecord.storage_path;
+    let inlineData = null;
+    let rawTextContext = "";
+
+    // Determine if URL or File
+    if (pathOrUrl.startsWith('http')) {
+      try {
+        rawTextContext = await extractTextFromUrl(pathOrUrl);
+      } catch (e) {
+        // Phase 4: URL Scraping Protection Fallback
+        rawTextContext = "This website could not be processed. Please upload the PDF version or try another source.";
+      }
+    } else {
+      const { data: fileData } = await supabase.storage.from('opportunities').download(pathOrUrl);
+      if (fileData) {
+        const arrayBuffer = await fileData.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        
+        // For actual text parsing we would need a PDF extractor, but Gemini accepts inlineData
+        inlineData = {
+          data: buffer.toString('base64'),
+          mimeType: pathOrUrl.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg'
+        };
+      } else {
+        throw new Error("Failed to download file");
+      }
+    }
 
 const orchestratorSchema = z.object({
   opportunityId: z.string().uuid(),
@@ -77,86 +119,10 @@ async function runGeminiWithRetry(ai: GoogleGenAI, contents: any[], maxRetries: 
   throw new Error("Max retries exceeded");
 }
 
-function generateRegexFallback(text: string) {
-  const dateMatches = text.match(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/g) || [];
-  const moneyMatches = text.match(/₹\s?\d+(?:,\d{3})*(?:\.\d{2})?/g) || [];
-  const emailMatches = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || [];
-  
-  return {
-    title: "Document Analysis (Fallback Mode)",
-    category: "OTHER",
-    plain_language_summary: "AI analysis was temporarily unavailable. Basic document intelligence extracted successfully.",
-    important_dates: { deadline: dateMatches.length > 0 ? dateMatches[0] : "Not Found In Document" },
-    eligibility_analysis: { requirements: [] },
-    required_documents: ["Review original document"],
-    opportunity_value: moneyMatches.length > 0 ? moneyMatches[0] : "Not Found In Document",
-    opportunity_loss_analysis: "Action required to prevent missing potential opportunity.",
-    readiness_score: 50,
-    risk_score: 50,
-    confidence_score: 10,
-    evidence_references: [],
-    action_checklist: [
-      { step_number: 1, title: "Review Document Manually", description: "Read the original text to confirm details." },
-      { step_number: 2, title: "Contact Issuer", description: emailMatches.length > 0 ? `Email: ${emailMatches[0]}` : "Find contact details in the document." }
-    ]
-  };
-}
-
-export async function POST(request: Request) {
-  const startTime = Date.now();
-  
-  try {
-    const rawBody = await request.json();
-    const parsedBody = orchestratorSchema.safeParse(rawBody);
-
-    if (!parsedBody.success) {
-      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
-    }
-
-    const { opportunityId, profile } = parsedBody.data;
-    const supabase = await createClient();
-
-    const { data: oppRecord } = await supabase.from('opportunities').select('*').eq('id', opportunityId).single();
-    if (!oppRecord) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-
-    const pathOrUrl = oppRecord.storage_path;
-    let inlineData = null;
-    let rawTextContext = "";
-
-    // Determine if URL or File
-    if (pathOrUrl.startsWith('http')) {
-      try {
-        rawTextContext = await extractTextFromUrl(pathOrUrl);
-      } catch (e) {
-        // Phase 4: URL Scraping Protection Fallback
-        rawTextContext = "This website could not be processed. Please upload the PDF version or try another source.";
-      }
-    } else {
-      const { data: fileData } = await supabase.storage.from('opportunities').download(pathOrUrl);
-      if (fileData) {
-        const arrayBuffer = await fileData.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        
-        // For actual text parsing we would need a PDF extractor, but Gemini accepts inlineData
-        inlineData = {
-          data: buffer.toString('base64'),
-          mimeType: pathOrUrl.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg'
-        };
-      } else {
-        throw new Error("Failed to download file");
-      }
-    }
-
-    // Phase 3: Large PDF Chunking Logic (Simplified text chunking for URLs, Gemini natively handles large PDFs up to token limit via inlineData, but if text > 50k chars we chunk)
+    // Phase 3: Large PDF Chunking Logic
     if (rawTextContext.length > 50000) {
       logger.info("Large text detected, truncating/chunking");
       rawTextContext = rawTextContext.substring(0, 50000) + "... [Truncated for AI Processing Limits]";
-    }
-
-    // Circuit Breaker check
-    if (geminiCircuitBreakerOpen && Date.now() < breakerResetTime) {
-      logger.warn("Circuit breaker open, falling back to Regex extraction instantly.");
-      // Skip Gemini
     }
 
     const profileContext = profile ? `
@@ -169,21 +135,47 @@ export async function POST(request: Request) {
       Analyze this document. ${profileContext}
       CRITICAL RULES:
       - NEVER hallucinate or guess.
+      - Every insight MUST be backed by a direct quote from the document.
+      - If you cannot find a piece of information, return null or an empty array. Do NOT invent defaults.
       - Return ONLY a JSON object exactly matching this schema:
       {
         "title": "String",
         "category": "SCHOLARSHIP | CIRCULAR | SCHEME | INTERNSHIP | COMPETITION | OTHER",
         "plain_language_summary": "String",
-        "important_dates": { "deadline": "String" },
-        "eligibility_analysis": { "requirements": ["String"] },
-        "required_documents": ["String"],
+        "important_dates": { "deadline": "String or null if not explicitly found" },
+        "eligibility_analysis": {
+          "requirements": [
+            {
+              "value": "String (e.g. [MATCHED] Income below 2.5L)",
+              "source_quote": "Exact quote from document",
+              "page_number": "String or number",
+              "confidence_score": 0-100
+            }
+          ]
+        },
+        "required_documents": [
+            {
+              "value": "String (e.g. Income Certificate)",
+              "source_quote": "Exact quote from document",
+              "page_number": "String or number",
+              "confidence_score": 0-100
+            }
+        ],
         "opportunity_value": "String",
         "opportunity_loss_analysis": "String",
-        "readiness_score": 0,
         "risk_score": 0,
         "confidence_score": 0,
         "evidence_references": [{"claim": "String", "quote_from_document": "String", "confidence_score": 0, "risk_assessment": "String"}],
-        "action_checklist": [{"step_number": 1, "title": "String", "description": "String"}]
+        "action_checklist": [
+          {
+            "step_number": 1,
+            "title": "String",
+            "description": "String",
+            "source_quote": "Exact quote from document",
+            "page_number": "String or number",
+            "confidence_score": 0-100
+          }
+        ]
       }
     `;
 
@@ -196,41 +188,39 @@ export async function POST(request: Request) {
     let usedProvider = "gemini";
     let isPartial = false;
 
-    if (!geminiCircuitBreakerOpen || Date.now() >= breakerResetTime) {
-      try {
-        const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
-        const responseText = await runGeminiWithRetry(ai, contents);
-        const { data: rawAiResult } = extractJsonFromGeminiResponse(responseText);
-        if (rawAiResult) {
-          finalAiResult = rawAiResult;
-        } else {
-          throw new Error("Failed to extract JSON");
-        }
-      } catch (geminiError) {
-        logger.error("Gemini completely failed after retries.");
-        geminiCircuitBreakerOpen = true;
-        breakerResetTime = Date.now() + 5 * 60 * 1000; // 5 minute breaker
-        finalAiResult = generateRegexFallback(rawTextContext);
-        usedProvider = "regex_fallback";
-        isPartial = true;
+    try {
+      const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
+      const responseText = await runGeminiWithRetry(ai, contents);
+      const { data: rawAiResult } = extractJsonFromGeminiResponse(responseText);
+      if (rawAiResult) {
+        finalAiResult = rawAiResult;
+      } else {
+        throw new Error("Failed to extract JSON");
       }
-    } else {
-      finalAiResult = generateRegexFallback(rawTextContext);
-      usedProvider = "regex_fallback";
-      isPartial = true;
+    } catch (geminiError) {
+      logger.error("Gemini completely failed after retries.");
+      // We no longer fallback to dummy data.
+      await supabase.from('opportunities').update({ status: 'ERROR' }).eq('id', opportunityId);
+      return NextResponse.json({ error: 'Analysis Incomplete' }, { status: 200 });
     }
 
     // Phase 8: Response Validation & Repair
+    const evidenceInsightSchema = z.object({
+      value: z.string(),
+      source_quote: z.string(),
+      page_number: z.union([z.string(), z.number()]).optional(),
+      confidence_score: z.coerce.number()
+    });
+
     const aiResponseSchema = z.object({
       title: z.string().catch("Unknown Opportunity"),
       category: z.string().catch("OTHER"),
       plain_language_summary: z.string().catch("Summary could not be generated."),
-      important_dates: z.any().catch({ deadline: "Not Found In Document" }),
-      eligibility_analysis: z.any().catch({ requirements: [] }),
-      required_documents: z.array(z.string()).catch([]),
+      important_dates: z.any().catch({ deadline: null }),
+      eligibility_analysis: z.object({ requirements: z.array(evidenceInsightSchema).catch([]) }).catch({ requirements: [] }),
+      required_documents: z.array(evidenceInsightSchema).catch([]),
       opportunity_value: z.string().catch("Not Found In Document"),
       opportunity_loss_analysis: z.string().catch("Loss analysis unavailable."),
-      readiness_score: z.coerce.number().catch(50),
       risk_score: z.coerce.number().catch(0),
       confidence_score: z.coerce.number().catch(0),
       evidence_references: z.array(z.any()).catch([]),
@@ -239,28 +229,29 @@ export async function POST(request: Request) {
 
     const repairedResult = aiResponseSchema.parse(finalAiResult);
 
+    // Dynamic Category checking
+    const finalCategory = repairedResult.confidence_score >= 80 && ['SCHOLARSHIP', 'CIRCULAR', 'SCHEME', 'INTERNSHIP', 'COMPETITION'].includes(repairedResult.category.toUpperCase()) 
+      ? repairedResult.category.toUpperCase() 
+      : 'OTHER';
+
     // Save back to DB
     const sanitizeOptions = { allowedTags: [], allowedAttributes: {} };
     
     await supabase.from('opportunities').update({
       title: sanitizeHtml(repairedResult.title, sanitizeOptions),
-      category: ['SCHOLARSHIP', 'CIRCULAR', 'SCHEME', 'INTERNSHIP', 'COMPETITION'].includes(repairedResult.category.toUpperCase()) ? repairedResult.category.toUpperCase() : 'OTHER',
+      category: finalCategory,
       simplified_summary: sanitizeHtml(repairedResult.plain_language_summary, sanitizeOptions),
-      deadline: repairedResult.important_dates?.deadline !== 'Not Found In Document' && repairedResult.important_dates?.deadline ? new Date(repairedResult.important_dates?.deadline).toISOString() : null,
+      deadline: repairedResult.important_dates?.deadline && repairedResult.important_dates.deadline !== 'Not Found In Document' ? new Date(repairedResult.important_dates.deadline).toISOString() : null,
       eligibility_analysis: repairedResult.eligibility_analysis || {},
       required_documents: repairedResult.required_documents || [],
       opportunity_value: sanitizeHtml(repairedResult.opportunity_value || '', sanitizeOptions),
       opportunity_loss_prediction: sanitizeHtml(repairedResult.opportunity_loss_analysis || '', sanitizeOptions),
-      readiness_score: repairedResult.readiness_score,
       risk_score: repairedResult.risk_score,
       confidence_score: repairedResult.confidence_score,
       evidence_references: repairedResult.evidence_references || [],
-      status: isPartial ? 'PARTIAL' : 'PROCESSED' // Could just use PROCESSED if PARTIAL is not in enum, checking schema: 'PENDING', 'PROCESSED', 'ERROR'. So we MUST use PROCESSED or ERROR.
+      status: 'PROCESSED'
     }).eq('id', opportunityId);
 
-    // Re-verify enum. Status enum was 'PENDING', 'PROCESSED', 'ERROR'.
-    // Let's force it to 'PROCESSED' even for partial so UI renders it.
-    await supabase.from('opportunities').update({ status: 'PROCESSED' }).eq('id', opportunityId);
 
     if (repairedResult.action_checklist && repairedResult.action_checklist.length > 0) {
       const stepsToInsert = repairedResult.action_checklist.map((step: any) => ({
@@ -268,7 +259,10 @@ export async function POST(request: Request) {
         step_number: step.step_number || 1,
         title: sanitizeHtml(step.title || "Step", sanitizeOptions),
         description: sanitizeHtml(step.description || "Action required", sanitizeOptions),
-        status: 'PENDING'
+        status: 'PENDING',
+        source_quote: step.source_quote ? sanitizeHtml(step.source_quote, sanitizeOptions) : null,
+        page_number: step.page_number ? String(step.page_number) : null,
+        confidence_score: step.confidence_score || 0
       }));
       await supabase.from('action_steps').insert(stepsToInsert);
     }
