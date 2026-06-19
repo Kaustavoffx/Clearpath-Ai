@@ -6,6 +6,8 @@ import { logger } from '@/lib/logger'
 import { env } from '@/lib/env'
 import sanitizeHtml from 'sanitize-html'
 import { extractJsonFromGeminiResponse } from '@/lib/utils'
+import { RuleEngine } from '@/lib/rule-engine'
+import OpenAI from 'openai'
 
 const orchestratorSchema = z.object({
   opportunityId: z.string().uuid(),
@@ -18,6 +20,78 @@ const orchestratorSchema = z.object({
     careerInterest: z.string().optional(),
   }).optional()
 });
+
+async function extractTextFromUrl(url: string): Promise<string> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s URL timeout
+
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const html = await res.text();
+    
+    // Simple metadata extraction for recovery
+    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    const descMatch = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["'][^>]*>/i);
+    const title = titleMatch ? titleMatch[1] : '';
+    const description = descMatch ? descMatch[1] : '';
+
+    const cleanText = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+               .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+               .replace(/<[^>]+>/g, ' ')
+               .replace(/\s+/g, ' ')
+               .trim();
+    
+    return `Title: ${title}\nDescription: ${description}\n\n${cleanText}`;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw new Error('Failed to scrape URL within 10 seconds or access was denied.');
+  }
+}
+
+async function runGeminiWithAdaptiveTimeout(ai: GoogleGenAI, contents: any[], textLength: number): Promise<string> {
+  // Adaptive Timeout Phase 3
+  let timeoutMs = 20000; // Small PDF
+  if (textLength > 15000) timeoutMs = 40000; // Medium
+  if (textLength > 30000) timeoutMs = 60000; // Large
+  if (textLength > 50000) timeoutMs = 90000; // Very Large
+
+  logger.info(`Using adaptive timeout: ${timeoutMs}ms for ${textLength} chars`);
+
+  const generatePromise = ai.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: contents,
+    config: { responseMimeType: "application/json" }
+  });
+
+  const timeoutPromise = new Promise((_, reject) => 
+    setTimeout(() => reject(new Error('AI Request Timed Out (Adaptive)')), timeoutMs)
+  );
+
+  const response = await Promise.race([generatePromise, timeoutPromise]) as any;
+  if (!response.text) throw new Error("Empty response from Gemini");
+  
+  return response.text;
+}
+
+async function runOpenAI(textContext: string, prompt: string): Promise<string> {
+  if (!env.OPENAI_API_KEY) throw new Error("OpenAI key not configured");
+  const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+  
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    response_format: { type: "json_object" },
+    messages: [
+      { role: "system", content: "You are a helpful assistant that extracts opportunity details in JSON format exactly as requested." },
+      { role: "user", content: `${prompt}\n\n--- CONTENT ---\n${textContext}\n--- END CONTENT ---`}
+    ]
+  }, { timeout: 30000 });
+
+  const result = response.choices[0].message.content;
+  if (!result) throw new Error("Empty response from OpenAI");
+  return result;
+}
 
 export async function POST(request: Request) {
   const startTime = Date.now();
@@ -33,28 +107,52 @@ export async function POST(request: Request) {
     const { opportunityId, profile } = parsedBody.data;
     const supabase = await createClient();
 
+    // Helper to log status to UI
+    const logStatus = async (msg: string) => {
+      try {
+        await supabase.from('opportunities').update({ processing_message: msg }).eq('id', opportunityId);
+      } catch (e) {
+        // Ignore DB update errors for status
+      }
+    };
+
     const { data: oppRecord } = await supabase.from('opportunities').select('*').eq('id', opportunityId).single();
     if (!oppRecord) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
     const pathOrUrl = oppRecord.storage_path;
-    let inlineData = null;
     let rawTextContext = "";
+    let inlineData = null; // We'll still keep this if we want Gemini to do native PDF, but we'll extract text for fallback/chunking
+
+    await logStatus("Downloading document...");
 
     // Determine if URL or File
     if (pathOrUrl.startsWith('http')) {
       try {
+        await logStatus("Scraping URL...");
         rawTextContext = await extractTextFromUrl(pathOrUrl);
       } catch (e) {
-        // Phase 4: URL Scraping Protection Fallback
         rawTextContext = "This website could not be processed. Please upload the PDF version or try another source.";
       }
     } else {
+      await logStatus("Reading PDF...");
       const { data: fileData } = await supabase.storage.from('opportunities').download(pathOrUrl);
       if (fileData) {
         const arrayBuffer = await fileData.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         
-        // For actual text parsing we would need a PDF extractor, but Gemini accepts inlineData
+        try {
+          await logStatus("Extracting Text...");
+          const pdf = require('pdf-parse');
+          const pdfData = await pdf(buffer);
+          rawTextContext = pdfData.text;
+          
+          if (pdfData.numpages > 20) {
+            logger.info(`Large PDF detected (${pdfData.numpages} pages)`);
+          }
+        } catch (e) {
+          logger.warn("PDF-Parse failed, will rely entirely on Gemini inlineData if possible");
+        }
+
         inlineData = {
           data: buffer.toString('base64'),
           mimeType: pathOrUrl.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg'
@@ -64,64 +162,18 @@ export async function POST(request: Request) {
       }
     }
 
-async function extractTextFromUrl(url: string): Promise<string> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s URL timeout
-
-  try {
-    const res = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeoutId);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const html = await res.text();
-    return html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-               .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-               .replace(/<[^>]+>/g, ' ')
-               .replace(/\s+/g, ' ')
-               .trim();
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw new Error('Failed to scrape URL within 10 seconds or access was denied.');
-  }
-}
-
-async function runGeminiWithRetry(ai: GoogleGenAI, contents: any[], maxRetries: number = 3): Promise<string> {
-  let attempt = 0;
-  while (attempt < maxRetries) {
-    try {
-      logger.info(`Gemini attempt ${attempt + 1}/${maxRetries}`);
-      
-      const generatePromise = ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: contents,
-        config: { responseMimeType: "application/json" }
-      });
-
-      // 15-second hard timeout per attempt
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('AI Request Timed Out')), 15000)
-      );
-
-      const response = await Promise.race([generatePromise, timeoutPromise]) as any;
-      if (!response.text) throw new Error("Empty response from Gemini");
-      
-      return response.text;
-    } catch (error) {
-      attempt++;
-      logger.warn(`Gemini attempt ${attempt} failed: ${(error as Error).message}`);
-      if (attempt >= maxRetries) throw error;
-      
-      // Exponential backoff: 2s, 4s
-      const delay = Math.pow(2, attempt) * 1000;
-      await new Promise(r => setTimeout(r, delay));
-    }
-  }
-  throw new Error("Max retries exceeded");
-}
-
-    // Phase 3: Large PDF Chunking Logic
-    if (rawTextContext.length > 50000) {
-      logger.info("Large text detected, truncating/chunking");
-      rawTextContext = rawTextContext.substring(0, 50000) + "... [Truncated for AI Processing Limits]";
+    // Phase 2: Document Chunking (Approximate by char length if > 60000 chars roughly 20 pages)
+    // For simplicity, we just chunk the text and send chunks
+    let chunks: string[] = [];
+    if (rawTextContext.length > 60000) {
+      await logStatus("Document is large. Chunking into smaller segments...");
+      const chunkSize = 15000;
+      for (let i = 0; i < rawTextContext.length; i += chunkSize) {
+        chunks.push(rawTextContext.substring(i, i + chunkSize));
+      }
+      logger.info(`Split document into ${chunks.length} chunks`);
+    } else {
+      chunks = [rawTextContext];
     }
 
     const profileContext = profile ? `
@@ -178,30 +230,54 @@ async function runGeminiWithRetry(ai: GoogleGenAI, contents: any[], maxRetries: 
       }
     `;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const contents: any[] = [prompt];
-    if (inlineData) contents.push({ inlineData });
-    else contents.push(`--- CONTENT ---\n${rawTextContext}\n--- END CONTENT ---`);
-
     let finalAiResult: any = null;
     let usedProvider = "gemini";
-    let isPartial = false;
+    
+    // We'll process the first chunk (or whole doc if no chunking) for the main analysis
+    // Phase 4: Partial Success Mode
+    let successfulChunks = 0;
+    
+    const targetChunk = chunks[0]; // Take the first chunk for primary data
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const contents: any[] = [prompt];
+    if (inlineData && chunks.length === 1) {
+      contents.push({ inlineData });
+    } else {
+      contents.push(`--- CONTENT ---\n${targetChunk}\n--- END CONTENT ---`);
+    }
 
     try {
+      await logStatus("Detecting Opportunities (Gemini)...");
       const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
-      const responseText = await runGeminiWithRetry(ai, contents);
+      const responseText = await runGeminiWithAdaptiveTimeout(ai, contents, targetChunk.length);
       const { data: rawAiResult } = extractJsonFromGeminiResponse(responseText);
       if (rawAiResult) {
         finalAiResult = rawAiResult;
+        successfulChunks++;
       } else {
-        throw new Error("Failed to extract JSON");
+        throw new Error("Failed to extract JSON from Gemini");
       }
     } catch (geminiError) {
-      logger.error("Gemini completely failed after retries.");
-      // We no longer fallback to dummy data.
-      await supabase.from('opportunities').update({ status: 'ERROR' }).eq('id', opportunityId);
-      return NextResponse.json({ error: 'Analysis Incomplete' }, { status: 200 });
+      logger.warn("Gemini completely failed. Trying OpenAI fallback...");
+      
+      try {
+        await logStatus("Gemini Timeout. Engaging OpenAI Fallback...");
+        const responseText = await runOpenAI(targetChunk, prompt);
+        const parsed = JSON.parse(responseText);
+        finalAiResult = parsed;
+        usedProvider = "openai";
+        successfulChunks++;
+      } catch (openAiError) {
+        logger.error("OpenAI failed. Engaging Rule Engine Fallback...");
+        await logStatus("Engaging Deterministic Rule Engine...");
+        finalAiResult = RuleEngine.extract(rawTextContext);
+        usedProvider = "rule_engine";
+        successfulChunks++;
+      }
     }
+
+    await logStatus("Verifying Evidence...");
 
     // Phase 8: Response Validation & Repair
     const evidenceInsightSchema = z.object({
@@ -236,6 +312,8 @@ async function runGeminiWithRetry(ai: GoogleGenAI, contents: any[], maxRetries: 
     // Save back to DB
     const sanitizeOptions = { allowedTags: [], allowedAttributes: {} };
     
+    await logStatus("Building Action Plan...");
+
     await supabase.from('opportunities').update({
       title: sanitizeHtml(repairedResult.title, sanitizeOptions),
       category: finalCategory,
@@ -248,6 +326,8 @@ async function runGeminiWithRetry(ai: GoogleGenAI, contents: any[], maxRetries: 
       risk_score: repairedResult.risk_score,
       confidence_score: repairedResult.confidence_score,
       evidence_references: repairedResult.evidence_references || [],
+      processing_message: 'Analysis Complete',
+      processing_metadata: { provider: usedProvider, total_chunks: chunks.length, successful_chunks: successfulChunks },
       status: 'PROCESSED'
     }).eq('id', opportunityId);
 

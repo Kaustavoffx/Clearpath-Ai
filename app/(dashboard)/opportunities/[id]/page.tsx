@@ -110,20 +110,7 @@ export default async function OpportunityDetailsPage({
   
   const estimatedTimeMins = (missingCount * 15) + 10 // 15 mins per doc + 10 mins base form
 
-  if (opportunity.status === 'ERROR') {
-    return (
-      <div className="container-wide py-12 flex flex-col items-center justify-center min-h-[50vh] animate-in fade-in duration-700">
-        <AlertTriangle className="w-16 h-16 text-warning mb-6" />
-        <h1 className="text-hero-title mb-4">Analysis Incomplete</h1>
-        <p className="text-body-text text-muted-foreground max-w-[600px] text-center mb-8">
-          The system could not confidently determine eligibility, missing documents, or deadlines for this opportunity. Please review the source document manually.
-        </p>
-        <Link href="/opportunities" className="bg-glass-surface text-foreground px-6 py-3 rounded-full font-semibold border border-glass-border hover:bg-glass-layer transition-spring">
-          Return to Dashboard
-        </Link>
-      </div>
-    )
-  }
+  const isRecoveryMode = opportunity.processing_metadata?.provider === 'rule_engine' || opportunity.confidence_score <= 30;
 
   return (
     <div className="container-wide py-12 flex flex-col gap-12 animate-in fade-in duration-700">
@@ -146,6 +133,19 @@ export default async function OpportunityDetailsPage({
         <JudgeArchitectureFlow />
       ) : (
         <div className="flex flex-col gap-12">
+
+          {/* RECOVERY MODE BANNER */}
+          {isRecoveryMode && (
+            <div className="bg-warning/10 border border-warning/30 p-6 rounded-[16px] flex items-start gap-4 animate-in fade-in duration-500 mb-4">
+              <AlertTriangle className="w-6 h-6 text-warning shrink-0 mt-1" />
+              <div>
+                <h3 className="text-[16px] font-semibold text-warning mb-1">Analysis Recovery Mode</h3>
+                <p className="text-[14px] text-warning/80 leading-relaxed">
+                  We encountered difficulty interpreting parts of this document. ClearPath OS recovered available information and generated the best possible action plan.
+                </p>
+              </div>
+            </div>
+          )}
           
           {/* HEADER AREA */}
           <div className="flex flex-col gap-4 relative z-10">
