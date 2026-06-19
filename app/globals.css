@@ -40,7 +40,7 @@
   --color-soft-periwinkle: #957FEF;
   --color-medium-slate-blue: #7161EF;
   
-  --color-twilight-900: #090D1A;
+  --color-twilight-900: #050408; /* Absolute Black Universe */
   --color-twilight-800: #0D1326;
   --color-twilight-700: #111B34;
   
@@ -71,8 +71,10 @@
   --wisteria: #B79CED;
   --soft-periwinkle: #957FEF;
   --medium-slate-blue: #7161EF;
+  --dark-bg: #050408;
+  --card-fill: rgba(113,97,239,0.03);
 
-  --twilight-900: #090D1A;
+  --twilight-900: #050408;
   --twilight-800: #0D1326;
   --twilight-700: #111B34;
 
@@ -124,11 +126,10 @@ html {
 
 @layer base {
   body {
-    background-color: var(--twilight-900);
+    background-color: var(--dark-bg);
     background-image: 
-      radial-gradient(circle at top, rgba(149,127,239,0.20), transparent 40%),
-      radial-gradient(circle at bottom right, rgba(183,156,237,0.12), transparent 50%),
-      linear-gradient(180deg, #090D1A, #0D1326, #111B34);
+      radial-gradient(circle at top, rgba(149,127,239,0.15), transparent 50%),
+      radial-gradient(circle at bottom right, rgba(183,156,237,0.1), transparent 60%);
     background-attachment: fixed;
     color: var(--text-primary);
     text-rendering: optimizeLegibility;
@@ -157,6 +158,17 @@ html {
     line-height: 1.1;
     letter-spacing: -0.03em;
     font-weight: 600;
+  }
+
+  /* Cinematic Greeting */
+  .text-cinematic-greeting {
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    background: linear-gradient(135deg, var(--powder-petal), var(--mauve), var(--soft-periwinkle));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 20px rgba(183, 156, 237, 0.2));
   }
 
   /* Section Title */
@@ -259,11 +271,27 @@ html {
     transform: translateZ(0); /* GPU accel */
   }
 
-  /* Hover System: Layered Twilight Glow */
   .liquid-glass-card:hover {
     transform: translateY(-4px) scale(1.01) translateZ(0);
     border-color: var(--soft-periwinkle);
     box-shadow: 0 0 40px rgba(149,127,239,0.25), 0 20px 60px rgba(0,0,0,0.35);
+  }
+
+  /* Cinematic Glass System for HUD */
+  .cinematic-glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    transition: all 300ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translateZ(0); /* GPU accel */
+  }
+
+  .cinematic-glass-card:hover {
+    transform: translateY(-8px) scale(1.02) translateZ(0);
+    border-color: var(--soft-periwinkle);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 40px rgba(149, 127, 239, 0.25);
   }
 
   /* Button System */
@@ -309,6 +337,19 @@ html {
   }
   .transition-spring {
     transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  /* Cinematic transitions */
+  .page-transition-enter {
+    opacity: 0;
+    filter: blur(8px);
+    transform: scale(0.98);
+  }
+  .page-transition-enter-active {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+    transition: opacity 300ms ease-out, filter 300ms ease-out, transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   /* ══════════════════════════════════════════════
@@ -370,6 +411,11 @@ html {
   50% { transform: scale(1.03); }
 }
 
+@keyframes breatheSlow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
 @keyframes ambientPulse {
   0%, 100% { opacity: 0.4; }
   50% { opacity: 0.7; }
@@ -395,12 +441,28 @@ html {
   100% { background-position: 200% 0; }
 }
 
+@keyframes cinematicFloat1 {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  33% { transform: translateY(-3px) translateX(2px); }
+  66% { transform: translateY(2px) translateX(-1px); }
+}
+
+@keyframes cinematicFloat2 {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  33% { transform: translateY(3px) translateX(-2px); }
+  66% { transform: translateY(-2px) translateX(1px); }
+}
+
 .animate-fadeInUp {
   animation: fadeInUp 0.6s ease-out both;
 }
 
 .animate-breathe {
   animation: breathe 4s ease-in-out infinite;
+}
+
+.animate-breathe-slow {
+  animation: breatheSlow 6s ease-in-out infinite;
 }
 
 .animate-ambientPulse {

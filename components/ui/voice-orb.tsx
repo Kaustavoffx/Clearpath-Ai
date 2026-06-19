@@ -2,7 +2,6 @@
 
 import React from 'react'
 import { cn } from '@/lib/utils'
-import { Mic, Loader2 } from 'lucide-react'
 
 interface VoiceOrbProps {
   isListening: boolean
@@ -13,52 +12,84 @@ interface VoiceOrbProps {
 
 export function VoiceOrb({ isListening, isProcessing, isSpeaking, onToggleListen }: VoiceOrbProps) {
   
-  let stateClass = "border-primary/20 shadow-[0_0_40px_rgba(149,127,239,0.15)]"
-  let icon = <Mic className="w-8 h-8 text-primary" />
+  // State specific sizing and physics
+  const orbScale = isListening ? "scale-110" : isSpeaking ? "scale-[1.05]" : "scale-100"
+  const haloScale = isListening ? "scale-[1.5] opacity-80" : isProcessing ? "scale-110 opacity-60" : isSpeaking ? "scale-[1.4] opacity-70" : "scale-100 opacity-40"
   
-  if (isListening) {
-    stateClass = "border-primary/40 shadow-[0_0_60px_rgba(149,127,239,0.3)]"
-    icon = <Mic className="w-8 h-8 text-white" />
-  } else if (isProcessing) {
-    stateClass = "border-wisteria/30 shadow-[0_0_50px_rgba(183,156,237,0.25)]"
-    icon = <Loader2 className="w-8 h-8 text-wisteria animate-spin" style={{ animationDuration: '2s' }} />
-  } else if (isSpeaking) {
-    stateClass = "border-mauve/30 shadow-[0_0_60px_rgba(222,192,241,0.3)] scale-[1.03]"
-    icon = (
-      <div className="flex items-end justify-center gap-[3px] h-8">
-        <div className="w-[3px] bg-mauve rounded-full h-4 animate-[wave_1.2s_ease-in-out_infinite_0ms]" />
-        <div className="w-[3px] bg-mauve rounded-full h-6 animate-[wave_1.2s_ease-in-out_infinite_150ms]" />
-        <div className="w-[3px] bg-white rounded-full h-8 animate-[wave_1.2s_ease-in-out_infinite_300ms]" />
-        <div className="w-[3px] bg-mauve rounded-full h-6 animate-[wave_1.2s_ease-in-out_infinite_450ms]" />
-        <div className="w-[3px] bg-mauve rounded-full h-4 animate-[wave_1.2s_ease-in-out_infinite_600ms]" />
-      </div>
-    )
-  }
-
   return (
-    <div className="relative group cursor-pointer gpu-accelerate" onClick={onToggleListen}>
-      {/* Outer ambient glow */}
-      <div className={cn(
-        "absolute inset-0 rounded-full transition-all duration-700 ease-in-out opacity-40 gpu-accelerate",
-        isListening ? "bg-primary/20 scale-[1.6]" : 
-        isProcessing ? "bg-wisteria/15 scale-110" : 
-        isSpeaking ? "bg-mauve/20 scale-[1.5]" : 
-        "bg-primary/10 scale-100 group-hover:scale-110"
-      )} style={{ filter: 'blur(30px)' }} />
+    <div className="relative group cursor-pointer gpu-accelerate flex items-center justify-center w-[300px] h-[300px]" onClick={onToggleListen}>
       
-      {/* Core Orb */}
+      {/* Layer 1: Massive Energy Halo (800px blur, animated colors) */}
       <div className={cn(
-        "relative flex items-center justify-center w-36 h-36 rounded-full transition-all duration-500 ease-out border-2 overflow-hidden gpu-accelerate",
-        "bg-gradient-to-br from-glass-surface to-glass-layer",
-        !isListening && !isProcessing && !isSpeaking && "animate-breathe",
-        stateClass
-      )}>
-        {/* Inner reflection */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.08] pointer-events-none" />
+        "absolute inset-[-100%] rounded-full transition-all duration-[2000ms] ease-in-out mix-blend-screen pointer-events-none",
+        haloScale,
+        !isListening && !isProcessing && !isSpeaking && "animate-breathe-slow"
+      )} style={{ 
+        background: `radial-gradient(circle at 50% 50%, var(--soft-periwinkle) 0%, var(--wisteria) 30%, var(--mauve) 60%, transparent 80%)`,
+        filter: 'blur(120px)' /* Browser max blur is often capped, using 120px is very heavy, it achieves the massive glow */
+      }} />
+
+      {/* Layer 5 (Behind): Voice Wave Energy Ring (Orbiting ring) */}
+      <div className={cn(
+        "absolute inset-0 m-auto w-[220px] h-[220px] rounded-full border border-primary/20 transition-all duration-700",
+        (isListening || isSpeaking) ? "animate-ping opacity-60" : "opacity-0 scale-90",
+      )} style={{ animationDuration: '3s' }} />
+      <div className={cn(
+        "absolute inset-0 m-auto w-[240px] h-[240px] rounded-full border border-wisteria/20 transition-all duration-700",
+        isSpeaking ? "animate-ping opacity-40" : "opacity-0 scale-90",
+      )} style={{ animationDuration: '2s', animationDelay: '0.5s' }} />
+
+      {/* Layer 2: Liquid Glass Sphere */}
+      <div className={cn(
+        "relative flex items-center justify-center w-48 h-48 rounded-full transition-all duration-[800ms] cubic-bezier(0.22, 1, 0.36, 1) overflow-hidden shadow-[0_0_60px_rgba(113,97,239,0.3)]",
+        "bg-glass-surface border border-glass-border backdrop-blur-[40px] [-webkit-backdrop-filter:blur(40px)]",
+        orbScale,
+        !isListening && !isProcessing && !isSpeaking && "animate-breathe-slow"
+      )}
+      style={{
+        boxShadow: `inset 0 0 40px rgba(149,127,239,0.4), 0 0 60px rgba(113,97,239,0.5)`
+      }}>
         
-        {/* Icon */}
-        <div className="relative z-10">
-          {icon}
+        {/* Layer 3: Reactive Glass Surface (Refraction & Highlights) */}
+        <div className="absolute inset-0 rounded-full pointer-events-none" style={{
+          background: `linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.1) 100%)`,
+          mixBlendMode: 'overlay'
+        }} />
+        <div className={cn(
+          "absolute inset-0 rounded-full bg-gradient-to-tr from-transparent via-white/[0.05] to-white/[0.15] pointer-events-none transition-transform duration-1000",
+          isProcessing && "animate-spin"
+        )} />
+        {isProcessing && (
+          <div className="absolute inset-0 rounded-full border-t-2 border-r-2 border-white/40 animate-spin" style={{ animationDuration: '3s' }} />
+        )}
+
+        {/* Layer 4: Premium Metallic Microphone & States */}
+        <div className="relative z-10 flex items-center justify-center filter drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+          {isSpeaking ? (
+            <div className="flex items-end justify-center gap-[4px] h-12">
+              <div className="w-[4px] bg-gradient-to-t from-mauve to-white rounded-full h-6 animate-[wave_1.2s_ease-in-out_infinite_0ms]" />
+              <div className="w-[4px] bg-gradient-to-t from-wisteria to-white rounded-full h-10 animate-[wave_1.2s_ease-in-out_infinite_150ms]" />
+              <div className="w-[4px] bg-gradient-to-t from-primary to-white rounded-full h-12 animate-[wave_1.2s_ease-in-out_infinite_300ms]" />
+              <div className="w-[4px] bg-gradient-to-t from-wisteria to-white rounded-full h-10 animate-[wave_1.2s_ease-in-out_infinite_450ms]" />
+              <div className="w-[4px] bg-gradient-to-t from-mauve to-white rounded-full h-6 animate-[wave_1.2s_ease-in-out_infinite_600ms]" />
+            </div>
+          ) : isProcessing ? (
+            <div className="w-10 h-10 border-4 border-wisteria/30 border-t-wisteria rounded-full animate-spin" />
+          ) : (
+            <svg 
+              className={cn("w-12 h-12 transition-colors duration-500", isListening ? "text-white" : "text-primary/90")}
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="1.5" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="22"></line>
+            </svg>
+          )}
         </div>
       </div>
     </div>

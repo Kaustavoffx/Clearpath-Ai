@@ -7,6 +7,17 @@ import { env } from '@/lib/env'
 import sanitizeHtml from 'sanitize-html'
 import { extractJsonFromGeminiResponse } from '@/lib/utils'
 
+const orchestratorSchema = z.object({
+  opportunityId: z.string().uuid(),
+  profile: z.object({
+    name: z.string().optional(),
+    gradeLevel: z.string().optional(),
+    state: z.string().optional(),
+    incomeRange: z.string().optional(),
+    category: z.string().optional(),
+    careerInterest: z.string().optional(),
+  }).optional()
+});
 
 export async function POST(request: Request) {
   const startTime = Date.now();
@@ -52,18 +63,6 @@ export async function POST(request: Request) {
         throw new Error("Failed to download file");
       }
     }
-
-const orchestratorSchema = z.object({
-  opportunityId: z.string().uuid(),
-  profile: z.object({
-    name: z.string().optional(),
-    gradeLevel: z.string().optional(),
-    state: z.string().optional(),
-    incomeRange: z.string().optional(),
-    category: z.string().optional(),
-    careerInterest: z.string().optional(),
-  }).optional()
-});
 
 async function extractTextFromUrl(url: string): Promise<string> {
   const controller = new AbortController();

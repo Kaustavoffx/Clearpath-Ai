@@ -100,8 +100,8 @@ export default async function OpportunityDetailsPage({
   const missingCount = requiredDocsInsights.length
   const totalItems = totalEligibilityReqs + missingCount
   
-  let readinessScore: string | number = 'Unknown'
-  let successProbability: string | number = 'Unknown'
+  let readinessScore: number | "Unknown" = 'Unknown'
+  let successProbability: number | "Unknown" = 'Unknown'
   
   if (totalItems > 0) {
     readinessScore = Math.round((completedCount / totalItems) * 100)

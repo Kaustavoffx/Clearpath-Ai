@@ -25,21 +25,62 @@ export function ClearPathAmbientBackground({ variant = 'dashboard', className }:
   return (
     <div className={cn("fixed inset-0 z-[-50] pointer-events-none overflow-hidden", className)}>
       
-      {/* Base Twilight Atmospheric Gradient */}
+      {/* Layer 1 is handled globally by body background-color: var(--dark-bg) (#050408) */}
+
+      {/* Layer 2: Massive blurred radial gradients */}
       <div 
-        className="absolute inset-0 w-full h-full gpu-accelerate"
+        className="absolute inset-0 w-full h-full gpu-accelerate opacity-80"
         style={{
           background: `
-            radial-gradient(circle at top, rgba(149,127,239,0.20), transparent 40%),
-            radial-gradient(circle at bottom right, rgba(183,156,237,0.12), transparent 50%),
-            linear-gradient(180deg, #090D1A, #0D1326, #111B34)
+            radial-gradient(circle at 20% 0%, rgba(149,127,239,0.15), transparent 40%),
+            radial-gradient(circle at 80% 100%, rgba(183,156,237,0.1), transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(113,97,239,0.05), transparent 60%)
           `
         }}
       />
 
-      {/* Landing: CSS-animated flowing twilight paths */}
+      {/* Layer 3: Digital Stardust System */}
+      <div className="absolute inset-0 w-full h-full gpu-accelerate">
+        {/* Far Layer: Tiny stars, 5% opacity, Extremely slow */}
+        <div className="absolute inset-0 opacity-[0.05]" style={{
+          backgroundImage: 'radial-gradient(circle at center, white 1px, transparent 1px)',
+          backgroundSize: '100px 100px',
+          animation: 'driftY 120s linear infinite'
+        }} />
+        <div className="absolute inset-0 opacity-[0.05]" style={{
+          backgroundImage: 'radial-gradient(circle at center, white 1px, transparent 1px)',
+          backgroundSize: '150px 150px',
+          backgroundPosition: '50px 50px',
+          animation: 'driftX 150s linear infinite reverse'
+        }} />
+
+        {/* Middle Layer: Blurred energy particles, 8% opacity, Organic drift */}
+        <div className="absolute inset-0 opacity-[0.08]" style={{
+          backgroundImage: 'radial-gradient(circle at center, rgba(183,156,237,0.8) 2px, transparent 2px)',
+          backgroundSize: '200px 200px',
+          filter: 'blur(1px)',
+          animation: 'driftX 60s ease-in-out infinite alternate'
+        }} />
+        <div className="absolute inset-0 opacity-[0.08]" style={{
+          backgroundImage: 'radial-gradient(circle at center, rgba(149,127,239,0.8) 2px, transparent 2px)',
+          backgroundSize: '250px 250px',
+          backgroundPosition: '100px 100px',
+          filter: 'blur(2px)',
+          animation: 'driftY 80s ease-in-out infinite alternate'
+        }} />
+
+        {/* Near Layer: Occasional intelligence pulses, 15% opacity, Rare movement */}
+        <div className="absolute inset-0 opacity-[0.15]" style={{
+          backgroundImage: 'radial-gradient(circle at center, var(--soft-periwinkle) 3px, transparent 3px)',
+          backgroundSize: '400px 400px',
+          filter: 'blur(3px)',
+          animation: 'ambientPulse 15s ease-in-out infinite'
+        }} />
+      </div>
+
+      {/* Layer 4: Animated energy waves (Landing paths) */}
       {activeVariant === 'landing' && (
-        <svg className="absolute inset-0 w-full h-full opacity-[0.25]" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <svg className="absolute inset-0 w-full h-full opacity-[0.25] gpu-accelerate" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
           <path
             d="M-100,500 C200,300 400,800 800,400 C1200,0 1600,600 2000,300"
             fill="none"

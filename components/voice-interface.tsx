@@ -3,27 +3,24 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { VoiceOrb } from '@/components/ui/voice-orb'
 import { toast } from 'sonner'
-import { UploadWidget } from '@/components/opportunities/upload-widget'
 import { useRouter } from 'next/navigation'
-import { Brain, User as UserIcon, Activity, Target, Shield, X, Mic, Cpu, RefreshCw } from 'lucide-react'
+import { Brain, X, Mic, Shield } from 'lucide-react'
 
 // Mock Data for Context Widgets
 const MOCK_CONTEXT = {
-  profile: { name: 'Student', readiness: 72, goal: 'College Admissions' },
-  activeOpportunity: { title: 'OASIS Scholarship', deadline: '2026-07-15' },
+  profile: { name: 'Kaustav', readiness: 72, goal: 'College Admissions' },
+  activeOpportunity: { title: 'OASIS Scholarship', deadline: 'July 15, 2026' },
   missingDoc: 'Income Certificate'
 }
 
 export function VoiceInterface() {
-  const [isActive, setIsActive] = useState(false) // Controls the immersive overlay
+  const [isActive, setIsActive] = useState(false)
   const [isListening, setIsListening] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [transcript, setTranscript] = useState("")
   const [aiResponse, setAiResponse] = useState("")
-  const [documentContext, setDocumentContext] = useState<string | null>(null)
-  const router = useRouter()
-
+  
   const audioContextRef = useRef<AudioContext | null>(null)
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null)
 
@@ -45,40 +42,11 @@ export function VoiceInterface() {
     window.speechSynthesis.speak(utterance)
   }, [])
 
-  const playAudio = useCallback(async (base64Audio: string) => {
-    try {
-      setIsSpeaking(true)
-      const audioData = atob(base64Audio)
-      const arrayBuffer = new ArrayBuffer(audioData.length)
-      const view = new Uint8Array(arrayBuffer)
-      for (let i = 0; i < audioData.length; i++) {
-        view[i] = audioData.charCodeAt(i)
-      }
-      
-      if (!audioContextRef.current) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
-      }
-      
-      const audioBuffer = await audioContextRef.current.decodeAudioData(arrayBuffer)
-      const source = audioContextRef.current.createBufferSource()
-      source.buffer = audioBuffer
-      source.connect(audioContextRef.current.destination)
-      source.onended = () => setIsSpeaking(false)
-      source.start(0)
-      sourceNodeRef.current = source
-    } catch (e) {
-      console.error("Audio playback failed", e)
-      setIsSpeaking(false)
-    }
-  }, [])
-
   const processTranscript = useCallback(async (finalText: string) => {
     setIsProcessing(true)
     setAiResponse("")
     
     try {
-      // In full implementation, this hits Deepgram & OpenAI orchestration
       const res = await fetch('/api/advisor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -91,11 +59,9 @@ export function VoiceInterface() {
       
       if (!res.ok) throw new Error(data.error || 'Failed to process intent')
       
-      // Assume the advisor returns { message: "..." }
       const responseText = data.message || "I've analyzed your request."
       setAiResponse(responseText)
       
-      // Fallback to native TTS for hackathon since we might not have Deepgram fully integrated for TTS
       fallbackTTS(responseText)
       
     } catch (error: unknown) {
@@ -109,7 +75,7 @@ export function VoiceInterface() {
   }, [fallbackTTS])
   
   const startListening = useCallback(() => {
-    setIsActive(true) // Open immersive mode if not already
+    setIsActive(true)
 
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
        toast.error("Speech recognition is not supported in this browser.")
@@ -150,7 +116,7 @@ export function VoiceInterface() {
     }
 
     if (isListening) {
-      // Handled by recognition.onend natively
+      // Handled natively
     } else if (isSpeaking && sourceNodeRef.current) {
       sourceNodeRef.current.stop()
       window.speechSynthesis.cancel()
@@ -172,163 +138,117 @@ export function VoiceInterface() {
           <Mic className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h4 className="text-[14px] font-semibold text-foreground">ClearPath Educational Copilot</h4>
-          <p className="text-[12px] text-muted-foreground">Tap to start a voice session</p>
+          <h4 className="text-[14px] font-semibold text-foreground">ClearPath Intelligence</h4>
+          <p className="text-[12px] text-muted-foreground">Tap to awaken</p>
         </div>
       </div>
     )
   }
 
-  // IMMERSIVE OVERLAY
+  // CINEMATIC AI CONSCIOUSNESS INTERFACE
   return (
-    <div className="fixed inset-0 z-[999] flex flex-col bg-background/80 backdrop-blur-3xl animate-in fade-in duration-500 font-sans text-foreground overflow-hidden">
+    <div className="fixed inset-0 z-[999] flex flex-col overflow-hidden page-transition-enter-active">
       
-      {/* Dynamic Background Glow based on state */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-[120px] pointer-events-none transition-colors duration-1000" 
-           style={{ backgroundColor: isSpeaking ? 'rgba(183, 156, 237, 0.15)' : isProcessing ? 'rgba(149, 127, 239, 0.2)' : isListening ? 'rgba(149, 127, 239, 0.15)' : 'rgba(255,255,255,0.02)' }} />
+      {/* Heavy Blur Environment Background */}
+      <div className="absolute inset-0 bg-background/60 backdrop-blur-[24px] pointer-events-none" />
 
       {/* Header */}
-      <div className="flex items-center justify-between p-8 relative z-10">
+      <div className="flex items-center justify-between p-8 relative z-50">
         <div className="flex items-center gap-3">
            <Brain className="w-6 h-6 text-primary" />
-           <span className="text-[14px] font-bold tracking-wider uppercase text-primary/80">Educational Copilot</span>
+           <span className="text-[14px] font-bold tracking-wider uppercase text-primary/80">Intelligence Active</span>
         </div>
         <button 
           onClick={() => {
             setIsActive(false)
             if (isSpeaking) { window.speechSynthesis.cancel(); setIsSpeaking(false); }
           }} 
-          className="p-3 rounded-full hover:bg-glass-layer transition-colors border border-glass-border bg-glass-surface shadow-sm"
+          className="p-3 rounded-full hover:bg-white/10 transition-colors border border-glass-border bg-glass-surface shadow-sm"
         >
-          <X className="w-5 h-5 text-muted-foreground hover:text-foreground" />
+          <X className="w-5 h-5 text-muted-foreground hover:text-white" />
         </button>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex w-full max-w-[1400px] mx-auto px-8 gap-8">
+      {/* Cinematic Greeting (Only when idle) */}
+      {!transcript && !aiResponse && !isListening && (
+        <div className="absolute top-[18%] left-1/2 -translate-x-1/2 text-center animate-fadeInUp pointer-events-none z-10 w-full">
+          <h2 className="text-cinematic-greeting mb-4">Good Evening, {MOCK_CONTEXT.profile.name}.</h2>
+          <p className="text-[18px] text-muted-foreground/80 font-medium tracking-wide">
+             I am your ClearPath Intelligence. How can I assist you?
+          </p>
+        </div>
+      )}
+
+      {/* Floating HUD System (Asymmetrical, Organic Physics) */}
+      <div className="absolute inset-0 pointer-events-none z-20">
         
-        {/* Left Side: Context Widgets */}
-        <div className="w-[300px] hidden lg:flex flex-col gap-4 animate-in slide-in-from-left-8 duration-700 fade-in delay-150">
-           <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest mb-2 px-2">Live Context Memory</h3>
-           
-           <div className="liquid-glass-card p-5">
-             <div className="flex items-center gap-3 mb-3 text-foreground">
-               <UserIcon className="w-4 h-4 text-primary" />
-               <span className="text-[14px] font-medium">Profile Context</span>
-             </div>
-             <div className="text-[12px] text-muted-foreground space-y-2">
-                <div className="flex justify-between"><span>Readiness</span><span className="text-foreground">{MOCK_CONTEXT.profile.readiness}%</span></div>
-                <div className="flex justify-between"><span>Goal</span><span className="text-foreground">{MOCK_CONTEXT.profile.goal}</span></div>
-             </div>
-           </div>
+        {/* Readiness Card */}
+        <div className="absolute top-[25%] left-[8%] w-[280px] cinematic-glass-card p-8 rounded-[24px] pointer-events-auto" style={{ animation: 'cinematicFloat1 8s ease-in-out infinite' }}>
+           <div className="text-[12px] uppercase tracking-widest text-primary mb-3 font-semibold">Readiness Score</div>
+           <div className="text-[56px] font-bold leading-none tracking-tighter text-foreground">{MOCK_CONTEXT.profile.readiness}%</div>
+        </div>
 
-           <div className="liquid-glass-card p-5">
-             <div className="flex items-center gap-3 mb-3 text-foreground">
-               <Target className="w-4 h-4 text-primary" />
-               <span className="text-[14px] font-medium">Opportunity Context</span>
-             </div>
-             <div className="text-[12px] text-muted-foreground space-y-2">
-                <div className="flex justify-between"><span>Active</span><span className="text-foreground">{MOCK_CONTEXT.activeOpportunity.title}</span></div>
-                <div className="flex justify-between"><span>Deadline</span><span className="text-foreground">{MOCK_CONTEXT.activeOpportunity.deadline}</span></div>
-             </div>
-           </div>
+        {/* Missing Documents */}
+        <div className="absolute bottom-[20%] left-[12%] w-[320px] cinematic-glass-card p-6 rounded-[24px] pointer-events-auto border-l-2 border-l-danger" style={{ animation: 'cinematicFloat2 10s ease-in-out infinite' }}>
+           <div className="text-[12px] uppercase tracking-widest text-danger mb-2 font-semibold flex items-center gap-2"><Shield className="w-4 h-4"/> Critical Missing</div>
+           <div className="text-[18px] font-medium text-foreground">{MOCK_CONTEXT.missingDoc}</div>
+        </div>
 
-           <div className="liquid-glass-card p-5 border-l-2 border-l-danger">
-             <div className="flex items-center gap-3 mb-3 text-danger">
-               <Shield className="w-4 h-4" />
-               <span className="text-[14px] font-medium">Missing Documents</span>
+        {/* Opportunity Radar */}
+        <div className="absolute top-[30%] right-[10%] w-[280px] cinematic-glass-card p-6 rounded-[24px] pointer-events-auto" style={{ animation: 'cinematicFloat2 9s ease-in-out infinite' }}>
+           <div className="text-[12px] uppercase tracking-widest text-muted-foreground mb-2 font-semibold">Deadline Radar</div>
+           <div className="text-[22px] font-medium text-foreground">{MOCK_CONTEXT.activeOpportunity.deadline}</div>
+           <div className="text-[14px] text-warning mt-1">{MOCK_CONTEXT.activeOpportunity.title}</div>
+        </div>
+
+        {/* Engine Routing / Processing */}
+        <div className="absolute bottom-[25%] right-[8%] w-[260px] cinematic-glass-card p-6 rounded-[24px] pointer-events-auto" style={{ animation: 'cinematicFloat1 11s ease-in-out infinite' }}>
+           <div className="text-[12px] uppercase tracking-widest text-muted-foreground mb-4 font-semibold">Engine Status</div>
+           <div className="space-y-3">
+             <div className="flex justify-between items-center text-[13px]">
+               <span className="text-muted-foreground">Voice Engine</span>
+               <span className="text-primary font-medium">Deepgram</span>
              </div>
-             <div className="text-[12px] text-foreground">
-                {MOCK_CONTEXT.missingDoc}
+             <div className="flex justify-between items-center text-[13px]">
+               <span className="text-muted-foreground">Reasoning Node</span>
+               <span className="text-wisteria font-medium">OpenAI o1</span>
              </div>
            </div>
         </div>
 
-        {/* Center: The Orb and Conversation */}
-        <div className="flex-1 flex flex-col items-center justify-center relative">
-          
-          <div className="flex flex-col items-center justify-center w-full max-w-2xl gap-12 relative z-10 -mt-16">
-            
-            <div className="text-center space-y-6 w-full min-h-[160px] flex flex-col justify-end px-4">
-              {transcript && !aiResponse && (
-                <div className="inline-block p-4 rounded-[20px] bg-glass-surface backdrop-blur-md border border-glass-border mx-auto animate-in fade-in slide-in-from-bottom-4 shadow-sm">
-                  <p className="text-[20px] text-foreground leading-relaxed font-medium">
-                    &quot;{transcript}&quot;
-                  </p>
-                </div>
-              )}
-              
-              {aiResponse && (
-                <div className="inline-block p-6 rounded-[24px] bg-primary/10 backdrop-blur-md border border-primary/20 shadow-twilight-glow mx-auto animate-in fade-in zoom-in-95 duration-500">
-                  <p className="text-[24px] font-medium tracking-tight leading-relaxed text-foreground">
-                    {aiResponse}
-                  </p>
-                </div>
-              )}
-              
-              {!transcript && !aiResponse && !isListening && (
-                <p className="text-[18px] text-muted-foreground/60 font-medium tracking-wide">
-                  Tap to speak. Try asking about your missing documents.
-                </p>
-              )}
+      </div>
 
-              {/* Status Indicator */}
-              <div className="flex items-center justify-center gap-2 mt-4 text-[12px] uppercase tracking-widest font-bold">
-                {isListening && <span className="text-primary animate-pulse flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-primary" /> Listening...</span>}
-                {isProcessing && <span className="text-wisteria flex items-center gap-2"><RefreshCw className="w-3 h-3 animate-spin" /> Thinking...</span>}
-                {isSpeaking && <span className="text-mauve flex items-center gap-2"><Activity className="w-3 h-3 animate-pulse" /> Speaking...</span>}
-              </div>
-            </div>
+      {/* User Speech (Cinematic Dialogue Layout - Top Left/Center) */}
+      {transcript && !aiResponse && (
+         <div className="absolute top-[20%] left-1/2 -translate-x-1/2 md:left-[15%] md:translate-x-0 max-w-[600px] animate-fadeInUp z-30 pointer-events-none px-6">
+            <div className="text-[12px] uppercase tracking-widest text-primary mb-3 font-semibold">User Input</div>
+            <p className="text-[28px] md:text-[32px] text-foreground/90 font-medium leading-tight text-balance">
+              &quot;{transcript}&quot;
+            </p>
+         </div>
+      )}
 
-            <div className="relative mt-8" onClick={handleToggleListen}>
-              {/* Dynamic sound wave background behind orb */}
-              {(isListening || isSpeaking || isProcessing) && (
-                <div className="absolute inset-0 m-auto w-[250px] h-[250px] flex items-center justify-center pointer-events-none">
-                  <div className="absolute w-full h-full rounded-full border border-primary/20 animate-ping" style={{ animationDuration: '3s' }} />
-                  <div className="absolute w-[80%] h-[80%] rounded-full border border-primary/30 animate-ping" style={{ animationDuration: '2s' }} />
-                </div>
-              )}
-              
-              <VoiceOrb 
-                isListening={isListening}
-                isProcessing={isProcessing}
-                isSpeaking={isSpeaking}
-                onToggleListen={handleToggleListen}
-              />
-            </div>
-            
+      {/* Center: The AI Core Orb */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-40">
+        <div className="pointer-events-auto relative mt-12" onClick={handleToggleListen}>
+          <VoiceOrb 
+            isListening={isListening}
+            isProcessing={isProcessing}
+            isSpeaking={isSpeaking}
+            onToggleListen={handleToggleListen}
+          />
+        </div>
+      </div>
+
+      {/* AI Response (Cinematic Dialogue Layout - Beneath Orb) */}
+      <div className="absolute bottom-[10%] left-1/2 -translate-x-1/2 w-full max-w-[900px] text-center px-8 z-30 pointer-events-none">
+        {aiResponse && (
+          <div className="animate-fadeInUp">
+            <p className="text-[32px] md:text-[40px] font-medium tracking-tight leading-snug text-foreground text-balance drop-shadow-2xl filter" style={{ textShadow: '0 4px 20px rgba(0,0,0,0.8)' }}>
+              {aiResponse}
+            </p>
           </div>
-
-        </div>
-
-        {/* Right Side: Tech Stack Routing Info */}
-        <div className="w-[280px] hidden lg:flex flex-col gap-4 animate-in slide-in-from-right-8 duration-700 fade-in delay-300">
-           <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest mb-2 px-2 text-right">Engine Routing</h3>
-           
-           <div className="liquid-glass-card p-5 ml-auto w-full">
-             <div className="flex items-center justify-between mb-4">
-               <span className="text-[13px] text-foreground">Voice Input</span>
-               <div className="flex items-center gap-1.5 text-[11px] text-primary bg-primary/10 px-2 py-1 rounded-full border border-primary/20">
-                 <Cpu className="w-3 h-3" /> Deepgram
-               </div>
-             </div>
-             
-             <div className="flex items-center justify-between mb-4 pt-4 border-t border-glass-border">
-               <span className="text-[13px] text-foreground">Reasoning</span>
-               <div className="flex items-center gap-1.5 text-[11px] text-wisteria bg-wisteria/10 px-2 py-1 rounded-full border border-wisteria/20">
-                 <Brain className="w-3 h-3" /> OpenAI
-               </div>
-             </div>
-             
-             <div className="flex items-center justify-between pt-4 border-t border-glass-border">
-               <span className="text-[13px] text-foreground">Data Scope</span>
-               <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground bg-glass-surface px-2 py-1 rounded-full border border-glass-border">
-                 <Shield className="w-3 h-3" /> Protected
-               </div>
-             </div>
-           </div>
-        </div>
-
+        )}
       </div>
 
     </div>
