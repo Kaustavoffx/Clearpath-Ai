@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { LayoutDashboard, FileSearch, Target, User, Bug, Menu, X, Cpu, Database, Activity, HardDrive } from 'lucide-react'
+import { LayoutDashboard, FileSearch, Target, User, Settings, Menu, X, Cpu, Database, Activity, HardDrive } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
 import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion'
@@ -96,9 +96,9 @@ export function AppNavigation({ profile }: AppNavigationProps) {
   ], [])
 
   const bottomItems = useMemo(() => [
-    { name: 'Profile', href: '/settings', icon: User },
-    { name: 'Settings', href: '?judge=true', icon: Bug, isActiveOverride: isJudgeMode },
-  ], [isJudgeMode])
+    { name: 'Profile', href: '/profile', icon: User },
+    { name: 'Settings', href: '/settings', icon: Settings },
+  ], [])
 
   // Handle Mobile interactions
   const handleCloseMobile = useCallback(() => setIsMobileMenuOpen(false), [])
@@ -179,7 +179,7 @@ export function AppNavigation({ profile }: AppNavigationProps) {
           {/* Bottom Nav Links */}
           <div className="flex flex-col px-2 mb-4">
             {bottomItems.map((item, index) => {
-              const isActive = item.isActiveOverride !== undefined ? item.isActiveOverride : pathname === item.href
+              const isActive = pathname === item.href
               return (
                 <NavItem 
                   key={index} 
@@ -293,7 +293,7 @@ export function AppNavigation({ profile }: AppNavigationProps) {
                     <NavItem 
                       key={`bottom-${index}`} 
                       item={item} 
-                      isActive={item.isActiveOverride !== undefined ? item.isActiveOverride : pathname === item.href} 
+                      isActive={pathname === item.href} 
                       forceExpanded={true}
                       onClick={handleCloseMobile}
                     />
