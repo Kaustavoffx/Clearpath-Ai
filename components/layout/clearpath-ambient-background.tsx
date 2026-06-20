@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
 
 interface ClearPathAmbientBackgroundProps {
@@ -12,6 +13,7 @@ interface ClearPathAmbientBackgroundProps {
 export function ClearPathAmbientBackground({ variant = 'dashboard', className }: ClearPathAmbientBackgroundProps) {
   const [mounted, setMounted] = useState(false)
   const searchParams = useSearchParams()
+  const { resolvedTheme } = useTheme()
   const isJudgeMode = searchParams?.get('judge') === 'true'
 
   useEffect(() => {
@@ -22,10 +24,51 @@ export function ClearPathAmbientBackground({ variant = 'dashboard', className }:
 
   const activeVariant = isJudgeMode && variant === 'dashboard' ? 'judge' : variant
 
+  // Light Mode: Frosted Intelligence
+  if (resolvedTheme === 'light') {
+    return (
+      <div className={cn("fixed inset-0 z-[-50] pointer-events-none overflow-hidden", className)}>
+        {/* Layer 2: Frosted gradients and clouds */}
+        <div 
+          className="absolute inset-0 w-full h-full gpu-accelerate opacity-60"
+          style={{
+            background: `
+              radial-gradient(ellipse at 10% -10%, rgba(149,127,239,0.1), transparent 50%),
+              radial-gradient(ellipse at 90% 110%, rgba(113,97,239,0.08), transparent 50%),
+              radial-gradient(circle at 50% 50%, rgba(239,217,206,0.2), transparent 70%)
+            `,
+            filter: 'blur(60px)'
+          }}
+        />
+        <div className="absolute inset-0 w-full h-full gpu-accelerate opacity-40">
+           <div className="absolute top-[20%] left-[20%] w-[40vw] h-[40vw] rounded-full animate-breathe-slow gpu-accelerate" style={{ background: 'rgba(183,156,237,0.1)', filter: 'blur(80px)' }} />
+           <div className="absolute bottom-[20%] right-[20%] w-[50vw] h-[50vw] rounded-full animate-ambientPulse gpu-accelerate" style={{ background: 'rgba(239,217,206,0.15)', filter: 'blur(100px)' }} />
+        </div>
+      </div>
+    )
+  }
+
+  // Neutral Mode: Professional Workspace
+  if (resolvedTheme === 'neutral') {
+    return (
+      <div className={cn("fixed inset-0 z-[-50] pointer-events-none overflow-hidden", className)}>
+        <div 
+          className="absolute inset-0 w-full h-full gpu-accelerate opacity-[0.03]"
+          style={{
+            background: `
+              linear-gradient(135deg, rgba(113,97,239,0.5) 0%, transparent 100%)
+            `
+          }}
+        />
+      </div>
+    )
+  }
+
+  // Dark Mode: Dreamy Twilight OS
   return (
     <div className={cn("fixed inset-0 z-[-50] pointer-events-none overflow-hidden", className)}>
       
-      {/* Layer 1 is handled globally by body background-color: var(--dark-bg) (#050408) */}
+      {/* Layer 1 is handled globally by body background-color: var(--background) */}
 
       {/* Layer 2: Massive blurred radial gradients */}
       <div 

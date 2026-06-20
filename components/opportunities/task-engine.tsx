@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { toggleTaskStatus, deleteTask } from '@/app/actions/task-actions'
 import { toast } from 'sonner'
+import { ConfirmationModal } from '@/components/ui/confirmation-modal'
 
 export function TaskEngine({ initialTasks }: { initialTasks: any[] }) {
   const [tasks, setTasks] = useState(() => {
@@ -36,16 +37,28 @@ export function TaskEngine({ initialTasks }: { initialTasks: any[] }) {
     )
   };
 
-  const handleDelete = (index: number) => {
-    const task = tasks[index];
-    if (confirm(`Delete task "${task.title}"?`)) {
-      setTasks(prev => prev.filter((_, i) => i !== index));
-      toast.promise(deleteTask(task.id), {
-        loading: 'Deleting task...',
-        success: 'Task deleted',
-        error: 'Failed to delete task'
-      });
+  const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const confirmDelete = async () => {
+    if (taskToDelete === null) return;
+    setIsDeleting(true);
+    const task = tasks[taskToDelete];
+    
+    try {
+      await deleteTask(task.id);
+      setTasks(prev => prev.filter((_, i) => i !== taskToDelete));
+      toast.success(`Task "${task.title}" deleted`);
+    } catch (error) {
+      toast.error('Failed to delete task');
+    } finally {
+      setIsDeleting(false);
+      setTaskToDelete(null);
     }
+  };
+
+  const handleDelete = (index: number) => {
+    setTaskToDelete(index);
   };
 
   const getPriorityColor = (priority: string) => {
@@ -153,6 +166,21 @@ export function TaskEngine({ initialTasks }: { initialTasks: any[] }) {
           )
         })}
       </div>
+
+      <ConfirmationModal
+        isOpen={taskToDelete !== null}
+        title="Delete Task?"
+        description={
+          <>
+            This action will permanently remove: <br />
+            <span className="font-semibold text-foreground mt-2 block">"{taskToDelete !== null ? tasks[taskToDelete]?.title : ''}"</span><br />
+            This action cannot be undone.
+          </>
+        }
+        isDeleting={isDeleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setTaskToDelete(null)}
+      />
     </div>
   )
 }

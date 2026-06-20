@@ -41,7 +41,7 @@ export default function RootLayout({
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          forcedTheme="dark"
+          themes={['light', 'dark', 'neutral']}
           disableTransitionOnChange
         >
           <div className="relative z-10 flex-1 flex flex-col w-full h-full">
