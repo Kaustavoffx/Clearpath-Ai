@@ -2,7 +2,6 @@ import { createClient } from "@/lib/supabase/server"
 import { cn } from "@/lib/utils"
 import { ListOrdered } from "lucide-react"
 import Link from "next/link"
-import { DemoShowcase } from "@/components/opportunities/demo-showcase"
 import { OpportunityQueue } from "@/components/opportunities/opportunity-queue"
 
 export default async function OpportunitiesPage() {
@@ -54,7 +53,6 @@ export default async function OpportunitiesPage() {
         </Link>
       </div>
 
-      <DemoShowcase />
 
       <OpportunityQueue initialOpportunities={processedOpps} />
     </div>

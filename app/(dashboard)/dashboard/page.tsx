@@ -133,13 +133,13 @@ export default async function DashboardPage() {
             <h2 className="text-lg font-semibold mb-4 text-foreground">System Status</h2>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-[14px] text-muted-foreground">Database</span>
+                <span className="text-[14px] text-muted-foreground">Opportunity Database</span>
                 <span className="text-[12px] uppercase font-bold tracking-widest text-success bg-success/10 px-2 py-1 rounded-full flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-success" /> Connected
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[14px] text-muted-foreground">AI Intelligence</span>
+                <span className="text-[14px] text-muted-foreground">Knowledge Engine</span>
                 <span className="text-[12px] uppercase font-bold tracking-widest text-primary bg-primary/10 px-2 py-1 rounded-full flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> Live
                 </span>
@@ -149,8 +149,8 @@ export default async function DashboardPage() {
                 <span className="text-[14px] font-semibold text-foreground">{opps.length}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[14px] text-muted-foreground">Tasks Tracked</span>
-                <span className="text-[14px] font-semibold text-foreground">{opportunityTasks.length}</span>
+                <span className="text-[14px] text-muted-foreground">Execution Layer</span>
+                <span className="text-[14px] font-semibold text-foreground">{opportunityTasks.length} Active</span>
               </div>
             </div>
           </div>

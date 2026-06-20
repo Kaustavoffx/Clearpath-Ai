@@ -146,10 +146,10 @@ export function AIProviderCenter({ initialUsage }: AIProviderCenterProps) {
         <h1 className="text-hero-title text-white mb-2 flex items-center gap-4">
           AI Provider Center
         </h1>
-        <h2 className="text-[24px] text-primary font-medium tracking-wide mb-6">Bring your own AI.</h2>
+        <h2 className="text-[24px] text-primary font-medium tracking-wide mb-6">Intelligence Providers.</h2>
         
         <p className="text-body-text text-muted-foreground max-w-2xl mb-6">
-          ClearPath OS never stores your API keys in plaintext. Your keys are AES-256-GCM encrypted server-side and used exclusively for requests you initiate.
+          Connect your preferred models securely. We never store your API keys on our servers. Your keys are AES-256-GCM encrypted server-side and used exclusively for requests you initiate.
         </p>
 
         <div className="flex flex-wrap gap-3">

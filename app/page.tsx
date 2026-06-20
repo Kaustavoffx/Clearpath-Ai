@@ -26,7 +26,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-6">
             <Link href="/login" className="text-[15px] font-medium text-muted-foreground hover:text-foreground transition-crisp">Sign In</Link>
             <Link href="/register">
-              <button className="btn-twilight h-10 px-6 rounded-full text-[14px] font-medium">Try Live Demo</button>
+              <button className="btn-twilight h-10 px-6 rounded-full text-[14px] font-medium">Open Workspace</button>
             </Link>
           </div>
         </div>
@@ -118,7 +118,7 @@ export default function LandingPage() {
           </p>
           <Link href="/register">
             <button className="btn-twilight h-16 px-14 rounded-[24px] text-[18px] font-medium shadow-twilight-glow">
-              Launch Live Demo
+              Open Workspace
             </button>
           </Link>
         </section>

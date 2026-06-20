@@ -13,7 +13,7 @@ export function AiAdvisor({ opportunityData }: { opportunityData: any }) {
     {
       id: 1,
       sender: 'ai',
-      message: `Hello! I am your Context-Aware AI Advisor. I have fully analyzed "${opportunityData?.title || 'this document'}". I have access to your tasks, documents, deadlines, and eligibility gaps. What should we execute next?`
+      message: `Hello! I am your ClearPath Intelligence. I have fully analyzed "${opportunityData?.title || 'this document'}". I have access to your tasks, documents, deadlines, and eligibility gaps. What should we execute next?`
     }
   ])
 
@@ -40,7 +40,7 @@ export function AiAdvisor({ opportunityData }: { opportunityData: any }) {
     } catch (error) {
       setChat(prev => [
         ...prev, 
-        { id: Date.now() + 1, sender: 'ai', message: "System Error connecting to Intelligence Core." }
+        { id: Date.now() + 1, sender: 'ai', message: "System Error connecting to Knowledge Engine." }
       ])
     } finally {
       setIsTyping(false)

@@ -60,7 +60,7 @@ export function Hero() {
           >
             <div className="absolute inset-0 rounded-full bg-primary/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <Sparkles className="w-4 h-4 animate-pulse" /> 
-            <span className="relative z-10">USAII Global AI Hackathon Submission</span>
+            <span className="relative z-10">Educational Intelligence Platform</span>
           </motion.div>
 
           {/* Primary Headline */}
@@ -114,13 +114,15 @@ export function Hero() {
             <Link href="/register" className="w-full sm:w-auto group relative">
               <div className="absolute -inset-1 bg-gradient-to-r from-[#EFD9CE] via-[#DEC0F1] to-[#B79CED] rounded-full blur opacity-0 group-hover:opacity-40 transition duration-500 group-hover:duration-200" />
               <button className="relative w-full sm:w-auto h-14 px-10 bg-primary text-primary-foreground text-[16px] font-semibold rounded-full flex items-center justify-center gap-2 hover:scale-[1.02] transition-all">
-                Launch Demo <ArrowRight className="w-5 h-5" />
+                Open Workspace <ArrowRight className="w-5 h-5" />
               </button>
             </Link>
             
-            <button className="w-full sm:w-auto h-14 px-8 bg-glass-surface border border-glass-border hover:bg-glass-layer text-foreground text-[16px] font-semibold rounded-full flex items-center justify-center gap-2 hover:scale-[1.02] transition-all group">
-              <Play className="w-4 h-4 text-primary group-hover:text-[#DEC0F1] transition-colors" /> Watch AI Think
-            </button>
+            <a href="#architecture" className="w-full sm:w-auto">
+              <button className="w-full sm:w-auto h-14 px-8 bg-glass-surface border border-glass-border hover:bg-glass-layer text-foreground text-[16px] font-semibold rounded-full flex items-center justify-center gap-2 hover:scale-[1.02] transition-all group">
+                <Play className="w-4 h-4 text-primary group-hover:text-[#DEC0F1] transition-colors" /> Explore Intelligence Layer
+              </button>
+            </a>
           </motion.div>
         </div>
 

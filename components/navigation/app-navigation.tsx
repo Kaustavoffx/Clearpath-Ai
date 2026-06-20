@@ -77,12 +77,12 @@ export function AppNavigation({ profile }: AppNavigationProps) {
 
   // Memoized Items
   const navItems = useMemo(() => [
-    { name: 'Mission Control', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Command Center', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Analyze', href: '/dashboard', icon: FileSearch },
-    { name: 'Opportunities', href: '/opportunities', icon: Target },
-    { name: 'AI Engines', href: '/ai-providers', icon: Cpu },
+    { name: 'Workspace', href: '/opportunities', icon: Target },
+    { name: 'Intelligence', href: '/ai-providers', icon: Cpu },
     { name: 'Profile', href: '/settings', icon: User },
-    { name: 'Judge Mode', href: '?judge=true', icon: Bug, isActiveOverride: isJudgeMode },
+    { name: 'Settings', href: '?judge=true', icon: Bug, isActiveOverride: isJudgeMode },
   ], [isJudgeMode])
 
   // Handle Mobile interactions

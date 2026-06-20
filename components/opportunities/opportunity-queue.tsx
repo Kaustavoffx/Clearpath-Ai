@@ -164,9 +164,9 @@ export function OpportunityQueue({ initialOpportunities }: { initialOpportunitie
           <div className="w-[80px] h-[80px] rounded-[24px] bg-primary/10 border border-primary/20 shadow-twilight-glow flex items-center justify-center mb-8">
             <FileText className="w-10 h-10 text-primary" />
           </div>
-          <h3 className="text-card-title text-foreground mb-3">Priority Queue Empty</h3>
+          <h3 className="text-card-title text-foreground mb-3">Your Opportunity Workspace Is Empty</h3>
           <p className="text-body-text mb-8 max-w-[500px]">
-            Upload documents to generate a personalized action queue instantly.
+            Upload a document to generate your first action plan.
           </p>
         </div>
       )}
