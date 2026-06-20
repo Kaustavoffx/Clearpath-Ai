@@ -102,7 +102,7 @@ export function OpportunitiesTable({ initialOpportunities }: { initialOpportunit
                   >
                     <td className="md:py-3 md:px-5 w-full md:w-[35%] md:min-w-[250px] flex items-center justify-between md:block">
                       <div className="flex flex-col">
-                        <span className="text-[14px] font-medium text-foreground line-clamp-1">{opp.title || "Untitled Document"}</span>
+                        <span className="text-[14px] font-medium text-foreground line-clamp-1 break-safe">{opp.title || "Untitled Document"}</span>
                         <span className="text-[11px] uppercase tracking-wider text-muted-foreground mt-0.5">{opp.category || "Document"}</span>
                       </div>
                       <div className="md:hidden flex items-center gap-2">

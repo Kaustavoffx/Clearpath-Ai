@@ -85,7 +85,7 @@ export default async function OpportunityCommandCenter({
           <Badge variant="outline" className="bg-primary/10 text-primary uppercase tracking-widest border-primary/20 shrink-0">
             {oppRecord.category || 'Document'}
           </Badge>
-          <h1 className="text-[20px] font-semibold tracking-tight text-foreground truncate max-w-[400px]">
+          <h1 className="text-[20px] font-semibold tracking-tight text-foreground break-safe">
             {oppRecord.title}
           </h1>
         </div>

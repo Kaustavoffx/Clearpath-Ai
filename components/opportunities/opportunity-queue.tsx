@@ -23,7 +23,7 @@ export function OpportunityQueue({ initialOpportunities }: { initialOpportunitie
   const rowVirtualizer = useVirtualizer({
     count: opportunities.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => typeof window !== 'undefined' && window.innerWidth < 768 ? 240 : 140, // Height of card plus gap
+    estimateSize: () => typeof window !== 'undefined' && window.innerWidth < 768 ? 96 : 140, // Height of card plus gap
     overscan: 5,
   })
 
@@ -130,17 +130,17 @@ export function OpportunityQueue({ initialOpportunities }: { initialOpportunitie
                     transform: `translateY(${virtualRow.start}px)`
                   }}
                   className={cn(
-                    "liquid-glass-card p-4 sm:p-6 flex flex-col md:flex-row gap-4 sm:gap-6 items-center md:items-stretch group overflow-hidden transition-all duration-300",
+                    "liquid-glass-card p-3 md:p-6 flex flex-row gap-3 md:gap-6 items-center group overflow-hidden transition-all duration-300",
                     isDragging ? "opacity-50 scale-95 shadow-none" : "hover:scale-[1.01]"
                   )}
                 >
-                  <div className="flex flex-row md:flex-col items-center justify-center shrink-0 w-full md:w-16 h-12 md:h-full border-b md:border-b-0 md:border-r border-glass-border pb-4 md:pb-0 md:pr-6 cursor-grab active:cursor-grabbing">
-                    <GripVertical className="w-5 h-5 text-muted-foreground/30 mb-2 group-hover:text-foreground transition-colors" />
-                    <div className="text-3xl font-black text-glass-border group-hover:text-primary transition-colors">#{index + 1}</div>
+                  <div className="flex flex-col items-center justify-center shrink-0 w-10 md:w-16 h-full border-r border-glass-border pr-3 md:pr-6 cursor-grab active:cursor-grabbing">
+                    <GripVertical className="w-3 h-3 md:w-5 md:h-5 text-muted-foreground/30 mb-1 md:mb-2 group-hover:text-foreground transition-colors" />
+                    <div className="text-sm md:text-3xl font-black text-glass-border group-hover:text-primary transition-colors">#{index + 1}</div>
                   </div>
 
-                  <div className="flex-1 flex flex-col gap-2 w-full">
-                    <div className="flex justify-between items-start">
+                  <div className="flex-1 flex flex-col justify-center min-w-0 py-1">
+                    <div className="hidden md:flex justify-between items-start">
                       <div className="text-[12px] uppercase tracking-widest font-semibold text-primary">{opp.category || "Document"}</div>
                       <div className="flex items-center gap-3">
                         <div className={cn("px-3 py-1 rounded-full text-[12px] font-bold border", pColor, pBadge)}>
@@ -157,11 +157,28 @@ export function OpportunityQueue({ initialOpportunities }: { initialOpportunitie
                       </div>
                     </div>
                     
-                    <h3 className="text-xl font-semibold tracking-tight text-foreground line-clamp-1">
+                    <h3 className="text-[14px] md:text-xl font-semibold tracking-tight text-foreground line-clamp-1 break-safe">
                       {opp.title || "Untitled Document"}
                     </h3>
+
+                    {/* Mobile Details Inline */}
+                    <div className="flex md:hidden items-center gap-2 mt-1 text-[11px] text-muted-foreground overflow-x-auto scrollbar-none whitespace-nowrap">
+                      <span className={cn("px-1.5 py-0.5 rounded-[4px] font-bold border shrink-0 text-[9px]", pColor, pBadge)}>
+                        PRI {pScore > 100 ? (100 - index) : pScore}
+                      </span>
+                      <span className="text-success font-medium shrink-0">Readiness {opp.readinessScore || 0}%</span>
+                      <span className="shrink-0">•</span>
+                      <span className="shrink-0">{opp.deadline ? new Date(opp.deadline).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : 'No Deadline'}</span>
+                      {opp.opportunity_value && opp.opportunity_value !== 'Not Found In Document' && (
+                        <>
+                          <span className="shrink-0">•</span>
+                          <span className="text-foreground shrink-0">{opp.opportunity_value}</span>
+                        </>
+                      )}
+                    </div>
                     
-                    <div className="flex flex-wrap items-center gap-6 mt-3">
+                    {/* Desktop Details */}
+                    <div className="hidden md:flex flex-wrap items-center gap-6 mt-3">
                       <div className="flex items-center gap-2 text-[13px] font-medium text-muted-foreground">
                         <Clock className="w-4 h-4" /> 
                         {opp.deadline ? new Date(opp.deadline).toLocaleDateString() : 'No Deadline'}
@@ -186,9 +203,9 @@ export function OpportunityQueue({ initialOpportunities }: { initialOpportunitie
                     </div>
                   </div>
 
-                  <div className="shrink-0 flex items-center">
-                    <Link href={`/opportunities/${opp.id}`} className="p-4 rounded-full bg-glass-surface border border-glass-border group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all">
-                      <ArrowRight className="w-5 h-5" />
+                  <div className="shrink-0 flex items-center pl-2">
+                    <Link href={`/opportunities/${opp.id}`} className="p-2 md:p-4 rounded-full bg-glass-surface border border-glass-border group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all">
+                      <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
                     </Link>
                   </div>
                 </div>

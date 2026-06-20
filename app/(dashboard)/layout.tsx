@@ -44,7 +44,7 @@ export default async function DashboardLayout({
       </Suspense>
       
       {/* Immersive Main Content */}
-      <main className="flex-1 flex flex-col relative w-full min-h-screen pt-safe pt-4 md:pt-6 px-4 md:pl-[104px] md:pr-6 pb-safe pb-24 md:pb-6">
+      <main className="flex-1 flex flex-col relative w-full min-h-screen pt-safe pt-4 md:pt-6 px-4 md:pl-[104px] md:pr-6 pb-safe md:pb-6 page-container md:!pb-6">
         {children}
       </main>
 

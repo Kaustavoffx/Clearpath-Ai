@@ -246,6 +246,18 @@ html {
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
   }
+  
+  /* Break Safe text prevention */
+  .break-safe {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  
+  /* Prevent content hiding under fixed elements */
+  .page-container {
+    padding-bottom: 140px;
+  }
 
   /* ══════════════════════════════════════════════
      CARD DEPTH SYSTEM
