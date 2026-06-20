@@ -4,35 +4,47 @@ import React, { useState } from 'react'
 import { Bot, Send, Sparkles, AlertTriangle, ShieldCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+import { askAiAdvisor } from '@/app/actions/ai-advisor-action'
+
 export function AiAdvisor({ opportunityData }: { opportunityData: any }) {
   const [query, setQuery] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
   const [chat, setChat] = useState([
     {
       id: 1,
       sender: 'ai',
-      message: `Hello! I am your Context-Aware AI Advisor. I have fully analyzed "${opportunityData?.title || 'this document'}" and understand your current readiness score. What specific questions do you have about the eligibility criteria or deadlines?`
+      message: `Hello! I am your Context-Aware AI Advisor. I have fully analyzed "${opportunityData?.title || 'this document'}". I have access to your tasks, documents, deadlines, and eligibility gaps. What should we execute next?`
     }
   ])
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!query.trim()) return
+    if (!query.trim() || isTyping) return
 
-    const userMessage = { id: Date.now(), sender: 'user', message: query }
+    const userQuery = query;
+    const userMessage = { id: Date.now(), sender: 'user', message: userQuery }
     setChat(prev => [...prev, userMessage])
     setQuery('')
+    setIsTyping(true)
 
-    // Mock AI response for Phase 3 UI
-    setTimeout(() => {
+    try {
+      const response = await askAiAdvisor(opportunityData.id, userQuery);
       setChat(prev => [
         ...prev, 
         { 
           id: Date.now() + 1, 
           sender: 'ai', 
-          message: 'The integration for live generative responses is scheduled for the upcoming platform iteration. I have securely logged your query regarding the context of this specific opportunity.' 
+          message: response || "I'm sorry, I couldn't generate a response."
         }
       ])
-    }, 1000)
+    } catch (error) {
+      setChat(prev => [
+        ...prev, 
+        { id: Date.now() + 1, sender: 'ai', message: "System Error connecting to Intelligence Core." }
+      ])
+    } finally {
+      setIsTyping(false)
+    }
   }
 
   return (

@@ -13,6 +13,7 @@ import { TaskEngine } from "@/components/opportunities/task-engine"
 import { ActivityFeed } from "@/components/opportunities/activity-feed"
 import { AiAdvisor } from "@/components/opportunities/ai-advisor"
 import { ExportCenter } from "@/components/opportunities/export-center"
+import { DeleteOpportunityButton } from "@/components/opportunities/delete-opportunity-button"
 import { cn } from "@/lib/utils"
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -68,6 +69,13 @@ export default async function OpportunityCommandCenter({
     {} // mock profile for now
   );
 
+  // 4. Fetch Activity Feed safely
+  let activityFeed: any[] = [];
+  try {
+    const { data: acts } = await supabase.from('activity_feed').select('*').eq('opportunity_id', id).order('created_at', { ascending: false });
+    if (acts) activityFeed = acts;
+  } catch(e) {}
+
   return (
     <div className="container-wide py-8 flex flex-col gap-8 animate-in fade-in duration-700">
       
@@ -103,6 +111,7 @@ export default async function OpportunityCommandCenter({
             <span className="text-[12px] uppercase font-semibold text-muted-foreground tracking-widest flex items-center gap-2">
               <Clock className="w-4 h-4" /> Live Countdown
             </span>
+            <DeleteOpportunityButton opportunityId={id} title={oppRecord.title || 'Untitled'} />
           </div>
           <LiveCountdown deadlineString={oppRecord.deadline} />
         </div>
@@ -234,7 +243,7 @@ export default async function OpportunityCommandCenter({
         </TabsContent>
 
         <TabsContent value="timeline" className="pt-8 outline-none animate-in fade-in duration-500">
-           <ActivityFeed />
+           <ActivityFeed activities={activityFeed} />
         </TabsContent>
 
         <TabsContent value="evidence" className="pt-8 outline-none animate-in fade-in duration-500">

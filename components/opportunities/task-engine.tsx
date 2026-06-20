@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import { CheckCircle2, Clock, MoreVertical, Edit3, Trash2, GripVertical, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { toggleTaskStatus, deleteTask } from '@/app/actions/task-actions'
+import { toast } from 'sonner'
 
 export function TaskEngine({ initialTasks }: { initialTasks: any[] }) {
   const [tasks, setTasks] = useState(() => {
@@ -13,6 +15,8 @@ export function TaskEngine({ initialTasks }: { initialTasks: any[] }) {
   const toggleTaskCompletion = (index: number) => {
     const newTasks = [...tasks];
     const task = newTasks[index];
+    const currentStatus = task.status;
+    
     if (task.status === 'COMPLETED' || task.completion_percent === 100) {
       task.status = 'PENDING';
       task.completion_percent = 0;
@@ -21,7 +25,27 @@ export function TaskEngine({ initialTasks }: { initialTasks: any[] }) {
       task.completion_percent = 100;
     }
     setTasks(newTasks);
-    // Real implementation would sync with DB here
+    
+    toast.promise(
+      toggleTaskStatus(task.id, currentStatus),
+      {
+        loading: 'Updating task...',
+        success: 'Task status saved',
+        error: 'Failed to update task'
+      }
+    )
+  };
+
+  const handleDelete = (index: number) => {
+    const task = tasks[index];
+    if (confirm(`Delete task "${task.title}"?`)) {
+      setTasks(prev => prev.filter((_, i) => i !== index));
+      toast.promise(deleteTask(task.id), {
+        loading: 'Deleting task...',
+        success: 'Task deleted',
+        error: 'Failed to delete task'
+      });
+    }
   };
 
   const getPriorityColor = (priority: string) => {
@@ -94,8 +118,8 @@ export function TaskEngine({ initialTasks }: { initialTasks: any[] }) {
                     <Badge variant="outline" className={cn("text-[10px] uppercase font-bold tracking-widest", getPriorityColor(task.priority))}>
                       {task.priority || 'Medium'}
                     </Badge>
-                    <button className="opacity-0 group-hover:opacity-100 p-1.5 text-muted-foreground hover:text-foreground transition-all rounded-md hover:bg-glass-layer">
-                      <MoreVertical className="w-4 h-4" />
+                    <button onClick={() => handleDelete(index)} className="opacity-0 group-hover:opacity-100 p-1.5 text-muted-foreground hover:text-danger hover:bg-danger/10 transition-all rounded-md">
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>

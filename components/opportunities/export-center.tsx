@@ -3,10 +3,51 @@
 import React from 'react'
 import { Download, CalendarDays, Share2, Mail, Link as LinkIcon, FileText, CheckCircle2 } from 'lucide-react'
 
+import { generateShareToken, logExportActivity } from '@/app/actions/export-actions'
+import { toast } from 'sonner'
+
 export function ExportCenter({ opportunityData }: { opportunityData: any }) {
-  const handleExport = (type: string) => {
-    // Phase 3 mock actions
-    console.log(`Exporting ${type} for ${opportunityData?.title}`)
+  const handleExport = async (type: string) => {
+    try {
+      if (type === 'google-calendar') {
+        const text = encodeURIComponent(`ClearPath OS: ${opportunityData.title}`);
+        const details = encodeURIComponent(`Action plan for ${opportunityData.title}`);
+        let dates = '';
+        if (opportunityData.deadline) {
+          const d = new Date(opportunityData.deadline).toISOString().replace(/-|:|\.\d\d\d/g, "");
+          dates = `&dates=${d}/${d}`;
+        }
+        window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&details=${details}${dates}`, '_blank');
+        await logExportActivity(opportunityData.id, 'Google Calendar');
+      } else if (type === 'ics') {
+        const text = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:ClearPath OS: ${opportunityData.title}\nDTSTART:${opportunityData.deadline ? new Date(opportunityData.deadline).toISOString().replace(/-|:|\.\d\d\d/g, "") : ''}\nEND:VEVENT\nEND:VCALENDAR`;
+        const blob = new Blob([text], { type: 'text/calendar' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `clearpath_${opportunityData.id}.ics`;
+        a.click();
+        await logExportActivity(opportunityData.id, 'ICS');
+      } else if (type === 'pdf') {
+        window.print();
+        await logExportActivity(opportunityData.id, 'PDF');
+      } else if (type === 'link') {
+        toast.promise(
+          generateShareToken(opportunityData.id),
+          {
+            loading: 'Generating secure link...',
+            success: (token) => {
+              const link = `${window.location.origin}/share/${token}`;
+              navigator.clipboard.writeText(link);
+              return 'Secure link copied to clipboard!';
+            },
+            error: 'Failed to generate link'
+          }
+        );
+      }
+    } catch (e) {
+      toast.error('Export failed');
+    }
   }
 
   return (
