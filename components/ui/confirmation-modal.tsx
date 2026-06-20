@@ -56,16 +56,16 @@ export function ConfirmationModal({
   
   // Theme aware overlay
   const overlayClass = isDark 
-    ? 'bg-black/55 backdrop-blur-[16px]' 
+    ? 'bg-black/55 backdrop-blur-[8px]' 
     : isLight 
-      ? 'bg-white/55 backdrop-blur-[18px]' 
+      ? 'bg-white/55 backdrop-blur-[10px]' 
       : 'bg-slate-900/40 backdrop-blur-sm'
 
   // Theme aware modal card
   const modalClass = isDark
-    ? 'bg-[#0a0a14]/80 backdrop-blur-[28px] border border-white/10 shadow-[0_25px_80px_rgba(0,0,0,0.45),0_0_40px_rgba(113,97,239,0.18)]'
+    ? 'bg-[#0a0a14]/80 backdrop-blur-[16px] border border-white/10 shadow-[0_25px_80px_rgba(0,0,0,0.45),0_0_40px_rgba(113,97,239,0.18)]'
     : isLight
-      ? 'bg-white/90 backdrop-blur-[30px] border border-[#7161ef]/10 shadow-[0_25px_80px_rgba(20,20,40,0.08)]'
+      ? 'bg-white/90 backdrop-blur-[18px] border border-[#7161ef]/10 shadow-[0_25px_80px_rgba(20,20,40,0.08)]'
       : 'bg-white backdrop-blur-md border border-slate-200 shadow-xl'
 
   return (

@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
 import { CheckCircle2, Circle, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -37,21 +36,11 @@ export function AIProcessingConstellation() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(133,138,227,0.1)_0%,transparent_70%)] blur-[40px] mix-blend-screen" />
       
       {/* Central Core */}
-      <motion.div 
-        animate={{ 
-          scale: [1, 1.05, 1],
-          opacity: [0.8, 1, 0.8],
-          boxShadow: [
-            "0 0 40px rgba(133,138,227,0.2)",
-            "0 0 80px rgba(151,223,252,0.4)",
-            "0 0 40px rgba(133,138,227,0.2)"
-          ]
-        }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute w-24 h-24 rounded-full bg-[#3D0E61] border border-[#858AE3]/40 flex items-center justify-center z-20 backdrop-blur-md"
+      <div 
+        className="absolute w-24 h-24 rounded-full bg-[#3D0E61] border border-[#858AE3]/40 flex items-center justify-center z-20 backdrop-blur-md shadow-[0_0_40px_rgba(133,138,227,0.2)] animate-pulse"
       >
         <Loader2 className="w-8 h-8 text-[#97DFFC] animate-spin" style={{ animationDuration: '3s' }} />
-      </motion.div>
+      </div>
 
       {/* Nodes and Paths */}
       <div className="relative w-full h-full max-w-[600px] max-h-[400px]">
@@ -68,7 +57,7 @@ export function AIProcessingConstellation() {
             <React.Fragment key={step}>
               {/* Connection Path to Center */}
               <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" style={{ overflow: 'visible' }}>
-                <motion.line
+                <line
                   x1="50%"
                   y1="50%"
                   x2={`calc(50% + ${x}px)`}
@@ -76,22 +65,18 @@ export function AIProcessingConstellation() {
                   stroke={isCompleted ? "#97DFFC" : isActive ? "#858AE3" : "rgba(255,255,255,0.1)"}
                   strokeWidth={isActive ? 2 : 1}
                   strokeDasharray={isCompleted ? "0" : "4 4"}
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 1 }}
                   className={cn(isActive && "animate-pulse")}
                 />
               </svg>
 
               {/* Node */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.2 }}
-                className="absolute w-40 flex flex-col items-center justify-center gap-3 z-10"
+              <div
+                className="absolute w-40 flex flex-col items-center justify-center gap-3 z-10 animate-fadeInUp"
                 style={{
                   left: `calc(50% + ${x}px - 5rem)`,
-                  top: `calc(50% + ${y}px - 1.5rem)`
+                  top: `calc(50% + ${y}px - 1.5rem)`,
+                  animationDelay: `${index * 0.2}s`,
+                  animationFillMode: 'both'
                 }}
               >
                 <div className={cn(
@@ -111,7 +96,7 @@ export function AIProcessingConstellation() {
                 )}>
                   {step}
                 </div>
-              </motion.div>
+              </div>
             </React.Fragment>
           )
         })}

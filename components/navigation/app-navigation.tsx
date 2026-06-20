@@ -22,23 +22,24 @@ interface AppNavigationProps {
 const NavItem = React.memo(({ 
   item, 
   isActive, 
-  collapsed, 
+  forceExpanded, 
   onClick 
 }: { 
   item: any, 
   isActive: boolean, 
-  collapsed: boolean,
+  forceExpanded?: boolean,
   onClick?: () => void
 }) => {
   return (
     <Link 
       href={item.href}
+      prefetch={true}
       onClick={onClick}
       className={cn(
         "flex items-center gap-4 rounded-[12px] transition-colors duration-200 group/item relative h-11 w-full",
         isActive ? "bg-glass-layer" : "hover:bg-glass-layer/50 text-muted-foreground hover:text-foreground"
       )}
-      title={collapsed ? item.name : undefined}
+      title={!forceExpanded ? item.name : undefined}
     >
       {/* Active Line Indicator - Thin edge bar */}
       <AnimatePresence>
@@ -59,7 +60,9 @@ const NavItem = React.memo(({
       
       <div className={cn(
         "whitespace-nowrap transition-all duration-200 overflow-hidden",
-        collapsed ? "opacity-0 w-0" : "opacity-100 flex-1 pr-4"
+        forceExpanded 
+          ? "opacity-100 flex-1 pr-4" 
+          : "opacity-0 w-0 group-hover/sidebar:opacity-100 group-hover/sidebar:flex-1 group-hover/sidebar:pr-4"
       )}>
         <span className={cn("text-[14px] leading-none", isActive ? "font-semibold text-foreground" : "font-medium")}>
           {item.name}
@@ -76,7 +79,6 @@ export function AppNavigation({ profile }: AppNavigationProps) {
   const isJudgeMode = searchParams?.get('judge') === 'true'
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
 
   // Derive Profile Info
   const firstName = profile?.first_name || 'Student'
@@ -108,13 +110,9 @@ export function AppNavigation({ profile }: AppNavigationProps) {
   return (
     <LazyMotion features={domAnimation}>
       {/* DESKTOP HOVER-EXPANDING INTELLIGENCE RAIL */}
-      <m.aside 
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        animate={{ width: isHovered ? 260 : 72 }}
-        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+      <aside 
+        className="group/sidebar hidden md:flex flex-col fixed left-4 top-4 bottom-4 bg-[#090D1A]/90 border border-glass-border/40 rounded-[24px] z-[60] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] backdrop-blur-md w-[72px] hover:w-[260px] transition-all duration-[220ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
         style={{ willChange: 'width' }}
-        className="hidden md:flex flex-col fixed left-4 top-4 bottom-4 bg-[#090D1A]/90 border border-glass-border/40 rounded-[24px] z-[60] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] backdrop-blur-2xl"
       >
         <div className="flex flex-col flex-1 py-4">
           
@@ -127,7 +125,7 @@ export function AppNavigation({ profile }: AppNavigationProps) {
             </div>
             <div className={cn(
               "whitespace-nowrap overflow-hidden transition-all duration-200",
-              !isHovered ? "opacity-0 w-0" : "opacity-100 w-full pr-4"
+              "opacity-0 w-0 group-hover/sidebar:opacity-100 group-hover/sidebar:w-full group-hover/sidebar:pr-4"
             )}>
               <span className="font-bold tracking-tight text-[16px] text-foreground">ClearPath OS</span>
             </div>
@@ -142,7 +140,6 @@ export function AppNavigation({ profile }: AppNavigationProps) {
                   key={index} 
                   item={item} 
                   isActive={isActive} 
-                  collapsed={!isHovered} 
                 />
               )
             })}
@@ -153,7 +150,7 @@ export function AppNavigation({ profile }: AppNavigationProps) {
           {/* Expanded System Info */}
           <div className={cn(
             "px-6 mb-6 flex flex-col gap-3 transition-all duration-200 overflow-hidden whitespace-nowrap",
-            !isHovered ? "opacity-0 max-h-0" : "opacity-100 max-h-[200px]"
+            "opacity-0 max-h-0 group-hover/sidebar:opacity-100 group-hover/sidebar:max-h-[200px]"
           )}>
              <div className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold mb-1">System Health</div>
              <div className="flex items-center gap-3 text-[13px] text-foreground">
@@ -188,7 +185,6 @@ export function AppNavigation({ profile }: AppNavigationProps) {
                   key={index} 
                   item={item} 
                   isActive={isActive} 
-                  collapsed={!isHovered} 
                 />
               )
             })}
@@ -198,7 +194,7 @@ export function AppNavigation({ profile }: AppNavigationProps) {
           <div className="border-t border-glass-border/40 mt-2 pt-2 px-2 flex flex-col">
             <div className={cn(
               "flex items-center transition-all duration-200 overflow-hidden whitespace-nowrap mb-2",
-              !isHovered ? "opacity-0 h-0" : "opacity-100 h-10 px-4 justify-between"
+              "opacity-0 h-0 group-hover/sidebar:opacity-100 group-hover/sidebar:h-10 group-hover/sidebar:px-4 group-hover/sidebar:justify-between"
             )}>
               <span className="text-[12px] font-medium text-muted-foreground">Appearance</span>
               <ThemeToggle />
@@ -206,7 +202,7 @@ export function AppNavigation({ profile }: AppNavigationProps) {
 
             <div className={cn(
               "flex items-center rounded-[12px] transition-colors duration-200 h-12 w-full",
-              !isHovered ? "justify-center" : "px-3 bg-glass-surface border border-glass-border/50"
+              "justify-center group-hover/sidebar:px-3 group-hover/sidebar:bg-glass-surface group-hover/sidebar:border group-hover/sidebar:border-glass-border/50 group-hover/sidebar:justify-start"
             )}>
               <div className="w-8 h-8 shrink-0 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
                 <span className="text-primary font-semibold text-[11px]">{initials}</span>
@@ -214,7 +210,7 @@ export function AppNavigation({ profile }: AppNavigationProps) {
               
               <div className={cn(
                 "flex flex-col whitespace-nowrap transition-all duration-200 overflow-hidden",
-                !isHovered ? "opacity-0 w-0" : "opacity-100 w-full pl-3"
+                "opacity-0 w-0 group-hover/sidebar:opacity-100 group-hover/sidebar:w-full group-hover/sidebar:pl-3"
               )}>
                 <span className="font-semibold text-[13px] leading-tight text-foreground">{fullName}</span>
                 <span className="text-[11px] font-medium text-muted-foreground mt-0.5">{plan}</span>
@@ -222,7 +218,7 @@ export function AppNavigation({ profile }: AppNavigationProps) {
             </div>
           </div>
         </div>
-      </m.aside>
+      </aside>
 
       {/* MOBILE EDGE-TO-EDGE BOTTOM NAV */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-glass-border bg-[#090D1A]/90 backdrop-blur-xl">
@@ -289,7 +285,7 @@ export function AppNavigation({ profile }: AppNavigationProps) {
                       key={index} 
                       item={item} 
                       isActive={pathname === item.href} 
-                      collapsed={false}
+                      forceExpanded={true}
                       onClick={handleCloseMobile}
                     />
                  ))}
@@ -298,7 +294,7 @@ export function AppNavigation({ profile }: AppNavigationProps) {
                       key={`bottom-${index}`} 
                       item={item} 
                       isActive={item.isActiveOverride !== undefined ? item.isActiveOverride : pathname === item.href} 
-                      collapsed={false}
+                      forceExpanded={true}
                       onClick={handleCloseMobile}
                     />
                  ))}

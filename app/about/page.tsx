@@ -1,12 +1,10 @@
-import { Header } from "@/components/landing/header"
-import { Footer } from "@/components/landing/footer"
+
 import { ChevronRight, Cpu, ShieldAlert, Zap, Globe, FileText, LayoutDashboard, Target } from "lucide-react"
 import Link from 'next/link'
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col selection:bg-primary/30">
-      <Header />
       
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-6 py-24 flex flex-col gap-24">
         
@@ -122,8 +120,6 @@ export default function AboutPage() {
         </section>
 
       </main>
-      
-      <Footer />
     </div>
   )
 }

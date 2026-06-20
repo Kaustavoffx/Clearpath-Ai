@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { Sparkles } from 'lucide-react'
-import { ClearPathAmbientBackground } from '@/components/layout/clearpath-ambient-background'
 import { Suspense } from 'react'
 
 export default async function LoginPage({
@@ -17,9 +16,7 @@ export default async function LoginPage({
 
   return (
     <div className="flex min-h-screen w-full flex-col lg:flex-row font-sans">
-      <Suspense fallback={null}>
-        <ClearPathAmbientBackground variant="auth" />
-      </Suspense>
+      {/* Background is now in RootLayout */}
       
       {/* Left Panel - Trust / Mission-first */}
       <div className="hidden lg:flex w-1/2 flex-col justify-between p-12 bg-glass-surface/10 border-r border-glass-border relative overflow-hidden">

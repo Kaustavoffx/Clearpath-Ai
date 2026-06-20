@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { cmGeom } from "@/lib/fonts";
 import "./globals.css";
+import { Suspense } from 'react'
+import { ClearPathAmbientBackground } from '@/components/layout/clearpath-ambient-background'
 import { ThemeProvider } from "@/components/theme-provider"
 
 export const metadata: Metadata = {
@@ -45,6 +47,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="relative z-10 flex-1 flex flex-col w-full h-full">
+            <Suspense fallback={null}>
+              <ClearPathAmbientBackground />
+            </Suspense>
             {children}
           </div>
         </ThemeProvider>

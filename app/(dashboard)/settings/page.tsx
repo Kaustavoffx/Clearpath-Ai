@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { User, GraduationCap, FileText, Settings as SettingsIcon, ShieldAlert, Activity } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { SettingsForm } from "@/components/settings/settings-form"
+import { ProfileForm } from "@/components/profile/profile-form"
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -45,7 +45,7 @@ export default async function SettingsPage() {
           <div className="flex-1 overflow-y-auto scrollbar-none pt-6">
             <TabsContent value="identity" className="outline-none animate-in fade-in duration-500 m-0">
                <div className="max-w-2xl bg-glass-surface p-6 rounded-[24px] border border-glass-border">
-                 <SettingsForm initialProfile={profile} userEmail={user.email} />
+                 <ProfileForm />
                </div>
             </TabsContent>
 

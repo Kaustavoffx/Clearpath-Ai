@@ -15,18 +15,21 @@ export function VoiceOrb({ isListening, isProcessing, isSpeaking, onToggleListen
   // State specific sizing and physics
   const orbScale = isListening ? "scale-110" : isSpeaking ? "scale-[1.05]" : "scale-100"
   const haloScale = isListening ? "scale-[1.5] opacity-80" : isProcessing ? "scale-110 opacity-60" : isSpeaking ? "scale-[1.4] opacity-70" : "scale-100 opacity-40"
+  const isActive = isListening || isProcessing || isSpeaking
+
   
   return (
     <div className="relative group cursor-pointer gpu-accelerate flex items-center justify-center w-[300px] h-[300px]" onClick={onToggleListen}>
       
-      {/* Layer 1: Massive Energy Halo (800px blur, animated colors) */}
+      {/* Layer 1: Massive Energy Halo (animated colors) */}
       <div className={cn(
         "absolute inset-[-100%] rounded-full transition-all duration-[2000ms] ease-in-out mix-blend-screen pointer-events-none",
         haloScale,
         !isListening && !isProcessing && !isSpeaking && "animate-breathe-slow"
       )} style={{ 
-        background: `radial-gradient(circle at 50% 50%, var(--soft-periwinkle) 0%, var(--wisteria) 30%, var(--mauve) 60%, transparent 80%)`,
-        filter: 'blur(120px)' /* Browser max blur is often capped, using 120px is very heavy, it achieves the massive glow */
+        boxShadow: isActive 
+          ? '0 0 80px rgba(183,156,237,0.4), inset 0 0 40px rgba(183,156,237,0.4)'
+          : '0 0 40px rgba(113,97,239,0.2), inset 0 0 20px rgba(113,97,239,0.2)'
       }} />
 
       {/* Layer 5 (Behind): Voice Wave Energy Ring (Orbiting ring) */}
@@ -42,7 +45,7 @@ export function VoiceOrb({ isListening, isProcessing, isSpeaking, onToggleListen
       {/* Layer 2: Liquid Glass Sphere */}
       <div className={cn(
         "relative flex items-center justify-center w-48 h-48 rounded-full transition-all duration-[800ms] cubic-bezier(0.22, 1, 0.36, 1) overflow-hidden shadow-[0_0_60px_rgba(113,97,239,0.3)]",
-        "bg-glass-surface border border-glass-border backdrop-blur-[40px] [-webkit-backdrop-filter:blur(40px)]",
+        "bg-glass-surface border border-glass-border backdrop-blur-[16px] [-webkit-backdrop-filter:blur(16px)]",
         orbScale,
         !isListening && !isProcessing && !isSpeaking && "animate-breathe-slow"
       )}

@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { ShieldAlert, FileText, UserCheck, ArrowRight, Activity, Lock, Unlock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ApplicationAssistant } from './application-assistant'
-import { motion, AnimatePresence } from 'framer-motion'
 
 import { ActionStep } from '@/lib/types'
 
@@ -67,10 +66,9 @@ export function HumanInTheLoopPipeline({ checklist, missingDocs = [] }: { checkl
 
       {/* Interactive Step Content */}
       <div className="w-full lg:w-2/3 liquid-glass-card p-10 shadow-glass-card relative overflow-hidden">
-        <AnimatePresence mode="wait">
           
           {currentStep === 1 && (
-            <motion.div key="step-1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="duration-500">
+            <div className="animate-fadeInUp duration-500">
               <div className="flex items-center gap-3 mb-6">
                 <FileText className="w-7 h-7 text-primary" />
                 <h2 className="text-section-title text-foreground">Step 1: AI Recommendation</h2>
@@ -115,11 +113,11 @@ export function HumanInTheLoopPipeline({ checklist, missingDocs = [] }: { checkl
               <Button onClick={handleNextStep} size="lg" className="w-full h-14 rounded-[999px] text-[16px] font-semibold transition-spring shadow-glass-card">
                 Proceed to Evidence Review <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
-            </motion.div>
+            </div>
           )}
 
           {currentStep === 2 && (
-            <motion.div key="step-2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="duration-500">
+            <div className="animate-fadeInUp duration-500">
                <div className="flex items-center gap-3 mb-6">
                 <ShieldAlert className="w-7 h-7 text-warning" />
                 <h2 className="text-section-title text-foreground">Step 2: Evidence Review</h2>
@@ -143,11 +141,11 @@ export function HumanInTheLoopPipeline({ checklist, missingDocs = [] }: { checkl
               <Button onClick={handleNextStep} disabled={!hasAcknowledgedEvidence} size="lg" className={cn("w-full h-14 rounded-[999px] text-[16px] font-semibold transition-spring", hasAcknowledgedEvidence ? "bg-warning hover:bg-warning/90 text-warning-foreground shadow-glass-card" : "")}>
                 Proceed to Confirmation <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
-            </motion.div>
+            </div>
           )}
 
           {currentStep === 3 && (
-            <motion.div key="step-3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="duration-500">
+            <div className="animate-fadeInUp duration-500">
                <div className="flex items-center gap-3 mb-6">
                 <UserCheck className="w-7 h-7 text-danger" />
                 <h2 className="text-section-title text-foreground">Step 3: Student Confirmation</h2>
@@ -174,16 +172,15 @@ export function HumanInTheLoopPipeline({ checklist, missingDocs = [] }: { checkl
               <Button onClick={handleNextStep} disabled={!hasConfirmed} variant="destructive" size="lg" className="w-full h-14 rounded-[999px] text-[16px] font-semibold transition-spring shadow-glass-card">
                 Unlock Final Action <Unlock className="w-5 h-5 ml-2" />
               </Button>
-            </motion.div>
+            </div>
           )}
 
           {currentStep === 4 && (
-            <motion.div key="step-4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="duration-500">
+            <div className="animate-fadeInUp duration-500">
               <ApplicationAssistant missingDocs={missingDocs} />
-            </motion.div>
+            </div>
           )}
 
-        </AnimatePresence>
       </div>
     </div>
   )

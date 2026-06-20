@@ -1,6 +1,5 @@
 import { AppNavigation } from "@/components/navigation/app-navigation"
 import { AdvisorFloatingButton } from "@/components/advisor/advisor-floating-button"
-import { ClearPathAmbientBackground } from "@/components/layout/clearpath-ambient-background"
 import { Suspense } from "react"
 import { createClient } from "@/lib/supabase/server"
 import { CommandBar } from "@/components/navigation/command-bar"
@@ -38,9 +37,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden">
-      <Suspense fallback={null}>
-        <ClearPathAmbientBackground variant="dashboard" />
-      </Suspense>
+      {/* Background is handled globally by RootLayout */}
 
       <Suspense fallback={<div className="w-[80px] lg:w-[280px] hidden md:block" />}>
         <AppNavigation profile={profile} />

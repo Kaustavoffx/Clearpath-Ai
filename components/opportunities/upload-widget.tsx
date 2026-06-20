@@ -11,7 +11,6 @@ import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { StressTranslator } from '@/components/ui/stress-translator'
 import { AIProcessingConstellation } from '@/components/opportunities/ai-processing-constellation'
-import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 interface UploadWidgetProps {
@@ -183,18 +182,13 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
       </div>
 
       <div className="relative z-10">
-        <AnimatePresence mode="wait">
           {mode === 'file' ? (
             !file ? (
               <div {...getRootProps()} className="focus:outline-none w-full">
                 <input {...getInputProps()} />
-                <motion.div
-                  key="dropzone"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
+                <div
                   className={cn(
-                    "border-2 border-dashed rounded-[24px] p-16 flex flex-col items-center justify-center text-center cursor-pointer transition-spring w-full",
+                    "animate-in fade-in zoom-in-95 duration-300 border-2 border-dashed rounded-[24px] p-16 flex flex-col items-center justify-center text-center cursor-pointer transition-spring w-full",
                     isDragActive ? "border-primary bg-primary/5 scale-[1.02]" : "border-glass-border bg-glass-surface/30 hover:bg-glass-surface/50 hover:border-foreground/30"
                   )}
                 >
@@ -207,14 +201,11 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
                   <p className="text-[14px] text-muted-foreground max-w-[300px]">
                     Supports PDF, PNG, JPG up to 10MB. It&apos;s secure and fully encrypted.
                   </p>
-                </motion.div>
+                </div>
               </div>
             ) : (
-              <motion.div 
-                key="file-preview"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="liquid-glass-card p-6 flex items-center justify-between"
+              <div 
+                className="liquid-glass-card p-6 flex items-center justify-between animate-in fade-in zoom-in-95 duration-300"
               >
                 <div className="flex items-center space-x-5 overflow-hidden">
                   <div className="w-14 h-14 rounded-[14px] bg-background border border-glass-border shadow-elevation-1 flex items-center justify-center shrink-0">
@@ -235,15 +226,11 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
                 >
                   <X className="h-5 w-5" />
                 </Button>
-              </motion.div>
+              </div>
             )
           ) : (
-            <motion.div 
-              key="url-input"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex flex-col gap-2"
+            <div 
+              className="flex flex-col gap-2 animate-fadeInUp duration-300"
             >
               <div className="relative">
                 <LinkIcon className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -255,9 +242,8 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
                   onChange={(e) => setUrl(e.target.value)}
                 />
               </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
 
         <div className="mt-8 flex justify-end">
           <Button 

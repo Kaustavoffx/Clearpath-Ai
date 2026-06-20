@@ -176,6 +176,7 @@ export default async function OpportunityCommandCenter({
                 </div>
               </div>
             </div>
+            </div>
 
             {/* Main Content Area */}
             <div className="lg:col-span-2 space-y-8">

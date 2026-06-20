@@ -1,7 +1,6 @@
 import { Sparkles, ArrowRight, ShieldCheck, FileSearch, CheckCircle, Zap } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ClearPathAmbientBackground } from "@/components/layout/clearpath-ambient-background"
 import { Suspense } from "react"
 import { cn } from "@/lib/utils"
 import { Hero } from "@/components/landing/hero"
@@ -11,7 +10,7 @@ export default function LandingPage() {
     <div className="min-h-screen relative overflow-hidden flex flex-col font-sans selection:bg-primary/30">
       
       <Suspense fallback={null}>
-        <ClearPathAmbientBackground variant="landing" />
+        {/* Background is now in RootLayout */}
       </Suspense>
 
       {/* ─── NAVIGATION ─── */}
