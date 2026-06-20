@@ -4,6 +4,7 @@ import "./globals.css";
 import { Suspense } from 'react'
 import { ClearPathAmbientBackground } from '@/components/layout/clearpath-ambient-background'
 import { ThemeProvider } from "@/components/theme-provider"
+import { ResponsiveQA } from "@/components/qa/responsive-check"
 
 export const metadata: Metadata = {
   title: {
@@ -51,6 +52,9 @@ export default function RootLayout({
               <ClearPathAmbientBackground />
             </Suspense>
             {children}
+            <Suspense fallback={null}>
+              <ResponsiveQA />
+            </Suspense>
           </div>
         </ThemeProvider>
       </body>

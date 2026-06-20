@@ -23,7 +23,7 @@ export function OpportunitiesTable({ initialOpportunities }: { initialOpportunit
   const rowVirtualizer = useVirtualizer({
     count: opportunities.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => typeof window !== 'undefined' && window.innerWidth < 768 ? 200 : 72,
+    estimateSize: () => typeof window !== 'undefined' && window.innerWidth < 768 ? 80 : 72,
     overscan: 5,
   })
 
@@ -81,7 +81,7 @@ export function OpportunitiesTable({ initialOpportunities }: { initialOpportunit
                 <th className="py-3 px-5 text-[11px] uppercase tracking-widest font-semibold text-muted-foreground whitespace-nowrap text-right">Actions</th>
               </tr>
             </thead>
-            <tbody style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }}>
+            <tbody style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }} className="block md:table-row-group">
               {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                 const idx = virtualRow.index
                 const opp = opportunities[idx];
@@ -94,21 +94,51 @@ export function OpportunitiesTable({ initialOpportunities }: { initialOpportunit
                 return (
                   <tr 
                     key={opp.id} 
-                    className="border-b border-glass-border/50 hover:bg-glass-layer/50 transition-colors group absolute top-0 left-0 w-full flex flex-col md:flex-row md:items-center p-4 md:p-0 gap-2 md:gap-0"
+                    className="border-b border-glass-border/50 hover:bg-glass-layer/50 transition-colors group absolute top-0 left-0 w-full flex md:table-row items-center"
                     style={{ 
                       height: `${virtualRow.size}px`,
                       transform: `translateY(${virtualRow.start}px)`
                     }}
                   >
-                    <td className="md:py-3 md:px-5 w-full md:w-[35%] md:min-w-[250px] flex items-center justify-between md:block">
+                    {/* MOBILE DEDICATED LAYOUT */}
+                    <td className="md:hidden w-full h-full p-3 flex flex-col justify-center relative cursor-pointer" onClick={(e) => {
+                      if (!(e.target as HTMLElement).closest('button')) {
+                        window.location.href = `/opportunities/${opp.id}`;
+                      }
+                    }}>
+                      <div className="flex justify-between items-start w-full">
+                        <div className="flex items-center gap-2 min-w-0 pr-4">
+                          <span className="text-[12px] font-bold text-muted-foreground shrink-0">#{idx + 1}</span>
+                          <span className="text-[14px] font-medium text-foreground truncate break-safe block w-full">{opp.title || "Untitled Document"}</span>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                      </div>
+                      <div className="flex items-center gap-3 mt-1.5 text-[12px] text-muted-foreground">
+                        <span className={cn("font-medium", opp.readinessScore >= 80 ? 'text-success' : 'text-warning')}>Readiness {opp.readinessScore || 0}%</span>
+                        <span>•</span>
+                        <span className="truncate">{opp.deadline ? new Date(opp.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '-'}</span>
+                        <span>•</span>
+                        <span className="font-medium truncate">{opp.opportunity_value && opp.opportunity_value !== 'Not Found In Document' ? opp.opportunity_value : '-'}</span>
+                      </div>
+                      
+                      <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDelete(opp.id, opp.title || 'Untitled');
+                          }}
+                          className="absolute right-3 bottom-3 p-1 text-muted-foreground hover:text-danger hover:bg-danger/10 rounded-md transition-colors"
+                          title="Move to Trash"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+
+                    {/* DESKTOP LAYOUT */}
+                    <td className="hidden md:table-cell py-3 px-5 w-[35%]">
                       <div className="flex flex-col">
                         <span className="text-[14px] font-medium text-foreground line-clamp-1 break-safe">{opp.title || "Untitled Document"}</span>
                         <span className="text-[11px] uppercase tracking-wider text-muted-foreground mt-0.5">{opp.category || "Document"}</span>
-                      </div>
-                      <div className="md:hidden flex items-center gap-2">
-                        <div className={cn("inline-flex items-center justify-center px-2 py-0.5 rounded-[6px] text-[11px] font-bold border", pColor)}>
-                          {pScore > 100 ? (100 - idx) : pScore}
-                        </div>
                       </div>
                     </td>
                     <td className="hidden md:table-cell py-3 px-5 w-[15%]">
@@ -116,28 +146,25 @@ export function OpportunitiesTable({ initialOpportunities }: { initialOpportunit
                         {pScore > 100 ? (100 - idx) : pScore}
                       </div>
                     </td>
-                    <td className="md:py-3 md:px-5 w-full md:w-[15%] flex items-center justify-between md:block text-[13px]">
-                      <span className="md:hidden text-muted-foreground font-semibold uppercase tracking-widest text-[10px]">Deadline</span>
+                    <td className="hidden md:table-cell py-3 px-5 w-[15%] text-[13px]">
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <Clock className="w-3.5 h-3.5 shrink-0 hidden md:block" />
                         <span className="truncate">{opp.deadline ? new Date(opp.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '-'}</span>
                       </div>
                     </td>
-                    <td className="md:py-3 md:px-5 w-full md:w-[15%] flex items-center justify-between md:block">
-                      <span className="md:hidden text-muted-foreground font-semibold uppercase tracking-widest text-[10px]">Value</span>
+                    <td className="hidden md:table-cell py-3 px-5 w-[15%]">
                       <div className="text-[13px] font-medium text-foreground truncate">
                         {opp.opportunity_value && opp.opportunity_value !== 'Not Found In Document' ? opp.opportunity_value : '-'}
                       </div>
                     </td>
-                    <td className="md:py-3 md:px-5 w-full md:w-[10%] flex items-center justify-between md:block">
-                      <span className="md:hidden text-muted-foreground font-semibold uppercase tracking-widest text-[10px]">Readiness</span>
+                    <td className="hidden md:table-cell py-3 px-5 w-[10%]">
                       <div className="flex items-center gap-2 text-[13px]">
                         <Activity className={cn("w-3.5 h-3.5", opp.readinessScore >= 80 ? 'text-success' : 'text-warning')} />
                         <span className="font-medium text-foreground">{opp.readinessScore || 0}%</span>
                       </div>
                     </td>
-                    <td className="md:py-3 md:px-5 w-full md:w-[10%] text-right mt-2 md:mt-0 pt-2 border-t md:border-0 border-glass-border/50">
-                      <div className="flex items-center justify-end gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                    <td className="hidden md:table-cell py-3 px-5 w-[10%] text-right border-l border-glass-border/10">
+                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
                           onClick={(e) => {
                             e.preventDefault();
@@ -152,7 +179,6 @@ export function OpportunitiesTable({ initialOpportunities }: { initialOpportunit
                           href={`/opportunities/${opp.id}`}
                           className="p-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-md transition-colors border border-primary/20 flex items-center gap-2"
                         >
-                          <span className="md:hidden text-[12px] font-semibold pl-1">View</span>
                           <ArrowRight className="w-4 h-4" />
                         </Link>
                       </div>
