@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { ClearPathAmbientBackground } from "@/components/layout/clearpath-ambient-background"
 import { Suspense } from "react"
 import { cn } from "@/lib/utils"
+import { Hero } from "@/components/landing/hero"
 
 export default function LandingPage() {
   return (
@@ -32,63 +33,11 @@ export default function LandingPage() {
       </nav>
 
       {/* ─── HERO: INTELLIGENCE COMMAND CENTER ─── */}
-      <main className="flex-1 pt-[160px] pb-[100px] relative z-10 flex flex-col gap-[140px]">
-        
-        <section className="container-wide text-center">
-          <div className="flex flex-col items-center animate-fadeInUp">
-            
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-10 text-[13px] font-medium tracking-[0.02em] text-primary shadow-twilight-glow">
-              <Sparkles className="w-4 h-4" /> Dreamy Twilight Intelligence
-            </div>
-            
-            {/* Headline */}
-            <h1 className="text-display text-foreground mb-6 max-w-[900px] leading-[1.05]">
-              You were never bad at applications.
-              <br />
-              <span className="text-muted-foreground">The system was.</span>
-            </h1>
-            
-            {/* Subheadline */}
-            <p className="text-[18px] md:text-[20px] text-muted-foreground text-balance max-w-[700px] mb-12 leading-[1.7] font-normal">
-              ClearPath OS converts bureaucratic complexity into executable action. 
-              40-page PDFs become 60-second timelines.
-            </p>
-            
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto mb-16">
-              <Link href="/register" className="w-full sm:w-auto">
-                <button className="btn-twilight w-full text-[16px] h-14 px-10 rounded-[20px] flex items-center justify-center gap-2 font-medium">
-                  Launch Live Demo <ArrowRight className="w-5 h-5" />
-                </button>
-              </Link>
-              <a href="#architecture" className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="w-full text-[16px] h-14 px-10 rounded-[20px] border-glass-border bg-glass-surface hover:bg-glass-layer font-medium">
-                  View Architecture
-                </Button>
-              </a>
-            </div>
+      <Hero />
 
-            {/* Trust Row */}
-            <div className="flex flex-wrap items-center justify-center gap-10 text-[14px] text-muted-foreground font-medium">
-              <div className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-warning" />
-                <span>60s Processing</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-success" />
-                <span>Evidence-Backed</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-primary" />
-                <span>Human-Verified</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── PROBLEM → SOLUTION → IMPACT ─── */}
-        <section className="container-wide">
+      {/* ─── PROBLEM → SOLUTION → IMPACT ─── */}
+      <main className="flex-1 relative z-10 flex flex-col gap-[140px] pb-[100px]">
+        <section className="container-wide mt-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
             {/* Problem */}
