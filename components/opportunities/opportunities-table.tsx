@@ -23,7 +23,7 @@ export function OpportunitiesTable({ initialOpportunities }: { initialOpportunit
   const rowVirtualizer = useVirtualizer({
     count: opportunities.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 72,
+    estimateSize: () => typeof window !== 'undefined' && window.innerWidth < 768 ? 200 : 72,
     overscan: 5,
   })
 
@@ -70,8 +70,8 @@ export function OpportunitiesTable({ initialOpportunities }: { initialOpportunit
     <>
       <div className="liquid-glass-card rounded-[24px] overflow-hidden border border-glass-border">
         <div className="overflow-x-auto scrollbar-none" ref={parentRef} style={{ height: '500px', overflowY: 'auto' }}>
-          <table className="w-full text-left border-collapse" style={{ minWidth: '800px' }}>
-            <thead className="sticky top-0 z-10">
+          <table className="w-full text-left border-collapse block md:table">
+            <thead className="sticky top-0 z-10 hidden md:table-header-group">
               <tr className="border-b border-glass-border bg-black/40 backdrop-blur-md">
                 <th className="py-3 px-5 text-[11px] uppercase tracking-widest font-semibold text-muted-foreground whitespace-nowrap">Opportunity</th>
                 <th className="py-3 px-5 text-[11px] uppercase tracking-widest font-semibold text-muted-foreground whitespace-nowrap">Priority</th>
@@ -94,42 +94,50 @@ export function OpportunitiesTable({ initialOpportunities }: { initialOpportunit
                 return (
                   <tr 
                     key={opp.id} 
-                    className="border-b border-glass-border/50 hover:bg-glass-layer/50 transition-colors group absolute top-0 left-0 w-full flex items-center"
+                    className="border-b border-glass-border/50 hover:bg-glass-layer/50 transition-colors group absolute top-0 left-0 w-full flex flex-col md:flex-row md:items-center p-4 md:p-0 gap-2 md:gap-0"
                     style={{ 
                       height: `${virtualRow.size}px`,
                       transform: `translateY(${virtualRow.start}px)`
                     }}
                   >
-                    <td className="py-3 px-5 w-[35%] min-w-[250px]">
+                    <td className="md:py-3 md:px-5 w-full md:w-[35%] md:min-w-[250px] flex items-center justify-between md:block">
                       <div className="flex flex-col">
                         <span className="text-[14px] font-medium text-foreground line-clamp-1">{opp.title || "Untitled Document"}</span>
                         <span className="text-[11px] uppercase tracking-wider text-muted-foreground mt-0.5">{opp.category || "Document"}</span>
                       </div>
+                      <div className="md:hidden flex items-center gap-2">
+                        <div className={cn("inline-flex items-center justify-center px-2 py-0.5 rounded-[6px] text-[11px] font-bold border", pColor)}>
+                          {pScore > 100 ? (100 - idx) : pScore}
+                        </div>
+                      </div>
                     </td>
-                    <td className="py-3 px-5 w-[15%]">
+                    <td className="hidden md:table-cell py-3 px-5 w-[15%]">
                       <div className={cn("inline-flex items-center justify-center px-2 py-0.5 rounded-[6px] text-[11px] font-bold border", pColor)}>
                         {pScore > 100 ? (100 - idx) : pScore}
                       </div>
                     </td>
-                    <td className="py-3 px-5 w-[15%]">
-                      <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
-                        <Clock className="w-3.5 h-3.5 shrink-0" />
+                    <td className="md:py-3 md:px-5 w-full md:w-[15%] flex items-center justify-between md:block text-[13px]">
+                      <span className="md:hidden text-muted-foreground font-semibold uppercase tracking-widest text-[10px]">Deadline</span>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Clock className="w-3.5 h-3.5 shrink-0 hidden md:block" />
                         <span className="truncate">{opp.deadline ? new Date(opp.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '-'}</span>
                       </div>
                     </td>
-                    <td className="py-3 px-5 w-[15%]">
+                    <td className="md:py-3 md:px-5 w-full md:w-[15%] flex items-center justify-between md:block">
+                      <span className="md:hidden text-muted-foreground font-semibold uppercase tracking-widest text-[10px]">Value</span>
                       <div className="text-[13px] font-medium text-foreground truncate">
                         {opp.opportunity_value && opp.opportunity_value !== 'Not Found In Document' ? opp.opportunity_value : '-'}
                       </div>
                     </td>
-                    <td className="py-3 px-5 w-[10%]">
+                    <td className="md:py-3 md:px-5 w-full md:w-[10%] flex items-center justify-between md:block">
+                      <span className="md:hidden text-muted-foreground font-semibold uppercase tracking-widest text-[10px]">Readiness</span>
                       <div className="flex items-center gap-2 text-[13px]">
                         <Activity className={cn("w-3.5 h-3.5", opp.readinessScore >= 80 ? 'text-success' : 'text-warning')} />
                         <span className="font-medium text-foreground">{opp.readinessScore || 0}%</span>
                       </div>
                     </td>
-                    <td className="py-3 px-5 w-[10%] text-right">
-                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <td className="md:py-3 md:px-5 w-full md:w-[10%] text-right mt-2 md:mt-0 pt-2 border-t md:border-0 border-glass-border/50">
+                      <div className="flex items-center justify-end gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                         <button 
                           onClick={(e) => {
                             e.preventDefault();
@@ -142,8 +150,9 @@ export function OpportunitiesTable({ initialOpportunities }: { initialOpportunit
                         </button>
                         <Link 
                           href={`/opportunities/${opp.id}`}
-                          className="p-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-md transition-colors border border-primary/20"
+                          className="p-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-md transition-colors border border-primary/20 flex items-center gap-2"
                         >
+                          <span className="md:hidden text-[12px] font-semibold pl-1">View</span>
                           <ArrowRight className="w-4 h-4" />
                         </Link>
                       </div>

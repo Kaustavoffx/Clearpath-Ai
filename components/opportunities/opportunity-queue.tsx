@@ -23,7 +23,7 @@ export function OpportunityQueue({ initialOpportunities }: { initialOpportunitie
   const rowVirtualizer = useVirtualizer({
     count: opportunities.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 140, // Height of card plus gap
+    estimateSize: () => typeof window !== 'undefined' && window.innerWidth < 768 ? 240 : 140, // Height of card plus gap
     overscan: 5,
   })
 
@@ -130,11 +130,11 @@ export function OpportunityQueue({ initialOpportunities }: { initialOpportunitie
                     transform: `translateY(${virtualRow.start}px)`
                   }}
                   className={cn(
-                    "liquid-glass-card p-6 flex flex-col md:flex-row gap-6 items-center group overflow-hidden transition-all duration-300",
+                    "liquid-glass-card p-4 sm:p-6 flex flex-col md:flex-row gap-4 sm:gap-6 items-center md:items-stretch group overflow-hidden transition-all duration-300",
                     isDragging ? "opacity-50 scale-95 shadow-none" : "hover:scale-[1.01]"
                   )}
                 >
-                  <div className="flex flex-col items-center justify-center shrink-0 w-16 h-full border-r border-glass-border pr-6 cursor-grab active:cursor-grabbing">
+                  <div className="flex flex-row md:flex-col items-center justify-center shrink-0 w-full md:w-16 h-12 md:h-full border-b md:border-b-0 md:border-r border-glass-border pb-4 md:pb-0 md:pr-6 cursor-grab active:cursor-grabbing">
                     <GripVertical className="w-5 h-5 text-muted-foreground/30 mb-2 group-hover:text-foreground transition-colors" />
                     <div className="text-3xl font-black text-glass-border group-hover:text-primary transition-colors">#{index + 1}</div>
                   </div>

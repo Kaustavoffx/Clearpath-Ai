@@ -212,8 +212,8 @@ export default async function OpportunityCommandCenter({
                  </div>
                </div>
 
-               <div className="grid grid-cols-2 gap-8">
-                 <div className="bg-glass-surface p-8 border border-glass-border rounded-[32px]">
+               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                 <div className="bg-glass-surface p-6 lg:p-8 border border-glass-border rounded-[24px] lg:rounded-[32px]">
                    <h2 className="text-lg font-semibold mb-4">Required Documents</h2>
                    <div className="space-y-3">
                      {metrics.documentsTotal === 0 ? (
@@ -229,7 +229,7 @@ export default async function OpportunityCommandCenter({
                    </div>
                  </div>
                  
-                 <div className="bg-glass-surface p-8 border border-glass-border rounded-[32px]">
+                 <div className="bg-glass-surface p-6 lg:p-8 border border-glass-border rounded-[24px] lg:rounded-[32px]">
                    <h2 className="text-lg font-semibold mb-4">Eligibility Match</h2>
                    <div className="space-y-3">
                      {oppRecord.eligibility_analysis?.requirements?.slice(0, 5).map((req: any, i: number) => {

@@ -65,7 +65,7 @@ export default async function DashboardPage() {
       />
 
       {/* V4 DENSE DYNAMIC CARDS */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
         <div className="liquid-glass-card p-4 rounded-[16px] flex flex-col gap-1">
           <Activity className="w-4 h-4 text-primary mb-1" />
           <div className="text-2xl font-semibold text-foreground tracking-tight leading-none">{stats.activeCount}</div>

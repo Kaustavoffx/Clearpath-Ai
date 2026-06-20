@@ -138,7 +138,7 @@ export function Hero() {
             className="w-full max-w-[500px] rounded-[32px] border border-glass-border/50 bg-[#071225]/60 backdrop-blur-3xl shadow-[0_20px_80px_rgba(113,97,239,0.15)] overflow-hidden flex flex-col group hover:border-[#957FEF]/50 transition-colors duration-500"
           >
             {/* Top Bar */}
-            <div className="h-12 border-b border-glass-border/50 flex items-center px-6 gap-2 bg-black/20">
+            <div className="h-10 sm:h-12 border-b border-glass-border/50 flex items-center px-4 sm:px-6 gap-2 bg-black/20">
               <div className="w-3 h-3 rounded-full bg-danger/80" />
               <div className="w-3 h-3 rounded-full bg-warning/80" />
               <div className="w-3 h-3 rounded-full bg-success/80" />
@@ -147,7 +147,7 @@ export function Hero() {
               </div>
             </div>
 
-            <div className="p-8 flex flex-col gap-8">
+            <div className="p-5 sm:p-8 flex flex-col gap-6 sm:gap-8">
               {/* Document Header */}
               <div>
                 <div className="text-[11px] font-bold uppercase tracking-widest text-success mb-2">Document Detected</div>
