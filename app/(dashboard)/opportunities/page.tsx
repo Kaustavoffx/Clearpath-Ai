@@ -1,8 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
-import { cn } from "@/lib/utils"
 import { ListOrdered } from "lucide-react"
 import Link from "next/link"
-import { OpportunityQueue } from "@/components/opportunities/opportunity-queue"
+import { OpportunitiesTable } from "@/components/opportunities/opportunities-table"
 
 export default async function OpportunitiesPage() {
   const supabase = await createClient()
@@ -38,23 +37,22 @@ export default async function OpportunitiesPage() {
   })
 
   return (
-    <div className="container-wide py-12 flex flex-col gap-12 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-glass-border pb-8">
+    <div className="container-wide py-6 flex flex-col gap-6 animate-fadeInUp max-w-[1440px]">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-glass-border pb-6">
         <div>
-          <h1 className="text-section-title mb-3 text-foreground flex items-center gap-3">
-            <ListOrdered className="w-8 h-8 text-primary" /> Priority Queue
+          <h1 className="text-[24px] font-semibold tracking-tight mb-2 text-foreground flex items-center gap-2">
+            <ListOrdered className="w-6 h-6 text-primary" /> Workspace Directory
           </h1>
-          <p className="text-body-text max-w-[600px]">
+          <p className="text-[14px] text-muted-foreground max-w-[600px]">
             Your central hub for executing opportunities. Ordered automatically by deadline, funding value, and readiness score.
           </p>
         </div>
-        <Link href="/dashboard" className="btn-twilight h-12 px-8 flex items-center justify-center rounded-[999px] shadow-twilight-glow font-medium shrink-0">
+        <Link href="/analyze" className="btn-twilight h-10 px-6 flex items-center justify-center rounded-[10px] shadow-[0_0_15px_rgba(149,127,239,0.3)] font-medium shrink-0 text-[13px]">
           Analyze New Document
         </Link>
       </div>
 
-
-      <OpportunityQueue initialOpportunities={processedOpps} />
+      <OpportunitiesTable initialOpportunities={processedOpps} />
     </div>
   )
 }

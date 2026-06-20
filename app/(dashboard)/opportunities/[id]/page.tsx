@@ -79,41 +79,45 @@ export default async function OpportunityCommandCenter({
   return (
     <div className="container-wide py-8 flex flex-col gap-8 animate-in fade-in duration-700">
       
-      {/* COMMAND CENTER HEADER */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-glass-surface/30 p-8 rounded-[32px] border border-glass-border shadow-glass-card relative overflow-hidden">
-        {/* Soft backdrop glow behind readiness engine */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[100px] pointer-events-none" />
-
-        <div className="flex flex-col gap-4 relative z-10 max-w-3xl">
-          <div className="flex flex-wrap items-center gap-3">
-            <Badge variant="outline" className="bg-primary/10 text-primary uppercase tracking-widest border-primary/20 shadow-sm px-4 py-1.5 text-[12px] font-semibold">
-              {oppRecord.category || 'Document'}
-            </Badge>
-            <Badge variant="outline" className={cn(
-              "uppercase tracking-widest border-glass-border shadow-sm px-4 py-1.5 text-[12px] font-semibold",
-              metrics.deadlineRisk === 'Critical' ? 'bg-danger/10 text-danger border-danger/20' :
-              metrics.deadlineRisk === 'High' ? 'bg-warning/10 text-warning border-warning/20' :
-              'bg-glass-surface text-muted-foreground'
-            )}>
-              Risk: {metrics.deadlineRisk}
-            </Badge>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-balance text-foreground mt-2">
+      {/* STICKY COMMAND CENTER HEADER */}
+      <div className="sticky top-0 z-40 -mx-6 px-6 py-4 bg-[#090D1A]/80 backdrop-blur-xl border-b border-glass-border mb-6 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
+        <div className="flex items-center gap-4 min-w-0">
+          <Badge variant="outline" className="bg-primary/10 text-primary uppercase tracking-widest border-primary/20 shrink-0">
+            {oppRecord.category || 'Document'}
+          </Badge>
+          <h1 className="text-[20px] font-semibold tracking-tight text-foreground truncate max-w-[400px]">
             {oppRecord.title}
           </h1>
-          <p className="text-lg text-muted-foreground line-clamp-2 max-w-2xl mt-2">
-            {oppRecord.simplified_summary}
-          </p>
         </div>
 
-        <div className="bg-glass-surface p-6 rounded-[24px] border border-glass-border shadow-sm relative z-10 shrink-0 min-w-[300px]">
-          <div className="flex items-center justify-between mb-6">
-            <span className="text-[12px] uppercase font-semibold text-muted-foreground tracking-widest flex items-center gap-2">
-              <Clock className="w-4 h-4" /> Live Countdown
+        <div className="flex flex-wrap items-center gap-4 md:gap-6">
+          <div className="flex flex-col items-end">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Deadline</span>
+            <span className={cn("text-[13px] font-semibold", metrics.deadlineRisk === 'Critical' ? 'text-danger' : 'text-foreground')}>
+              {oppRecord.deadline ? new Date(oppRecord.deadline).toLocaleDateString() : 'None'}
             </span>
-            <DeleteOpportunityButton opportunityId={id} title={oppRecord.title || 'Untitled'} />
           </div>
-          <LiveCountdown deadlineString={oppRecord.deadline} />
+          <div className="flex flex-col items-end">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Readiness</span>
+            <span className={cn("text-[13px] font-semibold", metrics.applicationReadiness >= 80 ? 'text-success' : 'text-warning')}>
+              {metrics.applicationReadiness}%
+            </span>
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Tasks</span>
+            <span className="text-[13px] font-semibold text-foreground">
+              {oppRecord.action_steps?.filter((t:any) => t.status === 'PENDING').length || 0} Left
+            </span>
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Value</span>
+            <span className="text-[13px] font-semibold text-success">
+              {oppRecord.opportunity_value !== 'Not Found In Document' ? oppRecord.opportunity_value : '-'}
+            </span>
+          </div>
+          <div className="pl-4 border-l border-glass-border">
+             <DeleteOpportunityButton opportunityId={id} title={oppRecord.title || 'Untitled'} />
+          </div>
         </div>
       </div>
 
@@ -134,12 +138,22 @@ export default async function OpportunityCommandCenter({
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             {/* Readiness Engine Widget */}
-            <div className="lg:col-span-1 liquid-glass-card p-8 border border-glass-border rounded-[32px] flex flex-col items-center shadow-glass-card relative">
-              <div className="w-full flex justify-between items-center mb-8">
-                <h3 className="text-[13px] font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-primary" /> Application Readiness
-                </h3>
+            <div className="lg:col-span-1 flex flex-col gap-6">
+              <div className="bg-glass-surface p-6 rounded-[24px] border border-glass-border shadow-sm shrink-0">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[12px] uppercase font-semibold text-muted-foreground tracking-widest flex items-center gap-2">
+                    <Clock className="w-4 h-4" /> Live Countdown
+                  </span>
+                </div>
+                <LiveCountdown deadlineString={oppRecord.deadline} />
               </div>
+
+              <div className="liquid-glass-card p-6 border border-glass-border rounded-[32px] flex flex-col items-center shadow-glass-card relative">
+                <div className="w-full flex justify-between items-center mb-6">
+                  <h3 className="text-[13px] font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-primary" /> Readiness
+                  </h3>
+                </div>
               
               <ReadinessRing score={metrics.applicationReadiness} size={220} strokeWidth={16} />
               
@@ -165,6 +179,11 @@ export default async function OpportunityCommandCenter({
 
             {/* Main Content Area */}
             <div className="lg:col-span-2 space-y-8">
+               <div className="bg-glass-surface p-6 border border-glass-border rounded-[24px]">
+                 <h2 className="text-[16px] font-semibold mb-2">Opportunity Overview</h2>
+                 <p className="text-[14px] text-muted-foreground leading-relaxed">{oppRecord.simplified_summary}</p>
+               </div>
+
                <div className="bg-glass-surface p-8 border border-glass-border rounded-[32px]">
                  <h2 className="text-xl font-semibold mb-6">Execution Pipeline</h2>
                  <div className="flex justify-between items-center relative">

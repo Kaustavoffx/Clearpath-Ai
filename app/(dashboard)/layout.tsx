@@ -3,6 +3,7 @@ import { AdvisorFloatingButton } from "@/components/advisor/advisor-floating-but
 import { ClearPathAmbientBackground } from "@/components/layout/clearpath-ambient-background"
 import { Suspense } from "react"
 import { createClient } from "@/lib/supabase/server"
+import { CommandBar } from "@/components/navigation/command-bar"
 
 export default async function DashboardLayout({
   children,
@@ -46,12 +47,15 @@ export default async function DashboardLayout({
       </Suspense>
       
       {/* Immersive Main Content */}
-      <main className="flex-1 flex flex-col relative w-full min-h-screen pt-6 md:pl-[120px] lg:pl-[328px] pr-6 pb-24 md:pb-6 transition-all duration-300">
+      <main className="flex-1 flex flex-col relative w-full min-h-screen pt-6 md:pl-[104px] pr-6 pb-24 md:pb-6">
         {children}
       </main>
 
       {/* Global Advisor Component */}
       <AdvisorFloatingButton />
+
+      {/* Global Command Search */}
+      <CommandBar />
     </div>
   )
 }
