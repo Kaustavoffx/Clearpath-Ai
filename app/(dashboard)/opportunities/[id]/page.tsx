@@ -11,6 +11,8 @@ import { DocumentChecklist } from "@/components/opportunities/document-checklist
 import { ProcessingOrchestrator } from "@/components/opportunities/processing-orchestrator"
 import { TaskEngine } from "@/components/opportunities/task-engine"
 import { ActivityFeed } from "@/components/opportunities/activity-feed"
+import { AiAdvisor } from "@/components/opportunities/ai-advisor"
+import { ExportCenter } from "@/components/opportunities/export-center"
 import { cn } from "@/lib/utils"
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -241,6 +243,14 @@ export default async function OpportunityCommandCenter({
              <h2 className="text-xl font-semibold mb-2">Evidence Matrix V2</h2>
              <p>Porting evidence systems to the new architecture.</p>
            </div>
+        </TabsContent>
+
+        <TabsContent value="advisor" className="pt-8 outline-none animate-in fade-in duration-500">
+           <AiAdvisor opportunityData={oppRecord} />
+        </TabsContent>
+
+        <TabsContent value="settings" className="pt-8 outline-none animate-in fade-in duration-500">
+           <ExportCenter opportunityData={oppRecord} />
         </TabsContent>
 
       </Tabs>
