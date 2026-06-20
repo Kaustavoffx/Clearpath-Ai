@@ -9,6 +9,8 @@ import { ReadinessRing } from "@/components/ui/readiness-ring"
 import { Metadata } from "next"
 import { DocumentChecklist } from "@/components/opportunities/document-checklist"
 import { ProcessingOrchestrator } from "@/components/opportunities/processing-orchestrator"
+import { TaskEngine } from "@/components/opportunities/task-engine"
+import { ActivityFeed } from "@/components/opportunities/activity-feed"
 import { cn } from "@/lib/utils"
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -226,11 +228,11 @@ export default async function OpportunityCommandCenter({
         </TabsContent>
 
         <TabsContent value="tasks" className="pt-8 outline-none animate-in fade-in duration-500">
-           <div className="p-20 text-center border-2 border-dashed border-glass-border rounded-[32px] text-muted-foreground">
-             <CheckSquare className="w-12 h-12 mx-auto mb-4 opacity-20" />
-             <h2 className="text-xl font-semibold mb-2">Task Engine</h2>
-             <p>This module is under construction in Phase 2.</p>
-           </div>
+           <TaskEngine initialTasks={oppRecord.action_steps || []} />
+        </TabsContent>
+
+        <TabsContent value="timeline" className="pt-8 outline-none animate-in fade-in duration-500">
+           <ActivityFeed />
         </TabsContent>
 
         <TabsContent value="evidence" className="pt-8 outline-none animate-in fade-in duration-500">

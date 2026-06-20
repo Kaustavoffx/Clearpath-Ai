@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { CheckCircle2, Upload, FileText, XCircle, RefreshCw, Eye, Trash2 } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 interface DocumentItem {
@@ -108,13 +109,37 @@ export function DocumentChecklist({ requiredDocuments, existingDocuments, opport
       </div>
       
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Document Vault</h3>
-        <div className="liquid-glass-card p-8 border border-glass-border rounded-[24px] flex flex-col items-center justify-center text-center h-[300px]">
-          <RefreshCw className="w-10 h-10 text-muted-foreground/30 mb-4" />
-          <h4 className="text-[16px] font-semibold text-foreground mb-2">Vault Connection Offline</h4>
-          <p className="text-[14px] text-muted-foreground max-w-[250px]">
-            The document vault is ready in the schema but requires the Vault Engine to be activated in Phase 2.
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <Upload className="w-5 h-5 text-primary" /> Document Vault
+        </h3>
+        <div className="liquid-glass-card p-6 border border-glass-border rounded-[24px] flex flex-col h-[300px]">
+          <p className="text-[13px] text-muted-foreground mb-4">
+            Upload reusable documents here to instantly fulfill requirements across multiple opportunities.
           </p>
+          <div className="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+            <div className="flex items-center justify-center p-6 border-2 border-dashed border-glass-border rounded-[16px] text-muted-foreground hover:bg-glass-surface/50 hover:text-foreground hover:border-primary/50 transition-colors cursor-pointer group">
+              <div className="flex flex-col items-center gap-2">
+                <Upload className="w-6 h-6 opacity-50 group-hover:text-primary group-hover:opacity-100 transition-colors" />
+                <span className="text-[14px] font-semibold">Upload New Document</span>
+              </div>
+            </div>
+            
+            {/* Example mock vault documents for UI demonstration */}
+            <div className="flex items-center justify-between p-3 bg-glass-surface border border-glass-border rounded-[12px]">
+              <div className="flex items-center gap-3">
+                <FileText className="w-4 h-4 text-primary" />
+                <span className="text-[13px] font-medium text-foreground">Income Certificate_2026.pdf</span>
+              </div>
+              <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-[10px] uppercase">Verified</Badge>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-glass-surface border border-glass-border rounded-[12px]">
+              <div className="flex items-center gap-3">
+                <FileText className="w-4 h-4 text-primary" />
+                <span className="text-[13px] font-medium text-foreground">Aadhaar_Card_Front.jpg</span>
+              </div>
+              <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-[10px] uppercase">Verified</Badge>
+            </div>
+          </div>
         </div>
       </div>
     </div>
