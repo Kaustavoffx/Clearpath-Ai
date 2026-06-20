@@ -2,7 +2,13 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { User, GraduationCap, FileText, Settings as SettingsIcon, ShieldAlert, Activity } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ProfileForm } from "@/components/profile/profile-form"
+
+import { IdentityForm } from "@/components/settings/identity-form"
+import { EducationDashboard } from "@/components/settings/education-dashboard"
+import { DocumentVault } from "@/components/settings/document-vault"
+import { PreferencesPanel } from "@/components/settings/preferences-panel"
+import { SecurityCenter } from "@/components/settings/security-center"
+import { UsageAnalytics } from "@/components/settings/usage-analytics"
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -12,11 +18,22 @@ export default async function SettingsPage() {
     redirect('/login')
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
+  // Fetch all related profile data concurrently
+  const [
+    { data: profile },
+    { data: education },
+    { data: documents },
+    { data: preferences },
+    { data: security },
+    { data: usage }
+  ] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).single(),
+    supabase.from('education_profiles').select('*').eq('user_id', user.id).single(),
+    supabase.from('document_vault').select('*').eq('user_id', user.id),
+    supabase.from('user_preferences').select('*').eq('user_id', user.id).single(),
+    supabase.from('user_security_settings').select('*').eq('user_id', user.id).single(),
+    supabase.from('user_usage_metrics').select('*').eq('user_id', user.id).single()
+  ])
 
   return (
     <div className="container-wide min-h-[calc(100vh-5rem)] flex flex-col pt-6 pb-12 gap-6 animate-fadeInUp max-w-[1440px]">
@@ -44,49 +61,27 @@ export default async function SettingsPage() {
           
           <div className="flex-1 overflow-y-auto scrollbar-none pt-6">
             <TabsContent value="identity" className="outline-none animate-in fade-in duration-500 m-0">
-               <div className="max-w-2xl bg-glass-surface p-6 rounded-[24px] border border-glass-border">
-                 <ProfileForm />
-               </div>
+               <IdentityForm initialProfile={profile} />
             </TabsContent>
 
             <TabsContent value="education" className="outline-none animate-in fade-in duration-500 m-0">
-               <div className="max-w-2xl bg-glass-surface p-6 rounded-[24px] border border-glass-border flex flex-col items-center justify-center text-center h-[300px]">
-                 <GraduationCap className="w-8 h-8 text-muted-foreground mb-4 opacity-50" />
-                 <h2 className="text-[16px] font-semibold text-foreground mb-2">Education Profile</h2>
-                 <p className="text-[14px] text-muted-foreground max-w-[400px]">Connect your university or school records to automatically verify eligibility across all opportunities.</p>
-               </div>
+               <EducationDashboard initialProfile={education} />
             </TabsContent>
 
             <TabsContent value="documents" className="outline-none animate-in fade-in duration-500 m-0">
-               <div className="max-w-2xl bg-glass-surface p-6 rounded-[24px] border border-glass-border flex flex-col items-center justify-center text-center h-[300px]">
-                 <FileText className="w-8 h-8 text-muted-foreground mb-4 opacity-50" />
-                 <h2 className="text-[16px] font-semibold text-foreground mb-2">Identity Documents</h2>
-                 <p className="text-[14px] text-muted-foreground max-w-[400px]">Securely store reusable identity documents like Aadhar, Passports, and Transcripts for instant opportunity generation.</p>
-               </div>
+               <DocumentVault initialDocuments={documents || []} />
             </TabsContent>
 
             <TabsContent value="preferences" className="outline-none animate-in fade-in duration-500 m-0">
-               <div className="max-w-2xl bg-glass-surface p-6 rounded-[24px] border border-glass-border flex flex-col items-center justify-center text-center h-[300px]">
-                 <SettingsIcon className="w-8 h-8 text-muted-foreground mb-4 opacity-50" />
-                 <h2 className="text-[16px] font-semibold text-foreground mb-2">System Preferences</h2>
-                 <p className="text-[14px] text-muted-foreground max-w-[400px]">Configure default UI scales, accessibility settings, and notification frequency.</p>
-               </div>
+               <PreferencesPanel initialPreferences={preferences} />
             </TabsContent>
 
             <TabsContent value="security" className="outline-none animate-in fade-in duration-500 m-0">
-               <div className="max-w-2xl bg-glass-surface p-6 rounded-[24px] border border-glass-border flex flex-col items-center justify-center text-center h-[300px]">
-                 <ShieldAlert className="w-8 h-8 text-muted-foreground mb-4 opacity-50" />
-                 <h2 className="text-[16px] font-semibold text-foreground mb-2">Security & Sessions</h2>
-                 <p className="text-[14px] text-muted-foreground max-w-[400px]">Manage active sessions, update your password, and enable multi-factor authentication.</p>
-               </div>
+               <SecurityCenter initialSecurity={security} />
             </TabsContent>
 
             <TabsContent value="usage" className="outline-none animate-in fade-in duration-500 m-0">
-               <div className="max-w-2xl bg-glass-surface p-6 rounded-[24px] border border-glass-border flex flex-col items-center justify-center text-center h-[300px]">
-                 <Activity className="w-8 h-8 text-muted-foreground mb-4 opacity-50" />
-                 <h2 className="text-[16px] font-semibold text-foreground mb-2">Usage Metrics</h2>
-                 <p className="text-[14px] text-muted-foreground max-w-[400px]">Detailed breakdown of your compute usage, storage allocation, and subscription plan limits.</p>
-               </div>
+               <UsageAnalytics initialUsage={usage} />
             </TabsContent>
           </div>
         </Tabs>
