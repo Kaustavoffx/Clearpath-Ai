@@ -52,21 +52,39 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Not authenticated')
 
-      let payload: Record<string, unknown> = {}
+      let documentHash = '';
+      let payload: Record<string, unknown> = {};
 
       if (mode === 'file' && file) {
         const fileExt = file.name.split('.').pop()
         const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`
         const filePath = `${user.id}/${fileName}`
 
+        // Generate Hash for duplicate prevention
+        try {
+          const buffer = await file.arrayBuffer();
+          const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          documentHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        } catch(e) {
+          console.error("Failed to hash file", e);
+        }
+
         const { error: uploadError } = await supabase.storage
           .from('opportunities')
           .upload(filePath, file)
 
         if (uploadError) throw uploadError
-        payload = { filePath }
+        payload = { filePath, documentHash }
       } else {
-        payload = { url }
+        // Simple hash of URL for duplicate prevention
+        try {
+          const msgUint8 = new TextEncoder().encode(url);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          documentHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        } catch(e) {}
+        payload = { url, documentHash }
       }
 
       // Inject profile into payload

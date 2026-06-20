@@ -5,19 +5,21 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: opp, error } = await supabase
-    .from('opportunities')
-    .select('status, processing_message, processing_metadata')
+  const { data: job, error } = await supabase
+    .from('processing_jobs')
+    .select('id, status, progress, stage, updated_at')
     .eq('id', id)
     .single();
 
-  if (error || !opp) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  if (error || !job) {
+    return NextResponse.json({ status: 'not_found' }, { status: 200 });
   }
 
   return NextResponse.json({
-    status: opp.status,
-    processing_message: opp.processing_message,
-    processing_metadata: opp.processing_metadata
+    id: job.id,
+    status: job.status,
+    progress: job.progress,
+    stage: job.stage,
+    updatedAt: job.updated_at
   });
 }

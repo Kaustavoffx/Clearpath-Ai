@@ -15,6 +15,18 @@ import { Metadata } from "next"
 
 function EvidenceDisplay({ insight, quote, page, confidence }: { insight?: string, quote?: string, page?: string | number, confidence?: number }) {
   if (!quote) return null;
+  
+  const score = confidence || 0;
+  let confLabel = "Low";
+  let confColor = "text-danger";
+  if (score >= 80) {
+    confLabel = "High";
+    confColor = "text-success";
+  } else if (score >= 50) {
+    confLabel = "Medium";
+    confColor = "text-warning";
+  }
+
   return (
     <div className="mt-3 bg-glass-surface/50 p-3 rounded-lg border border-glass-border">
       <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-1">Source Quote</div>
@@ -26,7 +38,7 @@ function EvidenceDisplay({ insight, quote, page, confidence }: { insight?: strin
         </div>
         <div>
           <span className="text-[10px] uppercase text-muted-foreground mr-1">Confidence</span>
-          <span className={cn("text-[12px] font-semibold", (confidence || 0) < 70 ? "text-warning" : "text-success")}>{confidence || 0}%</span>
+          <span className={cn("text-[12px] font-semibold", confColor)}>{confLabel} ({score}%)</span>
         </div>
       </div>
     </div>
@@ -59,18 +71,33 @@ export default async function OpportunityDetailsPage({
 
   const supabase = await createClient()
 
-  const { data: opportunity, error } = await supabase
+  let opportunity = null;
+
+  const { data: oppRecord, error: oppError } = await supabase
     .from('opportunities')
     .select('*, action_steps(*)')
     .eq('id', id)
     .single()
 
-  if (error || !opportunity) {
-    notFound()
+  if (oppError || !oppRecord) {
+    // Check if it's a job still processing
+    const { data: jobRecord, error: jobError } = await supabase
+      .from('processing_jobs')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (jobError || !jobRecord) {
+      notFound()
+    }
+
+    return <ProcessingOrchestrator jobId={id} />
   }
 
+  opportunity = oppRecord;
+
   if (opportunity.status === 'PENDING') {
-    return <ProcessingOrchestrator opportunityId={id} />
+    return <ProcessingOrchestrator jobId={id} />
   }
 
   let signedUrl = null
@@ -414,9 +441,18 @@ export default async function OpportunityDetailsPage({
                               <div className="flex gap-4 pt-4 border-t border-glass-border">
                                 <div className="flex-1">
                                   <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-1">Confidence</div>
-                                  <div className={cn("text-[14px] font-semibold", (ref.confidence_score || 0) < 70 ? "text-warning" : "text-success")}>
-                                    {ref.confidence_score || (isMissing ? 0 : 80)}%
-                                  </div>
+                                  {(() => {
+                                    const score = ref.confidence_score || (isMissing ? 0 : 80);
+                                    let confLabel = "Low";
+                                    let confColor = "text-danger";
+                                    if (score >= 80) { confLabel = "High"; confColor = "text-success"; }
+                                    else if (score >= 50) { confLabel = "Medium"; confColor = "text-warning"; }
+                                    return (
+                                      <div className={cn("text-[14px] font-semibold", confColor)}>
+                                        {confLabel} ({score}%)
+                                      </div>
+                                    );
+                                  })()}
                                 </div>
                                 <div className="flex-1 border-l border-glass-border pl-4">
                                   <div className="text-[11px] uppercase font-semibold text-muted-foreground mb-1">Risk if wrong</div>

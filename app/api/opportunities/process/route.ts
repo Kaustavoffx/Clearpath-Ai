@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid input payload' }, { status: 400 })
     }
 
-    const { filePath, url, profile } = parsedBody.data
+    const { filePath, url, profile, documentHash } = parsedBody.data as any
 
     const supabase = await createClient()
 
@@ -60,31 +60,43 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid file path' }, { status: 400 })
     }
 
-    // 3. Save initial PENDING record immediately
-    const titlePlaceholder = url ? `Link: ${new URL(url).hostname}` : (filePath?.split('/').pop() || 'Uploaded Document')
+    // 3. Duplicate Prevention
+    if (documentHash) {
+      const { data: existingOpp } = await supabase
+        .from('opportunities')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('document_hash', documentHash)
+        .single();
+        
+      if (existingOpp) {
+        logger.info({ userId: user.id, oppId: existingOpp.id }, 'Duplicate document detected. Returning existing opportunity.');
+        return NextResponse.json({ id: existingOpp.id, isDuplicate: true });
+      }
+    }
 
-    const { data: oppRecord, error: oppError } = await supabase
-      .from('opportunities')
+    const { data: jobRecord, error: jobError } = await supabase
+      .from('processing_jobs')
       .insert({
         user_id: user.id,
-        title: titlePlaceholder,
-        category: 'OTHER',
-        storage_path: filePath || url || 'unknown',
-        simplified_summary: 'Pending Analysis...',
-        status: 'PENDING'
+        file_name: filePath || url || 'unknown',
+        document_hash: documentHash || null,
+        status: 'queued',
+        stage: 'Initializing',
+        progress: 0
       })
       .select()
       .single()
 
-    if (oppError || !oppRecord) {
-      logger.error({ error: oppError }, 'Failed to insert pending opportunity into DB')
-      throw new Error('Failed to save opportunity to database')
+    if (jobError || !jobRecord) {
+      logger.error({ error: jobError }, 'Failed to insert processing job into DB')
+      throw new Error('Failed to create processing job')
     }
 
-    logger.info({ userId: user.id, opportunityId: oppRecord.id }, 'Successfully created pending opportunity')
+    logger.info({ userId: user.id, jobId: jobRecord.id }, 'Successfully created processing job')
     
     // 4. Return immediately for background processing UI
-    return NextResponse.json({ id: oppRecord.id })
+    return NextResponse.json({ id: jobRecord.id })
 
   } catch (error: unknown) {
     const err = error as Error

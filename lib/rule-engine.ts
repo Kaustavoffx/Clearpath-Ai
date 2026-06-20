@@ -34,10 +34,10 @@ export class RuleEngine {
     for (const sentence of sentences) {
       for (const keyword of docKeywords) {
         if (sentence.toLowerCase().includes(keyword)) {
-          // Extract a clean snippet (up to 50 chars around the keyword)
+          // Extract a clean snippet (up to 150 chars around the keyword)
           required_documents.push({
             value: `Document containing '${keyword}'`,
-            source_quote: sentence.substring(0, 150).trim() + "...",
+            source_quote: sentence.substring(0, 150).trim() + (sentence.length > 150 ? "..." : ""),
             page_number: "Unknown",
             confidence_score: 50
           });
@@ -46,7 +46,7 @@ export class RuleEngine {
       }
     }
 
-    // Eligibility constraints
+    // Eligibility constraints & Other Info
     const eligibility_requirements = [];
     if (lowerText.includes("eligibility") || lowerText.includes("criteria")) {
       eligibility_requirements.push({
@@ -54,6 +54,42 @@ export class RuleEngine {
         source_quote: "Please review the official document for exact eligibility criteria.",
         page_number: "Unknown",
         confidence_score: 30
+      });
+    }
+
+    // Extract Emails
+    const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi;
+    const emails = text.match(emailRegex) || [];
+    if (emails.length > 0) {
+      eligibility_requirements.push({
+        value: "Contact Email",
+        source_quote: emails[0],
+        page_number: "Unknown",
+        confidence_score: 80
+      });
+    }
+
+    // Extract Phone Numbers
+    const phoneRegex = /(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
+    const phones = text.match(phoneRegex) || [];
+    if (phones.length > 0) {
+      eligibility_requirements.push({
+        value: "Contact Phone",
+        source_quote: phones[0],
+        page_number: "Unknown",
+        confidence_score: 80
+      });
+    }
+
+    // Extract Websites
+    const websiteRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.gov\.in)/gi;
+    const websites = text.match(websiteRegex) || [];
+    if (websites.length > 0) {
+      eligibility_requirements.push({
+        value: "Official Website",
+        source_quote: websites[0],
+        page_number: "Unknown",
+        confidence_score: 80
       });
     }
 
@@ -68,7 +104,14 @@ export class RuleEngine {
       opportunity_loss_analysis: "Missing this deadline means you will not be considered for this opportunity.",
       risk_score: 90, // High risk since it's a fallback
       confidence_score: 20, // Low confidence
-      evidence_references: [],
+      evidence_references: [
+        {
+          claim: "Fallback Extraction Activated",
+          quote_from_document: "This is a deterministic extraction because the AI could not confidently parse the original text.",
+          confidence_score: 100,
+          risk_assessment: "Information may be incomplete."
+        }
+      ],
       action_checklist: [
         {
           step_number: 1,

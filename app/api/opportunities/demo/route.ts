@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { rateLimit } from '@/lib/security/rate-limit'
 import { logger } from '@/lib/logger'
+import { safeDate } from '@/lib/date-utils'
 
 export async function POST(request: Request) {
   try {
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
         category: 'SCHOLARSHIP',
         storage_path: 'demo-documents/national-merit-stem.pdf',
         simplified_summary: 'This is a highly competitive scholarship that provides $10,000 per year and a guaranteed summer internship at a top tech company. You need to maintain a 3.8 GPA and submit three letters of recommendation.',
-        deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
+        deadline: safeDate(new Date(Date.now() + 1000 * 60 * 60 * 24 * 30)),
         eligibility_analysis: {
           requirements: [
             `[MATCHED] Current high school junior or senior (Student: ${profile.gradeLevel || 'Unknown'})`,
@@ -65,7 +66,7 @@ export async function POST(request: Request) {
         category: 'SCHEME',
         storage_path: 'demo-documents/state-digital-grant.pdf',
         simplified_summary: 'A government scheme providing free laptops to students from lower-income families who are entering college.',
-        deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15).toISOString(),
+        deadline: safeDate(new Date(Date.now() + 1000 * 60 * 60 * 24 * 15)),
         eligibility_analysis: {
           requirements: [
             `[MATCHED] State resident for at least 5 years (Student: ${profile.state || 'Unknown'})`,
@@ -94,7 +95,7 @@ export async function POST(request: Request) {
         category: 'CIRCULAR',
         storage_path: 'demo-documents/board-exam-circular.pdf',
         simplified_summary: 'Due to unforeseen circumstances, the board exam center for District A has been changed. You must download a new admit card before the 15th.',
-        deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5).toISOString(),
+        deadline: safeDate(new Date(Date.now() + 1000 * 60 * 60 * 24 * 5)),
         eligibility_analysis: {
           requirements: [
             `[MATCHED] Student appearing for Board Exams (Student: ${profile.gradeLevel || 'Unknown'})`,

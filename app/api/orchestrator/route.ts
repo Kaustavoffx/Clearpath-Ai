@@ -8,9 +8,10 @@ import sanitizeHtml from 'sanitize-html'
 import { extractJsonFromGeminiResponse } from '@/lib/utils'
 import { RuleEngine } from '@/lib/rule-engine'
 import OpenAI from 'openai'
+import { safeDate } from '@/lib/date-utils'
 
 const orchestratorSchema = z.object({
-  opportunityId: z.string().uuid(),
+  jobId: z.string().uuid(),
   profile: z.object({
     name: z.string().optional(),
     gradeLevel: z.string().optional(),
@@ -104,44 +105,44 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
     }
 
-    const { opportunityId, profile } = parsedBody.data;
+    const { jobId, profile } = parsedBody.data;
     const supabase = await createClient();
 
     // Helper to log status to UI
-    const logStatus = async (msg: string) => {
+    const logStatus = async (msg: string, progress: number, status: string = 'processing') => {
       try {
-        await supabase.from('opportunities').update({ processing_message: msg }).eq('id', opportunityId);
+        await supabase.from('processing_jobs').update({ stage: msg, progress, status, updated_at: safeDate(new Date()) }).eq('id', jobId);
       } catch (e) {
         // Ignore DB update errors for status
       }
     };
 
-    const { data: oppRecord } = await supabase.from('opportunities').select('*').eq('id', opportunityId).single();
-    if (!oppRecord) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    const { data: jobRecord } = await supabase.from('processing_jobs').select('*').eq('id', jobId).single();
+    if (!jobRecord) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-    const pathOrUrl = oppRecord.storage_path;
+    const pathOrUrl = jobRecord.file_name;
     let rawTextContext = "";
     let inlineData = null; // We'll still keep this if we want Gemini to do native PDF, but we'll extract text for fallback/chunking
 
-    await logStatus("Downloading document...");
+    await logStatus("Downloading document...", 10);
 
     // Determine if URL or File
     if (pathOrUrl.startsWith('http')) {
       try {
-        await logStatus("Scraping URL...");
+        await logStatus("Scraping URL...", 20);
         rawTextContext = await extractTextFromUrl(pathOrUrl);
       } catch (e) {
         rawTextContext = "This website could not be processed. Please upload the PDF version or try another source.";
       }
     } else {
-      await logStatus("Reading PDF...");
+      await logStatus("Reading PDF...", 20);
       const { data: fileData } = await supabase.storage.from('opportunities').download(pathOrUrl);
       if (fileData) {
         const arrayBuffer = await fileData.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         
         try {
-          await logStatus("Extracting Text...");
+          await logStatus("Extracting Text...", 30);
           const pdf = require('pdf-parse');
           const pdfData = await pdf(buffer);
           rawTextContext = pdfData.text;
@@ -153,20 +154,34 @@ export async function POST(request: Request) {
           logger.warn("PDF-Parse failed, will rely entirely on Gemini inlineData if possible");
         }
 
+        // Phase 7: External URL Recovery
+        const urlMatch = rawTextContext.match(/(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.gov\.in)/);
+        if (urlMatch) {
+          try {
+            await logStatus("Fetching detected URL for extra context...", 35);
+            let fetchUrl = urlMatch[1];
+            if (!fetchUrl.startsWith('http')) fetchUrl = 'https://' + fetchUrl;
+            const extraText = await extractTextFromUrl(fetchUrl);
+            rawTextContext += "\n\n--- SUPPLEMENTAL WEBSITE CONTEXT ---\n" + extraText;
+          } catch (e) {
+            logger.warn("Failed to fetch supplemental URL");
+          }
+        }
+
         inlineData = {
           data: buffer.toString('base64'),
           mimeType: pathOrUrl.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg'
         };
       } else {
-        throw new Error("Failed to download file");
+        logger.error("Failed to download file");
+        rawTextContext = "Document download failed. We could not analyze the contents. Please manually verify requirements.";
       }
     }
 
     // Phase 2: Document Chunking (Approximate by char length if > 60000 chars roughly 20 pages)
-    // For simplicity, we just chunk the text and send chunks
     let chunks: string[] = [];
     if (rawTextContext.length > 60000) {
-      await logStatus("Document is large. Chunking into smaller segments...");
+      await logStatus("Document is large. Chunking into smaller segments...", 40);
       const chunkSize = 15000;
       for (let i = 0; i < rawTextContext.length; i += chunkSize) {
         chunks.push(rawTextContext.substring(i, i + chunkSize));
@@ -232,52 +247,75 @@ export async function POST(request: Request) {
 
     let finalAiResult: any = null;
     let usedProvider = "gemini";
-    
-    // We'll process the first chunk (or whole doc if no chunking) for the main analysis
-    // Phase 4: Partial Success Mode
     let successfulChunks = 0;
     
-    const targetChunk = chunks[0]; // Take the first chunk for primary data
+    // We will process up to 5 chunks to avoid timeouts on extremely large files
+    const chunksToProcess = chunks.slice(0, 5);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const contents: any[] = [prompt];
-    if (inlineData && chunks.length === 1) {
-      contents.push({ inlineData });
-    } else {
-      contents.push(`--- CONTENT ---\n${targetChunk}\n--- END CONTENT ---`);
-    }
-
-    try {
-      await logStatus("Detecting Opportunities (Gemini)...");
-      const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
-      const responseText = await runGeminiWithAdaptiveTimeout(ai, contents, targetChunk.length);
-      const { data: rawAiResult } = extractJsonFromGeminiResponse(responseText);
-      if (rawAiResult) {
-        finalAiResult = rawAiResult;
-        successfulChunks++;
-      } else {
-        throw new Error("Failed to extract JSON from Gemini");
-      }
-    } catch (geminiError) {
-      logger.warn("Gemini completely failed. Trying OpenAI fallback...");
+    for (let i = 0; i < chunksToProcess.length; i++) {
+      const targetChunk = chunksToProcess[i];
+      await logStatus(`Analyzing chunk ${i + 1} of ${chunksToProcess.length}...`, 40 + (i * 5));
       
+      const contents: any[] = [prompt];
+      if (inlineData && chunks.length === 1) {
+        contents.push({ inlineData });
+      } else {
+        contents.push(`--- CONTENT ---\n${targetChunk}\n--- END CONTENT ---`);
+      }
+
+      let chunkResult = null;
+
       try {
-        await logStatus("Gemini Timeout. Engaging OpenAI Fallback...");
-        const responseText = await runOpenAI(targetChunk, prompt);
-        const parsed = JSON.parse(responseText);
-        finalAiResult = parsed;
-        usedProvider = "openai";
+        const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
+        const responseText = await runGeminiWithAdaptiveTimeout(ai, contents, targetChunk.length);
+        const { data: rawAiResult } = extractJsonFromGeminiResponse(responseText);
+        if (rawAiResult) chunkResult = rawAiResult;
+      } catch (geminiError) {
+        logger.warn(`Gemini failed on chunk ${i}. Trying OpenAI fallback...`);
+        try {
+          const responseText = await runOpenAI(targetChunk, prompt);
+          chunkResult = JSON.parse(responseText);
+          usedProvider = "openai";
+        } catch (openAiError) {
+          logger.error(`OpenAI failed on chunk ${i}.`);
+        }
+      }
+
+      if (chunkResult) {
         successfulChunks++;
-      } catch (openAiError) {
-        logger.error("OpenAI failed. Engaging Rule Engine Fallback...");
-        await logStatus("Engaging Deterministic Rule Engine...");
-        finalAiResult = RuleEngine.extract(rawTextContext);
-        usedProvider = "rule_engine";
-        successfulChunks++;
+        if (!finalAiResult) {
+          finalAiResult = chunkResult; // take first chunk as base
+        } else {
+          // Merge arrays
+          if (chunkResult.action_checklist) {
+            finalAiResult.action_checklist = [...(finalAiResult.action_checklist || []), ...chunkResult.action_checklist];
+          }
+          if (chunkResult.evidence_references) {
+            finalAiResult.evidence_references = [...(finalAiResult.evidence_references || []), ...chunkResult.evidence_references];
+          }
+          if (chunkResult.required_documents) {
+            finalAiResult.required_documents = [...(finalAiResult.required_documents || []), ...chunkResult.required_documents];
+          }
+          if (chunkResult.eligibility_analysis?.requirements) {
+            if (!finalAiResult.eligibility_analysis) finalAiResult.eligibility_analysis = { requirements: [] };
+            finalAiResult.eligibility_analysis.requirements = [
+              ...(finalAiResult.eligibility_analysis.requirements || []),
+              ...chunkResult.eligibility_analysis.requirements
+            ];
+          }
+        }
       }
     }
 
-    await logStatus("Verifying Evidence...");
+    if (successfulChunks === 0) {
+      logger.error("All AI providers failed on all chunks. Engaging Rule Engine Fallback...");
+      await logStatus("Engaging Deterministic Rule Engine...", 75);
+      finalAiResult = RuleEngine.extract(rawTextContext);
+      usedProvider = "rule_engine";
+      successfulChunks = 1; // Mark as successful to avoid hard fail
+    }
+
+    await logStatus("Verifying Evidence...", 80);
 
     // Phase 8: Response Validation & Repair
     const evidenceInsightSchema = z.object({
@@ -312,13 +350,52 @@ export async function POST(request: Request) {
     // Save back to DB
     const sanitizeOptions = { allowedTags: [], allowedAttributes: {} };
     
-    await logStatus("Building Action Plan...");
+    await logStatus("Finalizing Opportunity...", 90);
 
-    await supabase.from('opportunities').update({
-      title: sanitizeHtml(repairedResult.title, sanitizeOptions),
+    const titlePlaceholder = pathOrUrl.startsWith('http') ? `Link: ${new URL(pathOrUrl).hostname}` : (pathOrUrl?.split('/').pop() || 'Uploaded Document');
+    const finalTitle = sanitizeHtml(repairedResult.title && repairedResult.title !== 'Unknown Opportunity' ? repairedResult.title : titlePlaceholder, sanitizeOptions);
+    
+    // QUALITY GATE: Validate constraints before DB insertion
+    if (!finalTitle || finalTitle.trim() === '') {
+      throw new Error("Quality Gate Failed: Opportunity Name is empty");
+    }
+    
+    if (finalCategory === 'OTHER' && usedProvider !== 'rule_engine') {
+      throw new Error("Quality Gate Failed: Opportunity Type is unknown");
+    }
+
+    const hasActionPlan = repairedResult.action_checklist && repairedResult.action_checklist.length > 0;
+    if (!hasActionPlan) {
+      throw new Error("Quality Gate Failed: Action Plan has 0 actions");
+    }
+    
+    const hasEvidence = repairedResult.evidence_references && repairedResult.evidence_references.length > 0;
+    if (!hasEvidence) {
+      throw new Error("Quality Gate Failed: Evidence has 0 sources");
+    }
+
+    if (typeof repairedResult.confidence_score !== 'number' || isNaN(repairedResult.confidence_score)) {
+      throw new Error("Quality Gate Failed: Invalid confidence score");
+    }
+
+    const finalSummary = sanitizeHtml(repairedResult.plain_language_summary, sanitizeOptions);
+    if (!finalSummary || finalSummary.trim() === '' || finalSummary === 'Summary could not be generated.') {
+      throw new Error("Quality Gate Failed: Summary is missing");
+    }
+
+    const invalidDeadlines = ['Not Found In Document', 'No Deadline Found', 'Unknown', 'N/A', 'None', 'null'];
+    const parsedDeadline = repairedResult.important_dates?.deadline;
+    const finalDeadline = parsedDeadline && !invalidDeadlines.includes(parsedDeadline) ? safeDate(parsedDeadline) : null;
+
+    const { data: newOpp, error: insertError } = await supabase.from('opportunities').insert({
+      id: jobId,
+      user_id: jobRecord.user_id,
+      document_hash: jobRecord.document_hash || null,
+      title: finalTitle,
       category: finalCategory,
+      storage_path: pathOrUrl,
       simplified_summary: sanitizeHtml(repairedResult.plain_language_summary, sanitizeOptions),
-      deadline: repairedResult.important_dates?.deadline && repairedResult.important_dates.deadline !== 'Not Found In Document' ? new Date(repairedResult.important_dates.deadline).toISOString() : null,
+      deadline: finalDeadline,
       eligibility_analysis: repairedResult.eligibility_analysis || {},
       required_documents: repairedResult.required_documents || [],
       opportunity_value: sanitizeHtml(repairedResult.opportunity_value || '', sanitizeOptions),
@@ -329,12 +406,16 @@ export async function POST(request: Request) {
       processing_message: 'Analysis Complete',
       processing_metadata: { provider: usedProvider, total_chunks: chunks.length, successful_chunks: successfulChunks },
       status: 'PROCESSED'
-    }).eq('id', opportunityId);
+    }).select().single();
+
+    if (insertError || !newOpp) {
+      throw new Error("Failed to insert completed opportunity: " + JSON.stringify(insertError));
+    }
 
 
     if (repairedResult.action_checklist && repairedResult.action_checklist.length > 0) {
       const stepsToInsert = repairedResult.action_checklist.map((step: any) => ({
-        opportunity_id: opportunityId,
+        opportunity_id: jobId,
         step_number: step.step_number || 1,
         title: sanitizeHtml(step.title || "Step", sanitizeOptions),
         description: sanitizeHtml(step.description || "Action required", sanitizeOptions),
@@ -346,12 +427,14 @@ export async function POST(request: Request) {
       await supabase.from('action_steps').insert(stepsToInsert);
     }
 
+    await logStatus("Completed", 100, "completed");
+
     // Phase 10: Logging
     logger.info({
       processing_time: Date.now() - startTime,
       provider_used: usedProvider,
       document_size: inlineData ? inlineData.data.length : rawTextContext.length,
-      opportunityId,
+      jobId,
       status: 'PROCESSED'
     }, 'Background Document Processing Complete');
 
@@ -359,8 +442,16 @@ export async function POST(request: Request) {
 
   } catch (error: any) {
     logger.error({ error: error.message, stack: error.stack }, 'Fatal API Route Error in Orchestrator');
-    // Phase 9: Graceful fail, never a 500 error screen. We update status to ERROR if we completely crash, 
-    // but the UI will handle it without crashing the page.
+    
+    try {
+      const supabase = await createClient();
+      const parsedBody = orchestratorSchema.safeParse(await request.clone().json().catch(() => ({})));
+      if (parsedBody.success) {
+        await supabase.from('processing_jobs').update({ status: 'failed', error: error.message, stage: 'Failed' }).eq('id', parsedBody.data.jobId);
+      }
+    } catch (e) {}
+
+    // Phase 9: Graceful fail, never a 500 error screen. We update status to failed.
     return NextResponse.json({ error: 'Analysis could not be completed.' }, { status: 200 }); // Return 200 so UI doesn't blow up if it uses fetch without checking ok
   }
 }

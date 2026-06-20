@@ -3,6 +3,7 @@ import OpenAI from 'openai'
 import { GoogleGenAI } from '@google/genai'
 import { createClient } from '@/lib/supabase/server'
 import { encrypt } from '@/lib/encryption'
+import { safeDate } from '@/lib/date-utils'
 
 export async function POST(request: Request) {
   try {
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
         user_id: user.id,
         provider: provider,
         ...encryptedData,
-        updated_at: new Date().toISOString()
+        updated_at: safeDate(new Date())
       }, { onConflict: 'user_id, provider' })
 
     if (keyError) {
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
       .from('user_usage')
       .update({
         [`${provider}_connected`]: true,
-        updated_at: new Date().toISOString()
+        updated_at: safeDate(new Date())
       })
       .eq('user_id', user.id)
 
