@@ -8,26 +8,51 @@ import { ResponsiveQA } from "@/components/qa/responsive-check"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://clearpath-ai.example.com'),
   title: {
-    template: "%s | ClearPath AI",
-    default: "ClearPath AI | Educational Opportunities Decoded",
+    template: "%s | ClearPath OS",
+    default: "ClearPath OS | AI Crisis-to-Action Translator",
   },
   description: "Transform confusing educational opportunities into personalized action plans using advanced AI. Never miss a scholarship, internship, or competition deadline again.",
-  keywords: ["education", "scholarship", "AI", "high school", "action plan", "opportunities", "student"],
+  keywords: ["education", "scholarship", "AI", "high school", "action plan", "opportunities", "student", "ClearPath OS"],
   authors: [{ name: "ClearPath Team" }],
-  creator: "ClearPath AI",
+  creator: "ClearPath OS",
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
+      { url: '/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    shortcut: ['/shortcut-icon.png'],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-touch-icon-precomposed.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://clearpath-ai.example.com",
-    title: "ClearPath AI | Educational Opportunities Decoded",
-    description: "Transform confusing educational opportunities into personalized action plans using advanced AI.",
-    siteName: "ClearPath AI",
+    title: "ClearPath OS | AI Crisis-to-Action Translator",
+    description: "Turning Confusing Opportunities Into Clear Actions.",
+    siteName: "ClearPath OS",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "ClearPath OS Preview",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ClearPath AI",
-    description: "Transform confusing educational opportunities into personalized action plans using advanced AI.",
+    title: "ClearPath OS | AI Crisis-to-Action Translator",
+    description: "Turning Confusing Opportunities Into Clear Actions.",
+    images: ["/twitter-image.png"],
   },
 };
 

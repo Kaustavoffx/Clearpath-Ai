@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { StressTranslator } from '@/components/ui/stress-translator'
-import { AIProcessingConstellation } from '@/components/opportunities/ai-processing-constellation'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
 interface UploadWidgetProps {
@@ -129,9 +129,17 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
 
   if (isUploading) {
     return (
-      <div className="w-full flex flex-col items-center gap-6">
-        <AIProcessingConstellation />
-        <p className="text-[14px] text-muted-foreground animate-pulse">Building your personalized action plan...</p>
+      <div className="w-full flex flex-col items-center gap-6 py-10">
+        <div className="relative w-24 h-24 mb-4">
+          <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse-slow" />
+          <div className="relative w-full h-full rounded-[16px] bg-black/20 border border-primary/30 flex items-center justify-center overflow-hidden p-3 shadow-twilight-glow backdrop-blur-xl">
+             <Image src="/icon-192x192.png" alt="ClearPath OS Loading" width={64} height={64} className="animate-breathe object-contain drop-shadow-[0_0_15px_rgba(113,97,239,0.8)]" priority />
+          </div>
+        </div>
+        <div className="text-center">
+          <p className="text-[16px] font-semibold text-foreground mb-1">Authenticating & Uploading</p>
+          <p className="text-[13px] text-muted-foreground animate-pulse">Building your personalized action plan...</p>
+        </div>
       </div>
     )
   }

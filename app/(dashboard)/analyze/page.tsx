@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { UploadWidget } from "@/components/opportunities/upload-widget"
 import { Target, FileSearch, ArrowRight, Zap } from "lucide-react"
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default async function AnalyzePage() {
   const supabase = await createClient()
@@ -68,6 +69,7 @@ export default async function AnalyzePage() {
                 </div>
               )) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-center p-4 border border-dashed border-glass-border rounded-[16px]">
+                  <Image src="/icon-192x192.png" alt="ClearPath OS Logo" width={48} height={48} className="opacity-20 mb-3 grayscale object-contain" />
                   <span className="text-[13px] text-muted-foreground">Queue is empty. Waiting for uploads.</span>
                 </div>
               )}

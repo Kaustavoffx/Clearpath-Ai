@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { Sparkles, ArrowRight, Play, CheckCircle2, FileText, Zap, ShieldCheck, UserCheck, Activity } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
@@ -51,6 +52,19 @@ export function Hero() {
         {/* LEFT 55% */}
         <div className="w-full lg:w-[55%] flex flex-col items-start text-left">
           
+          {/* Liquid Glass Orb Logo */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-24 h-24 mb-10 group"
+          >
+            <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl group-hover:bg-primary/40 group-hover:blur-2xl transition-all duration-700 animate-pulse-slow" />
+            <div className="relative w-full h-full rounded-full border border-glass-border/60 bg-glass-surface/40 backdrop-blur-2xl shadow-[0_0_30px_rgba(113,97,239,0.3)] flex items-center justify-center overflow-hidden p-2 group-hover:scale-105 transition-transform duration-500 group-hover:border-primary/50">
+               <Image src="/icon-192x192.png" alt="ClearPath OS Logo" width={80} height={80} className="object-contain drop-shadow-[0_0_10px_rgba(113,97,239,0.8)]" priority />
+            </div>
+          </motion.div>
+
           {/* Floating Badge */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}

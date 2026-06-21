@@ -1,6 +1,7 @@
 
 import { ChevronRight, Cpu, ShieldAlert, Zap, Globe, FileText, LayoutDashboard, Target } from "lucide-react"
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function AboutPage() {
   return (
@@ -8,10 +9,13 @@ export default function AboutPage() {
       
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-6 py-24 flex flex-col gap-24">
         
-        {/* Section 1: What is ClearPath OS */}
+        {/* Section 1: Why ClearPath OS */}
         <section className="flex flex-col items-center text-center max-w-3xl mx-auto pt-12 animate-fadeInUp">
+          <div className="w-24 h-24 mb-8 rounded-[20px] bg-primary/20 border border-primary/30 p-2 overflow-hidden shadow-twilight-glow flex items-center justify-center animate-breathe">
+             <Image src="/icon-192x192.png" alt="ClearPath OS Logo" width={80} height={80} className="object-contain drop-shadow-[0_0_10px_rgba(113,97,239,0.8)]" priority />
+          </div>
           <h1 className="text-display text-foreground font-semibold tracking-tight mb-6">
-            Opportunity Intelligence.
+            Why ClearPath OS
           </h1>
           <p className="text-xl text-muted-foreground leading-relaxed mb-8">
             ClearPath OS converts educational notices, scholarships, circulars, and government opportunities into personalized action plans in under 60 seconds.
