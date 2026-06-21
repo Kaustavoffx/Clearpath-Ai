@@ -54,14 +54,44 @@ export function Hero() {
           
           {/* Liquid Glass Orb Logo */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-24 h-24 mb-10 group"
+            className="relative w-[80px] h-[80px] md:w-[100px] md:h-[100px] lg:w-[120px] lg:h-[120px] mb-10 group rounded-full aspect-square"
           >
-            <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl group-hover:bg-primary/40 group-hover:blur-2xl transition-all duration-700 animate-pulse-slow" />
-            <div className="relative w-full h-full rounded-full border border-glass-border/60 bg-glass-surface/40 backdrop-blur-2xl shadow-[0_0_30px_rgba(113,97,239,0.3)] flex items-center justify-center overflow-hidden p-2 group-hover:scale-105 transition-transform duration-500 group-hover:border-primary/50">
-               <Image src="/icon-192x192.png" alt="ClearPath OS Logo" width={80} height={80} className="object-contain drop-shadow-[0_0_10px_rgba(113,97,239,0.8)]" priority />
+            <div className="relative w-full h-full rounded-full transition-transform duration-300 group-hover:scale-105 animate-cinematicFloat1">
+              
+              {/* Glow Layer */}
+              <div 
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{
+                  background: 'radial-gradient(circle, rgba(113,97,239,0.35) 0%, rgba(113,97,239,0.12) 45%, transparent 75%)'
+                }}
+              />
+              
+              {/* Glass Orb */}
+              <div 
+                className="relative w-full h-full rounded-full flex items-center justify-center overflow-hidden"
+                style={{
+                  background: 'rgba(11, 16, 32, 0.75)',
+                  backdropFilter: 'blur(24px)',
+                  WebkitBackdropFilter: 'blur(24px)',
+                  border: '1px solid rgba(139, 92, 246, 0.25)',
+                  boxShadow: '0 0 60px rgba(113, 97, 239, 0.25)'
+                }}
+              >
+                 <Image 
+                   src="/icon-192x192.png" 
+                   alt="ClearPath OS Logo" 
+                   fill
+                   sizes="(max-width: 768px) 80px, (max-width: 1024px) 100px, 120px"
+                   className="object-contain p-[15%] drop-shadow-[0_0_10px_rgba(113,97,239,0.8)]" 
+                   priority 
+                 />
+              </div>
+
+              {/* Hover Layer */}
+              <div className="absolute inset-0 rounded-full bg-white/0 group-hover:bg-white/5 transition-colors duration-300 pointer-events-none" />
             </div>
           </motion.div>
 

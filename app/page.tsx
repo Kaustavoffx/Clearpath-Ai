@@ -18,7 +18,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 w-full z-50 border-b border-glass-border bg-glass-surface/30" style={{ backdropFilter: 'blur(24px)' }}>
         <div className="container-wide h-[72px] flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-[12px] bg-primary/20 flex items-center justify-center transition-spring group-hover:scale-105 border border-primary/30 shadow-[0_0_20px_rgba(149,127,239,0.2)] overflow-hidden p-[2px]">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center transition-spring group-hover:scale-105 border border-primary/30 shadow-[0_0_20px_rgba(149,127,239,0.2)] overflow-hidden p-[2px]">
               <Image src="/icon-192x192.png" alt="ClearPath OS Logo" width={32} height={32} className="object-contain drop-shadow-[0_0_5px_rgba(113,97,239,0.8)]" priority />
             </div>
             <span className="font-semibold text-[18px] tracking-[-0.01em] text-foreground">ClearPath OS</span>

@@ -11,7 +11,7 @@ export default function AboutPage() {
         
         {/* Section 1: Why ClearPath OS */}
         <section className="flex flex-col items-center text-center max-w-3xl mx-auto pt-12 animate-fadeInUp">
-          <div className="w-24 h-24 mb-8 rounded-[20px] bg-primary/20 border border-primary/30 p-2 overflow-hidden shadow-twilight-glow flex items-center justify-center animate-breathe">
+          <div className="w-24 h-24 mb-8 rounded-full bg-primary/20 border border-primary/30 p-2 overflow-hidden shadow-twilight-glow flex items-center justify-center animate-breathe">
              <Image src="/icon-192x192.png" alt="ClearPath OS Logo" width={80} height={80} className="object-contain drop-shadow-[0_0_10px_rgba(113,97,239,0.8)]" priority />
           </div>
           <h1 className="text-display text-foreground font-semibold tracking-tight mb-6">

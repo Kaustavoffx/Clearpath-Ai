@@ -120,7 +120,7 @@ export function AppNavigation({ profile }: AppNavigationProps) {
           {/* Logo */}
           <div className="h-[60px] flex items-center mb-4">
             <div className="w-[72px] shrink-0 flex items-center justify-center">
-              <div className="h-9 w-9 rounded-[10px] bg-primary/20 border border-primary/40 flex items-center justify-center shadow-[0_0_15px_rgba(149,127,239,0.3)] overflow-hidden p-[2px]">
+              <div className="h-9 w-9 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center shadow-[0_0_15px_rgba(149,127,239,0.3)] overflow-hidden p-[2px]">
                 <Image src="/icon-192x192.png" alt="ClearPath OS Logo" width={32} height={32} className="object-contain drop-shadow-[0_0_8px_rgba(113,97,239,0.8)]" priority />
               </div>
             </div>
@@ -270,7 +270,7 @@ export function AppNavigation({ profile }: AppNavigationProps) {
             >
               <div className="p-6 flex justify-between items-center border-b border-glass-border">
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-[8px] bg-primary/20 border border-primary/50 flex items-center justify-center overflow-hidden p-[2px]">
+                  <div className="h-8 w-8 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center overflow-hidden p-[2px]">
                     <Image src="/icon-192x192.png" alt="ClearPath OS Logo" width={28} height={28} className="object-contain drop-shadow-[0_0_5px_rgba(113,97,239,0.8)]" />
                   </div>
                   <span className="font-bold tracking-tight text-lg text-foreground">ClearPath OS</span>

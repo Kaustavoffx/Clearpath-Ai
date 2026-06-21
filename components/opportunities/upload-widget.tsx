@@ -132,7 +132,7 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
       <div className="w-full flex flex-col items-center gap-6 py-10">
         <div className="relative w-24 h-24 mb-4">
           <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse-slow" />
-          <div className="relative w-full h-full rounded-[16px] bg-black/20 border border-primary/30 flex items-center justify-center overflow-hidden p-3 shadow-twilight-glow backdrop-blur-xl">
+          <div className="relative w-full h-full rounded-full bg-black/20 border border-primary/30 flex items-center justify-center overflow-hidden p-3 shadow-twilight-glow backdrop-blur-xl">
              <Image src="/icon-192x192.png" alt="ClearPath OS Loading" width={64} height={64} className="animate-breathe object-contain drop-shadow-[0_0_15px_rgba(113,97,239,0.8)]" priority />
           </div>
         </div>
