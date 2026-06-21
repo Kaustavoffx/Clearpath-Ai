@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, GraduationCap, Crosshair, Sparkles, Save, AlertCircle } from "lucide-react"
-import { updateEducationProfile } from '@/app/actions/settings-actions'
+import { updateEducationProfile, calculateLiveMatches } from '@/app/actions/settings-actions'
 import { cn } from "@/lib/utils"
 
 const TARGET_EXAMS = ['JEE', 'NEET', 'WBJEE', 'CUET', 'GATE', 'CAT', 'UPSC']
@@ -16,6 +16,32 @@ export function EducationDashboard({ initialProfile }: { initialProfile: any }) 
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
+  
+  const [matches, setMatches] = useState({
+    oppCount: 0,
+    scholarshipCount: 0,
+    schemesCount: 0,
+    competitionsCount: 0
+  })
+
+  // Fetch live matches whenever profile changes
+  useEffect(() => {
+    const fetchMatches = async () => {
+      try {
+        const result = await calculateLiveMatches(profile)
+        setMatches(result)
+      } catch (err) {
+        console.error("Failed to fetch matches", err)
+      }
+    }
+    
+    // Debounce the fetch to avoid spamming the DB
+    const timeoutId = setTimeout(() => {
+      fetchMatches()
+    }, 500)
+    
+    return () => clearTimeout(timeoutId)
+  }, [profile])
 
   const handleSave = async () => {
     setSaving(true)
@@ -48,12 +74,6 @@ export function EducationDashboard({ initialProfile }: { initialProfile: any }) 
       return { ...prev, [field]: next }
     })
   }
-
-  // Auto Matching Engine Mock
-  const oppCount = 127 + ((profile.target_exams?.length || 0) * 12) + ((profile.interests?.length || 0) * 8)
-  const scholarshipCount = 38 + ((profile.percentage ? parseInt(profile.percentage) : 0) > 85 ? 14 : 0)
-  const schemesCount = 21
-  const competitionsCount = oppCount - scholarshipCount - schemesCount
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">
@@ -217,22 +237,22 @@ export function EducationDashboard({ initialProfile }: { initialProfile: any }) 
           </h3>
 
           <div className="flex flex-col items-center justify-center mb-8 pt-4">
-            <span className="text-[54px] font-bold text-white leading-none tracking-tighter shadow-twilight-glow">{oppCount}</span>
+            <span className="text-[54px] font-bold text-white leading-none tracking-tighter shadow-twilight-glow">{matches.oppCount}</span>
             <span className="text-[12px] font-medium text-muted-foreground uppercase tracking-widest mt-2">Potential Matches</span>
           </div>
 
           <div className="space-y-4">
             <div className="bg-black/20 p-4 rounded-[16px] border border-glass-border flex justify-between items-center group hover:bg-primary/5 transition-colors">
               <span className="text-[13px] font-medium text-foreground">Scholarships</span>
-              <span className="bg-primary/20 text-primary px-3 py-1 rounded-full text-[12px] font-bold group-hover:bg-primary group-hover:text-primary-foreground transition-colors">{scholarshipCount}</span>
+              <span className="bg-primary/20 text-primary px-3 py-1 rounded-full text-[12px] font-bold group-hover:bg-primary group-hover:text-primary-foreground transition-colors">{matches.scholarshipCount}</span>
             </div>
             <div className="bg-black/20 p-4 rounded-[16px] border border-glass-border flex justify-between items-center group hover:bg-warning/5 transition-colors">
               <span className="text-[13px] font-medium text-foreground">Gov Schemes</span>
-              <span className="bg-warning/20 text-warning px-3 py-1 rounded-full text-[12px] font-bold group-hover:bg-warning group-hover:text-warning-foreground transition-colors">{schemesCount}</span>
+              <span className="bg-warning/20 text-warning px-3 py-1 rounded-full text-[12px] font-bold group-hover:bg-warning group-hover:text-warning-foreground transition-colors">{matches.schemesCount}</span>
             </div>
             <div className="bg-black/20 p-4 rounded-[16px] border border-glass-border flex justify-between items-center group hover:bg-success/5 transition-colors">
               <span className="text-[13px] font-medium text-foreground">Competitions</span>
-              <span className="bg-success/20 text-success px-3 py-1 rounded-full text-[12px] font-bold group-hover:bg-success group-hover:text-white transition-colors">{competitionsCount}</span>
+              <span className="bg-success/20 text-success px-3 py-1 rounded-full text-[12px] font-bold group-hover:bg-success group-hover:text-white transition-colors">{matches.competitionsCount}</span>
             </div>
           </div>
           

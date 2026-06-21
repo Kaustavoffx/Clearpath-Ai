@@ -13,6 +13,9 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
+  // Fetch profile
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+
   // Fetch opportunities
   const { data: opportunities } = await supabase
     .from('opportunities')
@@ -62,6 +65,7 @@ export default async function DashboardPage() {
         opportunities={opps} 
         stats={stats}
         tasks={opportunityTasks}
+        profile={profile}
       />
 
       {/* V4 DENSE DYNAMIC CARDS */}

@@ -1,20 +1,23 @@
 'use client'
 
 import { useState } from 'react'
-import { ShieldAlert, Key, Laptop, Smartphone, AlertCircle, Save, CheckCircle2 } from "lucide-react"
+import { ShieldAlert, Key, Laptop, Smartphone, AlertCircle, Save, CheckCircle2, Monitor } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { updateSecuritySettings } from '@/app/actions/settings-actions'
+import { createClient } from '@/lib/supabase/client'
 
-export function SecurityCenter({ initialSecurity }: { initialSecurity: any }) {
+export function SecurityCenter({ initialSecurity, initialSessions }: { initialSecurity: any, initialSessions: any[] }) {
   const [security, setSecurity] = useState(initialSecurity || {
     openai_key: '',
     gemini_key: '',
     deepgram_key: '',
   })
   
-  // Masked state: If the DB returned a key, we display '********' so we don't expose it.
+  const [sessions, setSessions] = useState<any[]>(initialSessions || [])
+  const supabase = createClient()
+
   const [keys, setKeys] = useState({
     openai_key: initialSecurity?.openai_key ? '********' : '',
     gemini_key: initialSecurity?.gemini_key ? '********' : '',
@@ -29,14 +32,11 @@ export function SecurityCenter({ initialSecurity }: { initialSecurity: any }) {
     setSaving(true)
     setError('')
     try {
-      // We only want to send the key if it was modified (i.e. not '********')
       const payload: any = {}
       if (keys.openai_key !== '********' && keys.openai_key !== '') payload.openai_key = keys.openai_key
       if (keys.gemini_key !== '********' && keys.gemini_key !== '') payload.gemini_key = keys.gemini_key
       if (keys.deepgram_key !== '********' && keys.deepgram_key !== '') payload.deepgram_key = keys.deepgram_key
 
-      // If they blanked it out, we might want to delete it, but let's assume blank means no change for now unless explicitly needed.
-      // If we actually want to clear it, we could check for an empty string if they edited it. Let's send empty strings if they cleared the field.
       if (keys.openai_key === '') payload.openai_key = null
       if (keys.gemini_key === '') payload.gemini_key = null
       if (keys.deepgram_key === '') payload.deepgram_key = null
@@ -44,7 +44,6 @@ export function SecurityCenter({ initialSecurity }: { initialSecurity: any }) {
       await updateSecuritySettings(payload)
       setSaved(true)
       
-      // Update local masked state after saving new keys
       setKeys(prev => ({
         openai_key: prev.openai_key && prev.openai_key !== '' ? '********' : '',
         gemini_key: prev.gemini_key && prev.gemini_key !== '' ? '********' : '',
@@ -57,6 +56,30 @@ export function SecurityCenter({ initialSecurity }: { initialSecurity: any }) {
     } finally {
       setSaving(false)
     }
+  }
+
+  const handleLogoutOtherDevices = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      
+      // Delete all sessions except the most recent one (mock logic for current session)
+      if (sessions.length > 0) {
+        const currentSessionId = sessions[0].id
+        await supabase.from('user_sessions').delete().eq('user_id', user.id).neq('id', currentSessionId)
+        setSessions(prev => prev.filter(s => s.id === currentSessionId))
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const getTimeAgo = (dateString: string) => {
+    const diff = Math.floor((new Date().getTime() - new Date(dateString).getTime()) / 1000)
+    if (diff < 60) return 'Just now'
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
+    return `${Math.floor(diff / 86400)}d ago`
   }
 
   return (
@@ -74,7 +97,7 @@ export function SecurityCenter({ initialSecurity }: { initialSecurity: any }) {
           <div className="flex items-center justify-between p-4 bg-glass-layer border border-glass-border rounded-[16px]">
             <div>
               <div className="text-[13px] font-medium text-foreground">Password Authentication</div>
-              <div className="text-[12px] text-muted-foreground mt-0.5">Last changed 4 months ago</div>
+              <div className="text-[12px] text-muted-foreground mt-0.5">Last changed 118 days ago</div>
             </div>
             <Button variant="outline" className="h-8 text-[12px] font-semibold border-glass-border">Change Password</Button>
           </div>
@@ -153,30 +176,34 @@ export function SecurityCenter({ initialSecurity }: { initialSecurity: any }) {
             </h3>
           
           <div className="space-y-4">
-            <div className="flex items-start gap-4 p-4 bg-primary/5 border border-primary/20 rounded-[16px]">
-              <Laptop className="w-6 h-6 text-primary shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <div className="text-[13px] font-medium text-foreground flex justify-between">
-                  <span>Chrome Desktop</span>
-                  <span className="text-[10px] uppercase tracking-widest font-bold text-success bg-success/20 px-2 py-0.5 rounded">Current</span>
+            {sessions.length > 0 ? sessions.map((session, index) => {
+              const isCurrent = index === 0; // Assuming newest is current
+              const Icon = session.device_name?.toLowerCase().includes('mobile') || session.os?.toLowerCase().includes('android') || session.os?.toLowerCase().includes('ios') ? Smartphone : Monitor;
+              return (
+                <div key={session.id} className={`flex items-start gap-4 p-4 ${isCurrent ? 'bg-primary/5 border-primary/20' : 'bg-glass-layer border-glass-border'} border rounded-[16px]`}>
+                  <Icon className={`w-6 h-6 ${isCurrent ? 'text-primary' : 'text-muted-foreground'} shrink-0 mt-0.5`} />
+                  <div className="flex-1">
+                    <div className="text-[13px] font-medium text-foreground flex justify-between">
+                      <span>{session.browser || 'Browser'} Desktop</span>
+                      {isCurrent && <span className="text-[10px] uppercase tracking-widest font-bold text-success bg-success/20 px-2 py-0.5 rounded">Current</span>}
+                    </div>
+                    <div className="text-[12px] text-muted-foreground mt-1">
+                      {session.os || 'OS'} • {isCurrent ? 'Active now' : `Last active ${getTimeAgo(session.last_active)}`}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-[12px] text-muted-foreground mt-1">Windows • Kolkata, India</div>
-              </div>
-            </div>
+              )
+            }) : (
+              <div className="text-center p-4 text-muted-foreground text-[13px]">No active sessions found.</div>
+            )}
             
-            <div className="flex items-start gap-4 p-4 bg-glass-layer border border-glass-border rounded-[16px]">
-              <Smartphone className="w-6 h-6 text-muted-foreground shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <div className="text-[13px] font-medium text-foreground">Android Phone</div>
-                <div className="text-[12px] text-muted-foreground mt-1">Android 14 • Last active 2h ago</div>
+            {sessions.length > 1 && (
+              <div className="pt-4">
+                <Button onClick={handleLogoutOtherDevices} variant="ghost" className="w-full text-danger hover:text-danger hover:bg-danger/10 border border-danger/20 text-[13px] font-semibold h-10 rounded-[12px]">
+                  Log Out All Other Devices
+                </Button>
               </div>
-            </div>
-            
-            <div className="pt-4">
-              <Button variant="ghost" className="w-full text-danger hover:text-danger hover:bg-danger/10 border border-danger/20 text-[13px] font-semibold h-10 rounded-[12px]">
-                Log Out All Other Devices
-              </Button>
-            </div>
+            )}
           </div>
         </div>
         </div>

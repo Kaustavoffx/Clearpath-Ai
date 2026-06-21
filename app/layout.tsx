@@ -5,6 +5,7 @@ import { Suspense } from 'react'
 import { ClearPathAmbientBackground } from '@/components/layout/clearpath-ambient-background'
 import { ThemeProvider } from "@/components/theme-provider"
 import { ResponsiveQA } from "@/components/qa/responsive-check"
+import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = {
   title: {
@@ -30,13 +31,30 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  let prefs = null;
+  if (user) {
+    const { data } = await supabase.from('user_preferences').select('*').eq('user_id', user.id).single()
+    prefs = data;
+  }
+
+  // Determine system appearance/theme
+  let theme = 'dark' // default
+  if (prefs?.appearance === 'Light') theme = 'light'
+  else if (prefs?.appearance === 'Neutral') theme = 'neutral'
+  
+  const motionClass = prefs?.reduce_motion ? 'reduce-motion' : '';
+  const densityClass = prefs?.workspace_mode === 'Compact Mode' ? 'density-compact' : 'density-detailed';
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${theme} ${motionClass} ${densityClass}`}>
       <head>
         {/* Ambient background manages its own rendering without heavy image preloads */}
       </head>
@@ -49,7 +67,7 @@ export default function RootLayout({
         >
           <div className="relative z-10 flex-1 flex flex-col w-full h-full">
             <Suspense fallback={null}>
-              <ClearPathAmbientBackground />
+              {!prefs?.reduce_motion && <ClearPathAmbientBackground />}
             </Suspense>
             {children}
             <Suspense fallback={null}>

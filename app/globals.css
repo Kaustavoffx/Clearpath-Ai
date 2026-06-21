@@ -590,3 +590,32 @@ html {
   0%, 100% { transform: scaleY(0.4); }
   50% { transform: scaleY(1); }
 }
+
+/* -------------------------------------------------------------------------- */
+/* GLOBAL PREFERENCES MODIFIERS                                               */
+/* -------------------------------------------------------------------------- */
+
+.reduce-motion * {
+  transition: none !important;
+  animation: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+.reduce-motion .ambient-background,
+.reduce-motion .particle-layer,
+.reduce-motion .card-glow {
+  display: none !important;
+}
+
+.density-compact .card-wrapper {
+  gap: 12px !important;
+}
+
+.density-compact .liquid-glass-card {
+  padding: 16px !important;
+}
+
+.density-compact .gap-6, .density-compact .gap-8 {
+  gap: 16px !important;
+}

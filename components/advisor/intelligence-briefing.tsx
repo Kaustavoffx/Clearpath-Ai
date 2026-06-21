@@ -6,9 +6,10 @@ interface IntelligenceBriefingProps {
   opportunities: any[];
   stats: any;
   tasks: any[];
+  profile?: any;
 }
 
-export function IntelligenceBriefing({ opportunities, stats, tasks }: IntelligenceBriefingProps) {
+export function IntelligenceBriefing({ opportunities, stats, tasks, profile }: IntelligenceBriefingProps) {
   // Find top priority opportunity
   const topPriority = opportunities.length > 0 
     ? [...opportunities].sort((a, b) => (b.priority_score || 0) - (a.priority_score || 0))[0] 
@@ -30,7 +31,7 @@ export function IntelligenceBriefing({ opportunities, stats, tasks }: Intelligen
   if (!topPriority) {
     return (
       <div className="w-full h-[180px] decision-surface p-6 flex flex-col justify-center items-center text-center">
-        <h3 className="text-[20px] font-medium text-foreground mb-2">Welcome to ClearPath OS</h3>
+        <h3 className="text-[20px] font-medium text-foreground mb-2">Welcome to ClearPath OS{profile?.first_name ? `, ${profile.first_name}` : ''}</h3>
         <p className="text-[14px] text-muted-foreground">Upload a document to generate your first intelligence briefing.</p>
       </div>
     );

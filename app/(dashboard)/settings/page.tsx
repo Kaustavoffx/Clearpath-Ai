@@ -19,11 +19,13 @@ export default async function SettingsPage() {
   const [
     { data: preferences },
     { data: security },
-    { data: usage }
+    { data: usage },
+    { data: sessions }
   ] = await Promise.all([
     supabase.from('user_preferences').select('*').eq('user_id', user.id).single(),
     supabase.from('user_security_settings').select('*').eq('user_id', user.id).single(),
-    supabase.from('user_usage_metrics').select('*').eq('user_id', user.id).single()
+    supabase.from('user_usage_metrics').select('*').eq('user_id', user.id).single(),
+    supabase.from('user_sessions').select('*').eq('user_id', user.id).order('last_active', { ascending: false })
   ])
 
   return (
@@ -53,7 +55,7 @@ export default async function SettingsPage() {
             </TabsContent>
 
             <TabsContent value="security" className="outline-none animate-in fade-in duration-500 m-0">
-               <SecurityCenter initialSecurity={security} />
+               <SecurityCenter initialSecurity={security} initialSessions={sessions || []} />
             </TabsContent>
 
             <TabsContent value="usage" className="outline-none animate-in fade-in duration-500 m-0">
