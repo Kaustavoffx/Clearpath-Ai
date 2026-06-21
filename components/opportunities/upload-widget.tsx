@@ -159,24 +159,27 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
         </button>
       </div>
 
-      <div className="mb-8">
-        <h3 className="text-[14px] font-medium uppercase tracking-wider text-muted-foreground mb-4">Supported Documents</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="flex flex-col items-center gap-2 p-3 rounded-[12px] bg-primary/5 border border-primary/10 text-center">
-            <GraduationCap className="w-6 h-6 text-primary" />
-            <span className="text-[12px] font-medium text-foreground">Scholarship Notice</span>
+      <div className="mb-8 bg-glass-layer/30 p-5 rounded-[16px] border border-glass-border shadow-sm">
+        <h3 className="text-[14px] font-semibold text-foreground mb-4 flex items-center gap-2">
+          <FileText className="w-4 h-4 text-primary" /> Supported Inputs
+        </h3>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="flex flex-col gap-1 p-3 rounded-[12px] bg-black/20 border border-glass-border">
+            <span className="text-[12px] uppercase text-muted-foreground tracking-wider font-semibold">Formats</span>
+            <span className="text-[13px] text-foreground font-medium">PDF, PNG, JPG</span>
           </div>
-          <div className="flex flex-col items-center gap-2 p-3 rounded-[12px] bg-success/5 border border-success/10 text-center">
-            <Banknote className="w-6 h-6 text-success" />
-            <span className="text-[12px] font-medium text-foreground">Govt Scheme</span>
+          <div className="flex flex-col gap-1 p-3 rounded-[12px] bg-black/20 border border-glass-border">
+            <span className="text-[12px] uppercase text-muted-foreground tracking-wider font-semibold">Max Size</span>
+            <span className="text-[13px] text-foreground font-medium">10 MB per file</span>
           </div>
-          <div className="flex flex-col items-center gap-2 p-3 rounded-[12px] bg-warning/5 border border-warning/10 text-center">
-            <School className="w-6 h-6 text-warning" />
-            <span className="text-[12px] font-medium text-foreground">School Circular</span>
+          <div className="flex flex-col gap-1 p-3 rounded-[12px] bg-black/20 border border-glass-border">
+            <span className="text-[12px] uppercase text-muted-foreground tracking-wider font-semibold">Web Links</span>
+            <span className="text-[13px] text-foreground font-medium">Public URLs, Govt portals</span>
           </div>
-          <div className="flex flex-col items-center gap-2 p-3 rounded-[12px] bg-info/5 border border-info/10 text-center">
-            <FileText className="w-6 h-6 text-info" />
-            <span className="text-[12px] font-medium text-foreground">Support Program</span>
+          <div className="flex flex-col gap-1 p-3 rounded-[12px] bg-danger/10 border border-danger/20">
+            <span className="text-[12px] uppercase text-danger/80 tracking-wider font-semibold">Unsupported</span>
+            <span className="text-[13px] text-danger font-medium">Logins, Passwords, Paywalls</span>
           </div>
         </div>
       </div>
@@ -188,8 +191,8 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
                 <input {...getInputProps()} />
                 <div
                   className={cn(
-                    "animate-in fade-in zoom-in-95 duration-300 border-2 border-dashed rounded-[24px] p-16 flex flex-col items-center justify-center text-center cursor-pointer transition-spring w-full",
-                    isDragActive ? "border-primary bg-primary/5 scale-[1.02]" : "border-glass-border bg-glass-surface/30 hover:bg-glass-surface/50 hover:border-foreground/30"
+                    "animate-in fade-in zoom-in-95 duration-300 border-2 border-dashed rounded-[24px] p-16 flex flex-col items-center justify-center text-center cursor-pointer transition-spring w-full relative overflow-hidden",
+                    isDragActive ? "border-primary bg-primary/5 scale-[1.02] shadow-[0_0_30px_rgba(var(--primary-rgb),0.2)]" : "border-glass-border bg-glass-surface/30 hover:bg-glass-surface/50 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.1)]"
                   )}
                 >
                   <div className="w-20 h-20 rounded-[20px] bg-background border border-glass-border shadow-glass-card flex items-center justify-center mb-6 text-primary">
@@ -242,6 +245,10 @@ export function UploadWidget({ onUploadComplete }: UploadWidgetProps = {}) {
                   onChange={(e) => setUrl(e.target.value)}
                 />
               </div>
+              <p className="text-[13px] text-muted-foreground px-2 flex items-center gap-2 mt-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-info shrink-0" />
+                Ensure the URL is publicly accessible. Pages behind logins cannot be analyzed.
+              </p>
             </div>
           )}
 
