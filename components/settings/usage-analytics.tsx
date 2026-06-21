@@ -26,8 +26,10 @@ export function UsageAnalytics({ initialUsage }: { initialUsage: any }) {
     <div className="flex flex-col gap-6 max-w-5xl">
 
       {/* PLAN HEADER */}
-      <div className="cinematic-glass-card p-8 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/20 rounded-full blur-[80px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      <div className="card-wrapper group/card-wrapper">
+        <div className="card-glow rounded-[24px]" />
+        <div className="cinematic-glass-card p-8 overflow-hidden relative rounded-[24px]">
+          <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/20 rounded-full blur-[80px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
           <div>
@@ -45,13 +47,16 @@ export function UsageAnalytics({ initialUsage }: { initialUsage: any }) {
             <div className="text-[11px] text-muted-foreground text-center">Limits reset on July 1st</div>
           </div>
         </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-3 overflow-visible">
         
         {/* USAGE LIMITS */}
-        <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border">
-          <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6">
+        <div className="card-wrapper group/card-wrapper">
+          <div className="card-glow rounded-[24px]" />
+          <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border">
+            <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6">
             <Activity className="w-5 h-5 text-primary" /> Quotas & Limits
           </h3>
 
@@ -76,27 +81,36 @@ export function UsageAnalytics({ initialUsage }: { initialUsage: any }) {
               </div>
             </div>
           </div>
+          </div>
         </div>
 
         {/* METRICS GRID */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="liquid-glass-card p-6 border border-glass-border rounded-[20px] flex flex-col justify-center">
+        <div className="grid grid-cols-2 gap-8 p-3 overflow-visible">
+          <div className="card-wrapper group/card-wrapper">
+            <div className="card-glow rounded-[20px]" />
+            <div className="liquid-glass-card p-6 border border-glass-border rounded-[20px] flex flex-col justify-center h-full">
             <Zap className="w-6 h-6 text-warning mb-3" />
             <div className="text-[28px] font-bold text-foreground leading-none">{usage.opportunities_generated}</div>
             <div className="text-[11px] uppercase tracking-widest font-semibold text-muted-foreground mt-2">Opportunities Generated</div>
+            </div>
           </div>
-          <div className="liquid-glass-card p-6 border border-glass-border rounded-[20px] flex flex-col justify-center">
+          <div className="card-wrapper group/card-wrapper">
+            <div className="card-glow rounded-[20px]" />
+            <div className="liquid-glass-card p-6 border border-glass-border rounded-[20px] flex flex-col justify-center h-full">
             <CheckCircle2 className="w-6 h-6 text-success mb-3" />
             <div className="text-[28px] font-bold text-foreground leading-none">{usage.readiness_tasks_completed} / {usage.readiness_tasks_total}</div>
             <div className="text-[11px] uppercase tracking-widest font-semibold text-muted-foreground mt-2">Tasks Completed</div>
+            </div>
           </div>
         </div>
 
       </div>
 
       {/* AI COMPUTE BREAKDOWN */}
-      <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border">
-        <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6">
+      <div className="card-wrapper group/card-wrapper">
+        <div className="card-glow rounded-[24px]" />
+        <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border">
+          <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6">
           <Cpu className="w-5 h-5 text-soft-periwinkle" /> Hardware & Compute Usage
         </h3>
         
@@ -114,7 +128,8 @@ export function UsageAnalytics({ initialUsage }: { initialUsage: any }) {
             <div className="text-[24px] font-bold text-foreground">{usage.deepgram_calls}</div>
           </div>
         </div>
-      </div>
+          </div>
+        </div>
 
     </div>
   )

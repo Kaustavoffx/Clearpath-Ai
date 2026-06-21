@@ -25,7 +25,9 @@ export function ProfileForm() {
   }
 
   return (
-    <div className="liquid-glass-card overflow-hidden">
+    <div className="card-wrapper group/card-wrapper">
+      <div className="card-glow rounded-[20px]" />
+      <div className="liquid-glass-card overflow-hidden rounded-[20px]">
       <div className="p-7">
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 border-b border-glass-border pb-6 mb-6">
           <div className="h-16 w-16 shrink-0 rounded-full bg-[#071225] border border-glass-border flex items-center justify-center relative">
@@ -109,6 +111,7 @@ export function ProfileForm() {
         <Button onClick={handleSave} className="h-10 px-6 rounded-xl font-medium text-[14px]">
           Save AI Context
         </Button>
+      </div>
       </div>
     </div>
   )

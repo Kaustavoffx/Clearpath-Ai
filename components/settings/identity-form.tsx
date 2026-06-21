@@ -34,8 +34,10 @@ export function IdentityForm({ initialProfile }: { initialProfile: any }) {
   return (
     <div className="flex flex-col gap-8">
       {/* PERSONAL PROFILE */}
-      <div className="liquid-glass-card overflow-hidden">
-        <div className="p-7">
+      <div className="card-wrapper group/card-wrapper">
+        <div className="card-glow rounded-[20px]" />
+        <div className="liquid-glass-card overflow-hidden rounded-[20px]">
+          <div className="p-7">
           <div className="flex flex-col sm:flex-row sm:items-center gap-5 border-b border-glass-border pb-6 mb-6">
             <div className="h-16 w-16 shrink-0 rounded-full bg-[#071225] border border-glass-border flex items-center justify-center relative overflow-hidden group">
               {profile.avatar_url ? (
@@ -98,11 +100,14 @@ export function IdentityForm({ initialProfile }: { initialProfile: any }) {
             </div>
           </div>
         </div>
+        </div>
       </div>
 
       {/* STUDENT PROFILE */}
-      <div className="liquid-glass-card overflow-hidden">
-        <div className="p-7">
+      <div className="card-wrapper group/card-wrapper">
+        <div className="card-glow rounded-[20px]" />
+        <div className="liquid-glass-card overflow-hidden rounded-[20px]">
+          <div className="p-7">
           <div className="flex flex-col sm:flex-row sm:items-center gap-5 border-b border-glass-border pb-6 mb-6">
             <div className="h-12 w-12 shrink-0 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
               <Building className="h-6 w-6 text-primary" />
@@ -154,11 +159,14 @@ export function IdentityForm({ initialProfile }: { initialProfile: any }) {
             </div>
           </div>
         </div>
+        </div>
       </div>
 
       {/* OPPORTUNITY CONTEXT */}
-      <div className="liquid-glass-card overflow-hidden">
-        <div className="p-7">
+      <div className="card-wrapper group/card-wrapper">
+        <div className="card-glow rounded-[20px]" />
+        <div className="liquid-glass-card overflow-hidden rounded-[20px]">
+          <div className="p-7">
           <div className="flex flex-col sm:flex-row sm:items-center gap-5 border-b border-glass-border pb-6 mb-6">
             <div className="h-12 w-12 shrink-0 rounded-xl bg-warning/10 border border-warning/20 flex items-center justify-center">
               <Landmark className="h-6 w-6 text-warning" />
@@ -246,14 +254,20 @@ export function IdentityForm({ initialProfile }: { initialProfile: any }) {
             </div>
           </div>
         </div>
+        </div>
       </div>
 
-      <div className="sticky bottom-6 z-10 liquid-glass-card px-7 py-5 flex justify-end items-center gap-4 border border-glass-border shadow-twilight-glow">
+      <div className="sticky bottom-6 z-20">
+        <div className="card-wrapper group/card-wrapper">
+          <div className="card-glow rounded-[20px]" />
+          <div className="liquid-glass-card px-7 py-5 flex justify-end items-center gap-4 border border-glass-border shadow-twilight-glow rounded-[20px]">
         {error && <span className="text-danger text-[13px] font-medium flex items-center gap-1.5"><AlertCircle className="w-4 h-4" /> {error}</span>}
         {saved && <span className="text-success text-[13px] font-medium flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> Changes Applied</span>}
         <Button onClick={handleSave} disabled={saving} className="btn-twilight h-10 px-8 rounded-xl font-medium text-[14px] flex items-center gap-2">
           {saving ? 'Synchronizing...' : <><Save className="w-4 h-4" /> Save Identity State</>}
         </Button>
+        </div>
+        </div>
       </div>
     </div>
   )

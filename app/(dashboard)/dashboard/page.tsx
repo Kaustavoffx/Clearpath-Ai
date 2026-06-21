@@ -65,36 +65,54 @@ export default async function DashboardPage() {
       />
 
       {/* V4 DENSE DYNAMIC CARDS */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-3">
-        <div className="liquid-glass-card p-3 sm:p-4 rounded-[12px] sm:rounded-[16px] flex flex-col gap-1">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 p-3 overflow-visible">
+        <div className="card-wrapper group/card-wrapper h-full">
+          <div className="card-glow rounded-[16px]" />
+          <div className="liquid-glass-card p-3 sm:p-4 rounded-[12px] sm:rounded-[16px] flex flex-col gap-1 h-full">
           <Activity className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary mb-1" />
           <div className="text-xl sm:text-2xl font-semibold text-foreground tracking-tight leading-none">{stats.activeCount}</div>
           <div className="text-[9px] sm:text-[10px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5 sm:mt-1">Active Plans</div>
+          </div>
         </div>
-        <div className="liquid-glass-card p-3 sm:p-4 rounded-[12px] sm:rounded-[16px] flex flex-col gap-1">
+        <div className="card-wrapper group/card-wrapper h-full">
+          <div className="card-glow rounded-[16px]" />
+          <div className="liquid-glass-card p-3 sm:p-4 rounded-[12px] sm:rounded-[16px] flex flex-col gap-1 h-full">
           <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-danger mb-1" />
           <div className="text-xl sm:text-2xl font-semibold text-danger tracking-tight leading-none">{stats.urgentDeadlinesCount}</div>
           <div className="text-[9px] sm:text-[10px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5 sm:mt-1">Urgent Deadlines</div>
+          </div>
         </div>
-        <div className="liquid-glass-card p-3 sm:p-4 rounded-[12px] sm:rounded-[16px] flex flex-col gap-1">
+        <div className="card-wrapper group/card-wrapper h-full">
+          <div className="card-glow rounded-[16px]" />
+          <div className="liquid-glass-card p-3 sm:p-4 rounded-[12px] sm:rounded-[16px] flex flex-col gap-1 h-full">
           <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-warning mb-1" />
           <div className="text-xl sm:text-2xl font-semibold text-warning tracking-tight leading-none">{stats.missingDocsCount}</div>
           <div className="text-[9px] sm:text-[10px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5 sm:mt-1">Missing Docs</div>
+          </div>
         </div>
-        <div className="liquid-glass-card p-3 sm:p-4 rounded-[12px] sm:rounded-[16px] flex flex-col gap-1">
+        <div className="card-wrapper group/card-wrapper h-full">
+          <div className="card-glow rounded-[16px]" />
+          <div className="liquid-glass-card p-3 sm:p-4 rounded-[12px] sm:rounded-[16px] flex flex-col gap-1 h-full">
           <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-success mb-1" />
           <div className="text-xl sm:text-2xl font-semibold text-success tracking-tight leading-none">₹{stats.potentialFundingTotal.toLocaleString()}</div>
           <div className="text-[9px] sm:text-[10px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5 sm:mt-1">Funding Value</div>
+          </div>
         </div>
-        <div className="liquid-glass-card p-3 sm:p-4 rounded-[12px] sm:rounded-[16px] flex flex-col gap-1">
+        <div className="card-wrapper group/card-wrapper h-full">
+          <div className="card-glow rounded-[16px]" />
+          <div className="liquid-glass-card p-3 sm:p-4 rounded-[12px] sm:rounded-[16px] flex flex-col gap-1 h-full">
           <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-foreground mb-1" />
           <div className="text-xl sm:text-2xl font-semibold text-foreground tracking-tight leading-none">{stats.completedCount}</div>
           <div className="text-[9px] sm:text-[10px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5 sm:mt-1">Completed</div>
+          </div>
         </div>
-        <div className="liquid-glass-card p-3 sm:p-4 rounded-[12px] sm:rounded-[16px] flex flex-col gap-1 bg-success/5 border-success/20">
+        <div className="card-wrapper group/card-wrapper h-full">
+          <div className="card-glow rounded-[16px]" />
+          <div className="liquid-glass-card p-3 sm:p-4 rounded-[12px] sm:rounded-[16px] flex flex-col gap-1 bg-success/5 border-success/20 h-full">
           <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-success mb-1" />
           <div className="text-xl sm:text-2xl font-semibold text-success tracking-tight leading-none">{stats.readyToSubmitCount}</div>
           <div className="text-[9px] sm:text-[10px] uppercase font-bold text-success/80 tracking-widest mt-0.5 sm:mt-1">Ready to Submit</div>
+          </div>
         </div>
       </div>
 
@@ -102,7 +120,9 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
         
         {/* Left Column: Priority Preview */}
-        <div className="lg:col-span-2 liquid-glass-card rounded-[24px] p-5 flex flex-col">
+        <div className="lg:col-span-2 card-wrapper group/card-wrapper h-full">
+          <div className="card-glow rounded-[24px]" />
+          <div className="liquid-glass-card rounded-[24px] p-5 flex flex-col h-full">
           <div className="flex items-center justify-between mb-4 shrink-0">
             <h2 className="text-[16px] font-semibold text-foreground flex items-center gap-2">
               <Target className="w-4 h-4 text-primary" /> Priority Workspace
@@ -139,10 +159,13 @@ export default async function DashboardPage() {
             )}
           </div>
         </div>
+        </div>
 
         {/* Right Column: Activity Feed & System */}
         <div className="flex flex-col gap-6 min-h-0">
-          <div className="liquid-glass-card rounded-[24px] p-5 shrink-0">
+          <div className="card-wrapper group/card-wrapper shrink-0">
+            <div className="card-glow rounded-[24px]" />
+            <div className="liquid-glass-card rounded-[24px] p-5">
             <h2 className="text-[14px] font-semibold mb-3 text-foreground">System Status</h2>
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
@@ -163,8 +186,11 @@ export default async function DashboardPage() {
               </div>
             </div>
           </div>
+          </div>
           
-          <div className="liquid-glass-card rounded-[24px] p-5 flex-1 flex flex-col min-h-0">
+          <div className="card-wrapper group/card-wrapper flex-1 flex flex-col min-h-0">
+            <div className="card-glow rounded-[24px]" />
+            <div className="liquid-glass-card rounded-[24px] p-5 flex-1 flex flex-col min-h-0">
             <h2 className="text-[14px] font-semibold mb-3 text-foreground shrink-0">Recent Activity</h2>
             <div className="flex-1 overflow-y-auto scrollbar-none pr-2 space-y-3 border-l border-glass-border pl-3">
               {globalActivities.length > 0 ? globalActivities.map((act) => (
@@ -177,6 +203,7 @@ export default async function DashboardPage() {
                 <div className="text-muted-foreground text-[12px] italic">No recent activity.</div>
               )}
             </div>
+          </div>
           </div>
         </div>
       </div>

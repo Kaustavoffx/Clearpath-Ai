@@ -63,10 +63,12 @@ export function SecurityCenter({ initialSecurity }: { initialSecurity: any }) {
     <div className="flex flex-col gap-6 max-w-4xl">
 
       {/* ACCOUNT SECURITY */}
-      <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border">
-        <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6">
-          <ShieldAlert className="w-5 h-5 text-warning" /> Account Security
-        </h3>
+      <div className="card-wrapper group/card-wrapper">
+        <div className="card-glow rounded-[24px]" />
+        <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border">
+          <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6">
+            <ShieldAlert className="w-5 h-5 text-warning" /> Account Security
+          </h3>
         
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-glass-layer border border-glass-border rounded-[16px]">
@@ -85,15 +87,18 @@ export function SecurityCenter({ initialSecurity }: { initialSecurity: any }) {
             <Button variant="outline" className="h-8 text-[12px] font-semibold border-glass-border">Enable 2FA</Button>
           </div>
         </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-3 overflow-visible">
         
         {/* API SECURITY */}
-        <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border flex flex-col h-full">
-          <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6 shrink-0">
-            <Key className="w-5 h-5 text-success" /> API Key Management
-          </h3>
+        <div className="card-wrapper group/card-wrapper h-full">
+          <div className="card-glow rounded-[24px]" />
+          <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border flex flex-col h-full">
+            <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6 shrink-0">
+              <Key className="w-5 h-5 text-success" /> API Key Management
+            </h3>
           <p className="text-[12px] text-muted-foreground mb-6">
             Provide your own API keys to bypass the Free Plan limits. Keys are encrypted at rest and never exposed.
           </p>
@@ -136,13 +141,16 @@ export function SecurityCenter({ initialSecurity }: { initialSecurity: any }) {
               {saving ? 'Encrypting...' : 'Save Keys securely'}
             </Button>
           </div>
-        </div>
+          </div>
+          </div>
 
         {/* ACTIVE SESSIONS */}
-        <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border h-full">
-          <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6">
-            <Laptop className="w-5 h-5 text-primary" /> Active Sessions
-          </h3>
+        <div className="card-wrapper group/card-wrapper h-full">
+          <div className="card-glow rounded-[24px]" />
+          <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border h-full">
+            <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6">
+              <Laptop className="w-5 h-5 text-primary" /> Active Sessions
+            </h3>
           
           <div className="space-y-4">
             <div className="flex items-start gap-4 p-4 bg-primary/5 border border-primary/20 rounded-[16px]">
@@ -170,6 +178,7 @@ export function SecurityCenter({ initialSecurity }: { initialSecurity: any }) {
               </Button>
             </div>
           </div>
+        </div>
         </div>
       </div>
 

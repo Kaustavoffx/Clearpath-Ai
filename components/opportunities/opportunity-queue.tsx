@@ -130,10 +130,12 @@ export function OpportunityQueue({ initialOpportunities }: { initialOpportunitie
                     transform: `translateY(${virtualRow.start}px)`
                   }}
                   className={cn(
-                    "liquid-glass-card p-3 md:p-6 flex flex-row gap-3 md:gap-6 items-center group overflow-hidden transition-all duration-300",
-                    isDragging ? "opacity-50 scale-95 shadow-none" : "hover:scale-[1.01]"
+                    "card-wrapper group/card-wrapper p-0 transition-all duration-300",
+                    isDragging ? "opacity-50 scale-95 shadow-none" : "hover:-translate-y-1"
                   )}
                 >
+                  <div className="card-glow rounded-[20px]" />
+                  <div className="liquid-glass-card h-full p-3 md:p-6 flex flex-row gap-3 md:gap-6 items-center group overflow-hidden rounded-[20px]">
                   <div className="flex flex-col items-center justify-center shrink-0 w-10 md:w-16 h-full border-r border-glass-border pr-3 md:pr-6 cursor-grab active:cursor-grabbing">
                     <GripVertical className="w-3 h-3 md:w-5 md:h-5 text-muted-foreground/30 mb-1 md:mb-2 group-hover:text-foreground transition-colors" />
                     <div className="text-sm md:text-3xl font-black text-glass-border group-hover:text-primary transition-colors">#{index + 1}</div>
@@ -208,13 +210,16 @@ export function OpportunityQueue({ initialOpportunities }: { initialOpportunitie
                       <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
                     </Link>
                   </div>
+                  </div>
                 </div>
               )
             })}
           </div>
         </div>
       ) : (
-        <div className="liquid-glass-card border-dashed border-glass-border p-[80px] flex flex-col items-center justify-center text-center">
+        <div className="card-wrapper group/card-wrapper">
+          <div className="card-glow rounded-[24px]" />
+          <div className="liquid-glass-card border-dashed border-glass-border p-[80px] flex flex-col items-center justify-center text-center rounded-[24px]">
           <div className="w-[80px] h-[80px] rounded-[24px] bg-primary/10 border border-primary/20 shadow-twilight-glow flex items-center justify-center mb-8">
             <FileText className="w-10 h-10 text-primary" />
           </div>
@@ -222,6 +227,7 @@ export function OpportunityQueue({ initialOpportunities }: { initialOpportunitie
           <p className="text-body-text mb-8 max-w-[500px]">
             Upload a document to generate your first action plan.
           </p>
+        </div>
         </div>
       )}
 

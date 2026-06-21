@@ -47,7 +47,9 @@ export function PreferencesPanel({ initialPreferences }: { initialPreferences: a
     <div className="flex flex-col gap-6 max-w-4xl">
       
       {/* APPEARANCE */}
-      <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border">
+      <div className="card-wrapper group/card-wrapper">
+        <div className="card-glow rounded-[24px]" />
+        <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border">
         <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6">
           <Monitor className="w-5 h-5 text-primary" /> System Appearance
         </h3>
@@ -74,12 +76,15 @@ export function PreferencesPanel({ initialPreferences }: { initialPreferences: a
             </button>
           ))}
         </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-3 overflow-visible">
         
         {/* NOTIFICATION CENTER */}
-        <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border">
+        <div className="card-wrapper group/card-wrapper h-full">
+          <div className="card-glow rounded-[24px]" />
+          <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border h-full">
           <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6">
             <Bell className="w-5 h-5 text-warning" /> Notification Center
           </h3>
@@ -111,11 +116,14 @@ export function PreferencesPanel({ initialPreferences }: { initialPreferences: a
               </div>
             ))}
           </div>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-8">
           {/* AI SETTINGS */}
-          <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border">
+          <div className="card-wrapper group/card-wrapper">
+            <div className="card-glow rounded-[24px]" />
+            <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border">
             <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6">
               <Zap className="w-5 h-5 text-success" /> AI Engine Routing
             </h3>
@@ -149,10 +157,13 @@ export function PreferencesPanel({ initialPreferences }: { initialPreferences: a
                 </button>
               ))}
             </div>
+            </div>
           </div>
 
           {/* WORKSPACE & ACCESSIBILITY */}
-          <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border">
+          <div className="card-wrapper group/card-wrapper">
+            <div className="card-glow rounded-[24px]" />
+            <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border">
             <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6">
               <SettingsIcon className="w-5 h-5 text-primary" /> Workspace Accessibility
             </h3>
@@ -185,17 +196,21 @@ export function PreferencesPanel({ initialPreferences }: { initialPreferences: a
                 </button>
               </div>
             </div>
+            </div>
           </div>
         </div>
 
       </div>
 
-      <div className="liquid-glass-card px-7 py-5 flex justify-end items-center gap-4">
+      <div className="card-wrapper group/card-wrapper">
+        <div className="card-glow rounded-[20px]" />
+        <div className="liquid-glass-card px-7 py-5 flex justify-end items-center gap-4 rounded-[20px]">
         {error && <span className="text-danger text-[13px] font-medium flex items-center gap-1.5"><AlertCircle className="w-4 h-4" /> {error}</span>}
         {saved && <span className="text-success text-[13px] font-medium flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> Preferences Updated</span>}
         <Button onClick={handleSave} disabled={saving} className="btn-twilight h-10 px-8 rounded-xl font-medium text-[14px] flex items-center gap-2">
           {saving ? 'Syncing...' : <><Save className="w-4 h-4" /> Save Preferences</>}
         </Button>
+      </div>
       </div>
 
     </div>

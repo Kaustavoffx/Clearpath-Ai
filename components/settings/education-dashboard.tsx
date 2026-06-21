@@ -62,7 +62,9 @@ export function EducationDashboard({ initialProfile }: { initialProfile: any }) 
       <div className="flex-1 flex flex-col gap-8">
         
         {/* ACADEMIC PROFILE */}
-        <div className="liquid-glass-card overflow-hidden">
+        <div className="card-wrapper group/card-wrapper">
+          <div className="card-glow rounded-[20px]" />
+          <div className="liquid-glass-card overflow-hidden rounded-[20px]">
           <div className="p-7">
             <div className="flex items-center gap-4 mb-6">
               <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
@@ -110,10 +112,13 @@ export function EducationDashboard({ initialProfile }: { initialProfile: any }) 
               </div>
             </div>
           </div>
+          </div>
         </div>
 
         {/* TARGET EXAMS */}
-        <div className="liquid-glass-card overflow-hidden">
+        <div className="card-wrapper group/card-wrapper">
+          <div className="card-glow rounded-[20px]" />
+          <div className="liquid-glass-card overflow-hidden rounded-[20px]">
           <div className="p-7">
             <div className="flex items-center gap-4 mb-6">
               <div className="h-10 w-10 rounded-lg bg-danger/10 border border-danger/20 flex items-center justify-center">
@@ -145,10 +150,13 @@ export function EducationDashboard({ initialProfile }: { initialProfile: any }) 
               })}
             </div>
           </div>
+          </div>
         </div>
 
         {/* INTERESTS */}
-        <div className="liquid-glass-card overflow-hidden">
+        <div className="card-wrapper group/card-wrapper">
+          <div className="card-glow rounded-[20px]" />
+          <div className="liquid-glass-card overflow-hidden rounded-[20px]">
           <div className="p-7">
             <div className="flex items-center gap-4 mb-6">
               <div className="h-10 w-10 rounded-lg bg-success/10 border border-success/20 flex items-center justify-center">
@@ -180,22 +188,28 @@ export function EducationDashboard({ initialProfile }: { initialProfile: any }) 
               })}
             </div>
           </div>
+          </div>
         </div>
 
         {/* ACTION BAR */}
-        <div className="liquid-glass-card px-7 py-5 flex justify-end items-center gap-4">
+        <div className="card-wrapper group/card-wrapper">
+          <div className="card-glow rounded-[20px]" />
+          <div className="liquid-glass-card px-7 py-5 flex justify-end items-center gap-4 rounded-[20px]">
           {error && <span className="text-danger text-[13px] font-medium flex items-center gap-1.5"><AlertCircle className="w-4 h-4" /> {error}</span>}
           {saved && <span className="text-success text-[13px] font-medium flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> Updated</span>}
           <Button onClick={handleSave} disabled={saving} className="btn-twilight h-10 px-8 rounded-xl font-medium text-[14px] flex items-center gap-2">
             {saving ? 'Syncing...' : <><Save className="w-4 h-4" /> Save Education Profile</>}
           </Button>
         </div>
+        </div>
 
       </div>
 
       {/* RIGHT COLUMN: AUTO MATCHING ENGINE PREVIEW */}
       <div className="w-full lg:w-[350px] shrink-0">
-        <div className="sticky top-[120px] cinematic-glass-card p-6 overflow-hidden">
+        <div className="card-wrapper group/card-wrapper sticky top-[120px]">
+          <div className="card-glow rounded-[32px]" />
+          <div className="cinematic-glass-card p-6 overflow-hidden rounded-[32px]">
           <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-primary/10 rounded-full blur-[60px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
           
           <h3 className="text-[14px] font-bold uppercase tracking-widest text-primary mb-6 flex items-center gap-2">
@@ -225,6 +239,7 @@ export function EducationDashboard({ initialProfile }: { initialProfile: any }) 
           <p className="text-[11px] text-muted-foreground text-center mt-6 uppercase tracking-wider">
             Engine synchronizes instantly with changes
           </p>
+        </div>
         </div>
       </div>
 

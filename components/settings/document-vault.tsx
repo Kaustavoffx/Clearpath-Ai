@@ -86,13 +86,15 @@ export function DocumentVault({ initialDocuments }: { initialDocuments: any[] })
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-3 overflow-visible">
         {vaultMap.map(doc => {
           const config = getStatusConfig(doc.status)
           const isLoading = loading === doc.type
 
           return (
-            <div key={doc.type} className="liquid-glass-card p-5 border border-glass-border rounded-[20px] flex flex-col">
+            <div key={doc.type} className="card-wrapper group/card-wrapper h-full">
+              <div className="card-glow rounded-[20px]" />
+              <div className="liquid-glass-card p-5 border border-glass-border rounded-[20px] flex flex-col h-full">
               <div className="flex justify-between items-start mb-6">
                 <div className="w-10 h-10 rounded-xl bg-[#071225] flex items-center justify-center border border-glass-border shadow-inner">
                   <FileText className="w-5 h-5 text-muted-foreground" />
@@ -136,6 +138,7 @@ export function DocumentVault({ initialDocuments }: { initialDocuments: any[] })
                     </Button>
                   </>
                 )}
+              </div>
               </div>
             </div>
           )
