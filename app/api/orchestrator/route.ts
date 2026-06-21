@@ -94,6 +94,25 @@ async function runOpenAI(textContext: string, prompt: string): Promise<string> {
   return result;
 }
 
+function normalizeCategory(category: string): string {
+  if (!category) return "GENERAL_NOTICE";
+  const value = category.toUpperCase();
+  const allowed = [
+    "SCHOLARSHIP",
+    "INTERNSHIP",
+    "FELLOWSHIP",
+    "COMPETITION",
+    "GRANT",
+    "GENERAL_NOTICE",
+    "CIRCULAR",
+    "SCHEME"
+  ];
+  if (!allowed.includes(value)) {
+    return "GENERAL_NOTICE";
+  }
+  return value;
+}
+
 export async function POST(request: Request) {
   const startTime = Date.now();
   
@@ -206,7 +225,7 @@ export async function POST(request: Request) {
       - Return ONLY a JSON object exactly matching this schema:
       {
         "title": "String",
-        "category": "SCHOLARSHIP | CIRCULAR | SCHEME | INTERNSHIP | COMPETITION | OTHER",
+        "category": "Classify into ONE of: SCHOLARSHIP | INTERNSHIP | FELLOWSHIP | COMPETITION | GRANT | GENERAL_NOTICE. If unsure, return GENERAL_NOTICE. Never return UNKNOWN or OTHER or NULL.",
         "plain_language_summary": "String",
         "important_dates": { "deadline": "String or null if not explicitly found" },
         "eligibility_analysis": {
@@ -327,7 +346,7 @@ export async function POST(request: Request) {
 
     const aiResponseSchema = z.object({
       title: z.string().catch("Unknown Opportunity"),
-      category: z.string().catch("OTHER"),
+      category: z.string().catch("GENERAL_NOTICE"),
       plain_language_summary: z.string().catch("Summary could not be generated."),
       important_dates: z.any().catch({ deadline: null }),
       eligibility_analysis: z.object({ requirements: z.array(evidenceInsightSchema).catch([]) }).catch({ requirements: [] }),
@@ -343,9 +362,10 @@ export async function POST(request: Request) {
     const repairedResult = aiResponseSchema.parse(finalAiResult);
 
     // Dynamic Category checking
-    const finalCategory = repairedResult.confidence_score >= 80 && ['SCHOLARSHIP', 'CIRCULAR', 'SCHEME', 'INTERNSHIP', 'COMPETITION'].includes(repairedResult.category.toUpperCase()) 
-      ? repairedResult.category.toUpperCase() 
-      : 'OTHER';
+    let finalCategory = normalizeCategory(repairedResult.category);
+    if (finalCategory === 'GENERAL_NOTICE' && repairedResult.category?.toUpperCase() !== 'GENERAL_NOTICE') {
+      logger.warn(`Unknown opportunity type '${repairedResult.category}'. Falling back to GENERAL_NOTICE.`);
+    }
 
     // Save back to DB
     const sanitizeOptions = { allowedTags: [], allowedAttributes: {} };
@@ -358,10 +378,6 @@ export async function POST(request: Request) {
     // QUALITY GATE: Validate constraints before DB insertion
     if (!finalTitle || finalTitle.trim() === '') {
       throw new Error("Quality Gate Failed: Opportunity Name is empty");
-    }
-    
-    if (finalCategory === 'OTHER' && usedProvider !== 'rule_engine') {
-      throw new Error("Quality Gate Failed: Opportunity Type is unknown");
     }
 
     const hasActionPlan = repairedResult.action_checklist && repairedResult.action_checklist.length > 0;
