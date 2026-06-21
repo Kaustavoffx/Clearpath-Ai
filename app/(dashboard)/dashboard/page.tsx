@@ -26,11 +26,11 @@ export default async function DashboardPage() {
 
   const opps = opportunities || [];
 
-  // Fetch docs
-  let opportunityDocuments: any[] = [];
+  // Fetch docs from REAL single source of truth vault
+  let documentVault: any[] = [];
   try {
-    const { data: docs } = await supabase.from('opportunity_documents').select('*, opportunities!inner(*)').eq('opportunities.user_id', user.id);
-    if (docs) opportunityDocuments = docs;
+    const { data: docs } = await supabase.from('document_vault').select('*').eq('user_id', user.id);
+    if (docs) documentVault = docs;
   } catch(e) {}
 
   // Fetch tasks
@@ -47,13 +47,12 @@ export default async function DashboardPage() {
     if (acts) globalActivities = acts;
   } catch(e) {}
 
-  const stats = DashboardEngine.calculateStats(opps, opportunityDocuments, opportunityTasks);
+  const stats = DashboardEngine.calculateStats(opps, documentVault, opportunityTasks);
 
   // Decorate top 3 for preview
   const topOpps = opps.slice(0, 3).map(opp => {
     const oppTasks = opportunityTasks.filter(t => t.opportunity_id === opp.id);
-    const oppDocs = opportunityDocuments.filter(d => d.opportunity_id === opp.id);
-    const metrics = DashboardEngine.calculateStats([opp], oppDocs, oppTasks);
+    const metrics = DashboardEngine.calculateStats([opp], documentVault, oppTasks);
     return { ...opp, readinessScore: metrics.averageReadiness };
   });
 

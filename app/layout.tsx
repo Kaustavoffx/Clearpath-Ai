@@ -63,6 +63,7 @@ export default async function RootLayout({
           attribute="class"
           defaultTheme="dark"
           themes={['light', 'dark', 'neutral']}
+          forcedTheme={theme}
           disableTransitionOnChange
         >
           <div className="relative z-10 flex-1 flex flex-col w-full h-full">

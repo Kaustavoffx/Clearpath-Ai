@@ -438,6 +438,19 @@ export async function POST(request: Request) {
       status: 'PROCESSED'
     }, 'Background Document Processing Complete');
 
+    // SINGLE SOURCE OF TRUTH: Usage Logging
+    if (usedProvider !== "rule_engine") {
+      try {
+        await supabase.from('usage_logs').insert({
+          user_id: jobRecord.user_id,
+          service: usedProvider === 'openai' ? 'OpenAI' : 'Gemini',
+          operation: 'Document Analysis'
+        });
+      } catch (e) {
+        logger.error("Failed to log usage metrics");
+      }
+    }
+
     return NextResponse.json({ success: true, provider: usedProvider });
 
   } catch (error: any) {

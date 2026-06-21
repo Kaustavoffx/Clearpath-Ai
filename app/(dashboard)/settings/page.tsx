@@ -20,13 +20,24 @@ export default async function SettingsPage() {
     { data: preferences },
     { data: security },
     { data: usage },
-    { data: sessions }
+    { data: sessions },
+    { count: openaiCalls },
+    { count: geminiCalls }
   ] = await Promise.all([
     supabase.from('user_preferences').select('*').eq('user_id', user.id).single(),
     supabase.from('user_security_settings').select('*').eq('user_id', user.id).single(),
     supabase.from('user_usage_metrics').select('*').eq('user_id', user.id).single(),
-    supabase.from('user_sessions').select('*').eq('user_id', user.id).order('last_active', { ascending: false })
+    supabase.from('user_sessions').select('*').eq('user_id', user.id).order('last_active', { ascending: false }),
+    supabase.from('usage_logs').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('service', 'OpenAI'),
+    supabase.from('usage_logs').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('service', 'Gemini')
   ])
+
+  // Merge live usage counts with standard usage metrics
+  const liveUsage = {
+    ...(usage || {}),
+    openai_calls: openaiCalls || 0,
+    gemini_calls: geminiCalls || 0
+  }
 
   return (
     <div className="container-wide min-h-[calc(100vh-5rem)] flex flex-col pt-6 pb-12 gap-6 animate-fadeInUp max-w-[1440px]">
@@ -59,7 +70,7 @@ export default async function SettingsPage() {
             </TabsContent>
 
             <TabsContent value="usage" className="outline-none animate-in fade-in duration-500 m-0">
-               <UsageAnalytics initialUsage={usage} />
+               <UsageAnalytics initialUsage={liveUsage} />
             </TabsContent>
           </div>
         </Tabs>
