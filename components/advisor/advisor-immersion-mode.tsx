@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { X, Send, Sparkles, Keyboard, Loader2, Mic } from 'lucide-react'
+import { X, Send, Sparkles, Keyboard, Loader2, ArrowLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { VoiceOrb } from '@/components/ui/voice-orb'
 import { toast } from 'sonner'
@@ -37,11 +37,79 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
     "What documents am I missing?",
   ])
   
+  // Animation & Rendering States
+  const [isRendered, setIsRendered] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null)
   const recognitionRef = useRef<unknown>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
+
+  // ─── MOUNT & ANIMATION LOGIC ───
+  useEffect(() => {
+    if (isOpen) {
+      setIsRendered(true)
+      // Slight delay to allow DOM to render before triggering opacity transition
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setIsVisible(true))
+      })
+    } else {
+      setIsVisible(false)
+      const timer = setTimeout(() => setIsRendered(false), 200)
+      return () => clearTimeout(timer)
+    }
+  }, [isOpen])
+
+  // ─── UNIVERSAL CLOSE SYSTEM ───
+  const handleClose = useCallback(() => {
+    if (window.history.state?.advisorOpen) {
+      window.history.back()
+    } else {
+      onClose()
+    }
+  }, [onClose])
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Capture focus to restore later
+    if (document.activeElement instanceof HTMLElement) {
+      previousFocusRef.current = document.activeElement;
+    }
+
+    // Push state for browser history / mobile back button
+    window.history.pushState({ advisorOpen: true }, '');
+
+    const handlePopState = (e: PopStateEvent) => {
+      onClose(); // Parent handles state
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClose();
+      }
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+      document.removeEventListener('keydown', handleKeyDown)
+      // Restore focus
+      if (previousFocusRef.current) {
+        previousFocusRef.current.focus()
+      }
+      // If we unmount and we are still in the history state (e.g. unmounted for another reason), clean up
+      if (window.history.state?.advisorOpen) {
+        window.history.back()
+      }
+    }
+  }, [isOpen, onClose, handleClose])
+
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -174,7 +242,7 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
           role: 'advisor',
-          content: 'I encountered an error connecting to the intelligence engine. Please check your API keys in the AI Provider Center.'
+          content: 'I encountered an error connecting to the intelligence engine. Please check your network connection.'
         }])
         setAdvisorState('idle')
       }
@@ -248,7 +316,7 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
     }
   }, [advisorState, startListening])
 
-  if (!isOpen) return null
+  if (!isRendered) return null
 
   const latestMessage = messages[messages.length - 1]
   const showActionCard = latestMessage?.role === 'advisor' && latestMessage.metadata?.bestAction
@@ -260,7 +328,14 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
     : 'Tap to speak'
 
   return (
-    <div className="fixed inset-0 z-[200] font-sans flex flex-col items-center justify-between overflow-hidden bg-[#030712]/90" style={{ backdropFilter: 'blur(10px)' }}>
+    <div 
+      className={cn(
+        "fixed inset-0 z-[200] font-sans flex flex-col items-center justify-between overflow-hidden bg-[#030712]/90",
+        "transition-all duration-200 ease-in-out",
+        isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+      )} 
+      style={{ backdropFilter: 'blur(10px)' }}
+    >
       
       {/* Background ambient */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none gpu-accelerate">
@@ -268,8 +343,19 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
         <div className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full" style={{ background: 'radial-gradient(circle, rgba(133,138,227,0.06) 0%, transparent 70%)' }} />
       </div>
 
+      {/* ─── DESKTOP/MOBILE CLOSE BUTTON ─── */}
+      <button 
+        onClick={handleClose} 
+        aria-label="Close Advisor"
+        title="Close Advisor"
+        className="absolute z-50 flex items-center justify-center rounded-full bg-white/10 backdrop-blur border border-white/5 text-muted-foreground hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-[0_0_15px_rgba(133,138,227,0.5)] md:top-[24px] md:right-[24px] md:w-12 md:h-12 w-11 h-11 right-4 top-4"
+        style={{ paddingTop: 'env(safe-area-inset-top)', boxSizing: 'content-box' }}
+      >
+        <X className="w-5 h-5" />
+      </button>
+
       {/* ─── HEADER ─── */}
-      <div className="w-full flex items-center justify-between p-5 relative z-10">
+      <div className="w-full flex items-center p-5 relative z-10" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}>
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-[#071225] border border-glass-border flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-[#97DFFC]" />
@@ -281,13 +367,10 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
             </span>
           </div>
         </div>
-        <button onClick={onClose} className="p-2.5 rounded-full hover:bg-white/5 transition-crisp text-muted-foreground hover:text-foreground">
-          <X className="w-5 h-5" />
-        </button>
       </div>
 
       {/* ─── CENTERPIECE ─── */}
-      <div className="flex-1 w-full max-w-3xl flex flex-col items-center justify-center relative z-10 px-6 gap-8">
+      <div className="flex-1 w-full max-w-3xl flex flex-col items-center justify-center relative z-10 px-6 gap-8 pb-20 md:pb-0">
         
         {/* Faded Transcript History */}
         <div className="w-full max-w-xl max-h-[25vh] overflow-y-auto scrollbar-none flex flex-col gap-4 mask-image-b-fade pb-8">
@@ -415,9 +498,9 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
       </div>
 
       {/* ─── BOTTOM CONTROLS ─── */}
-      <div className="w-full flex flex-col items-center justify-end p-6 relative z-10 min-h-[100px]">
+      <div className="w-full flex flex-col items-center justify-end p-6 relative z-10 min-h-[100px] mb-[env(safe-area-inset-bottom)] md:mb-0">
         {showKeyboard ? (
-          <div className="w-full max-w-xl flex items-center gap-2 bg-[#071225]/80 border border-glass-border p-2 rounded-2xl animate-fadeInUp" style={{ backdropFilter: 'blur(12px)' }}>
+          <div className="w-full max-w-xl flex items-center gap-2 bg-[#071225]/80 border border-glass-border p-2 rounded-2xl animate-fadeInUp mb-12 md:mb-0" style={{ backdropFilter: 'blur(12px)' }}>
             <button 
               onClick={() => setShowKeyboard(false)}
               className="p-2.5 text-muted-foreground hover:text-white transition-crisp"
@@ -442,7 +525,7 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-5 animate-fadeInUp">
+          <div className="flex items-center gap-5 animate-fadeInUp mb-14 md:mb-0">
             <button 
               onClick={() => setShowKeyboard(true)}
               className="p-3.5 rounded-full bg-[#071225] border border-glass-border hover:bg-white/5 hover:border-white/10 text-muted-foreground hover:text-white transition-crisp"
@@ -451,6 +534,17 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
             </button>
           </div>
         )}
+      </div>
+      
+      {/* ─── MOBILE BOTTOM EXIT ACTION ─── */}
+      <div className="md:hidden fixed bottom-0 left-0 w-full z-20" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <button 
+          onClick={handleClose}
+          aria-label="Back to Dashboard"
+          className="w-full min-h-[56px] flex items-center justify-center gap-2 bg-[#030712]/95 border-t border-glass-border text-[15px] font-medium text-white/90 hover:bg-[#071225] transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" /> Back to Dashboard
+        </button>
       </div>
 
     </div>
