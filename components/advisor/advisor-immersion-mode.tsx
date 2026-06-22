@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { X, Send, Sparkles, Keyboard, Loader2, ArrowLeft, ChevronDown, ChevronUp, ArrowDown } from 'lucide-react'
+import { X, Send, Sparkles, Keyboard, Loader2, ArrowLeft, ArrowDown, ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { VoiceOrb } from '@/components/ui/voice-orb'
 import { toast } from 'sonner'
@@ -47,7 +47,6 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true)
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
   const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null)
   const recognitionRef = useRef<unknown>(null)
@@ -59,12 +58,7 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
     const latestMessage = messages[messages.length - 1]
     if (!latestMessage) return
 
-    if (latestMessage.role === 'user') {
-      setRevealedCharCount(latestMessage.content.length)
-      return
-    }
-
-    if (advisorState === 'idle') {
+    if (latestMessage.role === 'user' || advisorState === 'idle') {
       setRevealedCharCount(latestMessage.content.length)
       return
     }
@@ -73,7 +67,7 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
       const timer = setInterval(() => {
         setRevealedCharCount((prev) => {
           if (prev < latestMessage.content.length) {
-            return prev + 3 // Reveal 3 chars per ~30ms (simulates speaking pace)
+            return prev + 3
           }
           clearInterval(timer)
           return latestMessage.content.length
@@ -94,15 +88,14 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
   useEffect(() => {
     if (autoScrollEnabled && scrollContainerRef.current) {
       const container = scrollContainerRef.current;
-      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      container.scrollTop = container.scrollHeight;
     }
-  }, [revealedCharCount, messages.length, autoScrollEnabled, expandedSections])
+  }, [revealedCharCount, messages.length, autoScrollEnabled, expandedSections, liveTranscript, advisorState])
 
   const handleUserScroll = useCallback(() => {
     if (!scrollContainerRef.current) return;
     const container = scrollContainerRef.current;
     
-    // Check if scrolled up significantly
     const isAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 50;
     if (!isAtBottom && autoScrollEnabled) {
       setAutoScrollEnabled(false);
@@ -143,14 +136,10 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
 
     window.history.pushState({ advisorOpen: true }, '');
 
-    const handlePopState = (e: PopStateEvent) => {
-      onClose();
-    }
+    const handlePopState = () => onClose();
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleClose();
-      }
+      if (e.key === 'Escape') handleClose();
     }
 
     window.addEventListener('popstate', handlePopState)
@@ -159,15 +148,10 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
     return () => {
       window.removeEventListener('popstate', handlePopState)
       document.removeEventListener('keydown', handleKeyDown)
-      if (previousFocusRef.current) {
-        previousFocusRef.current.focus()
-      }
-      if (window.history.state?.advisorOpen) {
-        window.history.back()
-      }
+      if (previousFocusRef.current) previousFocusRef.current.focus()
+      if (window.history.state?.advisorOpen) window.history.back()
     }
   }, [isOpen, onClose, handleClose])
-
 
   // Focus input when keyboard shown
   useEffect(() => {
@@ -195,9 +179,7 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
       const audioData = atob(base64Audio)
       const arrayBuffer = new ArrayBuffer(audioData.length)
       const view = new Uint8Array(arrayBuffer)
-      for (let i = 0; i < audioData.length; i++) {
-        view[i] = audioData.charCodeAt(i)
-      }
+      for (let i = 0; i < audioData.length; i++) view[i] = audioData.charCodeAt(i)
       
       if (!audioContextRef.current) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -299,7 +281,7 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
     }
   }, [messages, playAudio, fallbackTTS])
 
-  // ─── SPEECH RECOGNITION (Web Speech API) ───
+  // ─── SPEECH RECOGNITION ───
   const startListening = useCallback(() => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       toast.error("Speech recognition not supported. Use the keyboard instead.")
@@ -323,22 +305,16 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
     recognition.onresult = (event: any) => {
       let interim = ''
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript
-        } else {
-          interim += event.results[i][0].transcript
-        }
+        if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript
+        else interim += event.results[i][0].transcript
       }
       setLiveTranscript(finalTranscript + interim)
     }
 
     recognition.onend = () => {
       const text = finalTranscript.trim()
-      if (text.length > 0) {
-        processInput(text)
-      } else {
-        setAdvisorState('idle')
-      }
+      if (text.length > 0) processInput(text)
+      else setAdvisorState('idle')
     }
 
     recognition.onerror = () => {
@@ -355,9 +331,7 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (recognitionRef.current as any).stop()
     } else if (advisorState === 'speaking') {
-      if (sourceNodeRef.current) {
-        sourceNodeRef.current.stop()
-      }
+      if (sourceNodeRef.current) sourceNodeRef.current.stop()
       window.speechSynthesis?.cancel()
       setAdvisorState('idle')
     } else if (advisorState === 'idle') {
@@ -371,19 +345,24 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
   const showActionCard = latestMessage?.role === 'advisor' && latestMessage.metadata?.bestAction
   const isAdvisorLatest = latestMessage?.role === 'advisor'
 
-  // Render logic for progressive text
+  // Section splitting for long responses
   let visibleSections: string[] = []
   if (isAdvisorLatest) {
     const revealedSubstring = latestMessage.content.substring(0, revealedCharCount)
-    // Split by double newline to form sections
     visibleSections = revealedSubstring.split(/\n\n+/).filter(s => s.trim().length > 0)
-    // Ensure at least one section if we have content but no newlines
     if (visibleSections.length === 0 && revealedSubstring.trim().length > 0) {
       visibleSections = [revealedSubstring]
     }
   }
 
-  // State label
+  // Section Titles for long responses
+  const getSectionTitle = (idx: number, total: number) => {
+    if (idx === 0) return "Summary"
+    if (idx === total - 1) return "Conclusion"
+    if (idx === 1 && total >= 3) return "Key Insight"
+    return "Details"
+  }
+
   const stateLabel = advisorState === 'listening' ? 'Listening...'
     : advisorState === 'thinking' ? 'Thinking...'
     : advisorState === 'speaking' ? 'Speaking...'
@@ -392,7 +371,7 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
   return (
     <div 
       className={cn(
-        "fixed inset-0 z-[200] font-sans flex flex-col items-center justify-between overflow-hidden bg-[#030712]/90",
+        "fixed inset-0 z-[200] font-sans overflow-hidden bg-[#030712]/90",
         "transition-all duration-200 ease-in-out",
         isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
       )} 
@@ -405,19 +384,8 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
         <div className="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full" style={{ background: 'radial-gradient(circle, rgba(133,138,227,0.06) 0%, transparent 70%)' }} />
       </div>
 
-      {/* ─── DESKTOP/MOBILE CLOSE BUTTON ─── */}
-      <button 
-        onClick={handleClose} 
-        aria-label="Close Advisor"
-        title="Close Advisor"
-        className="absolute z-50 flex items-center justify-center rounded-full bg-white/10 backdrop-blur border border-white/5 text-muted-foreground hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-[0_0_15px_rgba(133,138,227,0.5)] md:top-[24px] md:right-[24px] md:w-12 md:h-12 w-11 h-11 right-4 top-4"
-        style={{ paddingTop: 'env(safe-area-inset-top)', boxSizing: 'content-box' }}
-      >
-        <X className="w-5 h-5" />
-      </button>
-
-      {/* ─── HEADER ─── */}
-      <div className="w-full flex items-center p-5 relative z-10 shrink-0" style={{ paddingTop: 'calc(1.25rem + env(safe-area-inset-top))' }}>
+      {/* ─── TOP AREA: LOGO & CLOSE ─── */}
+      <div className="absolute top-0 w-full flex items-center justify-between p-4 md:p-6 z-[210]" style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top))' }}>
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-[#071225] border border-glass-border flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-[#97DFFC]" />
@@ -429,93 +397,123 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
             </span>
           </div>
         </div>
+        
+        <button 
+          onClick={handleClose} 
+          aria-label="Close Advisor"
+          title="Close Advisor"
+          className="flex items-center justify-center rounded-full bg-white/10 backdrop-blur border border-white/5 text-muted-foreground hover:text-white transition-all duration-200 hover:scale-105 hover:shadow-[0_0_15px_rgba(133,138,227,0.5)] w-11 h-11 md:w-12 md:h-12"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
-      {/* ─── SCROLLABLE CENTERPIECE ─── */}
+      {/* ─── CENTER FIXED ORB ─── */}
+      <div className="absolute top-[25%] md:top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4 z-[210]">
+        <VoiceOrb 
+          isListening={advisorState === 'listening'}
+          isProcessing={advisorState === 'thinking'}
+          isSpeaking={advisorState === 'speaking'}
+          onToggleListen={handleToggleListen}
+        />
+        <span className={cn(
+          "text-[12px] uppercase tracking-[0.12em] font-medium transition-crisp",
+          advisorState === 'listening' ? "text-[#97DFFC]" :
+          advisorState === 'thinking' ? "text-[#858AE3]" :
+          advisorState === 'speaking' ? "text-[#858AE3]" :
+          "text-muted-foreground"
+        )}>
+          {stateLabel}
+        </span>
+      </div>
+
+      {/* ─── DEDICATED RESPONSE SHEET (Scrollable) ─── */}
       <div 
         ref={scrollContainerRef}
         onWheel={handleUserScroll}
         onTouchMove={handleUserScroll}
-        className="flex-1 w-full flex flex-col items-center justify-start relative z-10 px-6 gap-8 pb-20 md:pb-12 overflow-y-auto scrollbar-none"
+        className="absolute bottom-[60px] md:bottom-[70px] left-1/2 -translate-x-1/2 w-[92vw] md:max-w-[800px] h-[50vh] min-h-[30vh] max-h-[50vh] overflow-y-auto scrollbar-none scroll-smooth flex flex-col items-center justify-start z-[205] mask-image-t-fade pt-8 pb-10"
       >
         
-        {/* Faded Transcript History */}
-        <div className="w-full max-w-[700px] flex flex-col gap-4 mt-8">
-          {messages.slice(0, -1).map((msg, idx) => (
-            <div 
-              key={msg.id}
-              className={cn(
-                "flex flex-col transition-crisp",
-                msg.role === 'user' ? "items-end" : "items-start"
-              )}
-              style={{ opacity: 0.3 }}
-            >
-              <div className={cn(
-                "px-4 py-2.5 rounded-2xl max-w-[85%] text-[15px] leading-[1.6]",
-                msg.role === 'user' ? "bg-white/4 text-white/70" : "text-[#97DFFC]/70"
-              )}>
-                {msg.content}
-              </div>
+        {/* Faded Transcript History (Older messages) */}
+        {messages.slice(0, -1).map((msg, idx) => (
+          <div 
+            key={msg.id}
+            className={cn(
+              "flex flex-col transition-crisp w-full mb-4",
+              msg.role === 'user' ? "items-end" : "items-start"
+            )}
+            style={{ opacity: 0.3 }}
+          >
+            <div className={cn(
+              "px-4 py-2.5 rounded-2xl max-w-[85%] text-[15px] leading-[1.6]",
+              msg.role === 'user' ? "bg-white/4 text-white/70" : "text-[#97DFFC]/70"
+            )}>
+              {msg.content}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
 
         {/* Live Transcription */}
         {liveTranscript && advisorState === 'listening' && (
-          <div className="text-[18px] text-muted-foreground text-center w-full max-w-[700px] animate-fadeInUp mt-4">
+          <div className="text-[18px] text-muted-foreground text-center w-full animate-fadeInUp mt-4">
             &ldquo;{liveTranscript}&rdquo;
           </div>
         )}
 
         {/* Active Content */}
-        <div className="w-full max-w-[700px] flex flex-col items-center justify-start gap-5 min-h-[50vh]">
+        <div className="w-full flex flex-col items-center justify-start gap-5">
           {advisorState === 'thinking' ? (
-            <div className="text-[16px] text-[#858AE3]/60 flex items-center justify-center gap-2.5 font-medium animate-fadeInUp mt-8">
-              <Loader2 className="w-4 h-4 animate-spin" /> Reasoning over your data...
+            <div className="text-[16px] text-[#858AE3]/60 flex items-center justify-center gap-2.5 font-medium animate-fadeInUp mt-4">
+              <Loader2 className="w-4 h-4 animate-spin" /> Reasoning...
             </div>
           ) : latestMessage ? (
-            <div className="flex flex-col items-center gap-5 w-full animate-fadeInUp mt-8">
+            <div className="flex flex-col items-center gap-5 w-full animate-fadeInUp">
               
               {/* User message rendering */}
               {latestMessage.role === 'user' && (
-                <p className="text-[20px] md:text-[24px] font-medium leading-[1.45] tracking-[-0.01em] text-white text-center">
+                <p className="text-[18px] md:text-[22px] font-medium leading-[1.45] tracking-[-0.01em] text-white text-center">
                   {latestMessage.content}
                 </p>
               )}
 
-              {/* Advisor progressive text rendering with chunking */}
+              {/* Advisor progressive text rendering with glass-card chunking for long responses */}
               {isAdvisorLatest && visibleSections.map((section, idx) => {
+                const isLongResponse = latestMessage.content.length > 300;
                 const isLatestSection = idx === visibleSections.length - 1;
                 const isExpanded = expandedSections[idx] || isLatestSection;
-                const alignLeft = section.length > 80 || visibleSections.length > 1;
 
-                if (!isExpanded) {
+                if (isLongResponse && !isExpanded) {
                   return (
                     <button 
                       key={idx}
                       onClick={() => setExpandedSections(prev => ({ ...prev, [idx]: true }))}
-                      className="w-full max-w-[90vw] md:max-w-[700px] liquid-glass-card p-4 text-left flex items-center justify-between border-glass-border hover:bg-white/5 transition-all text-[#858AE3] rounded-[16px] animate-fadeInUp"
+                      className="w-full liquid-glass-card p-4 text-left flex items-center justify-between border-glass-border hover:bg-white/5 transition-all text-[#858AE3] rounded-[16px] animate-fadeInUp"
                     >
-                      <span className="text-[14px] font-medium truncate">Previous Guidance</span>
+                      <span className="text-[14px] font-medium truncate">{getSectionTitle(idx, visibleSections.length)}</span>
                       <ChevronDown className="w-4 h-4 shrink-0" />
                     </button>
                   )
                 }
 
                 return (
-                  <div key={idx} className="w-full flex flex-col gap-2 animate-fadeInUp">
-                    {/* Optional collapse button if it's not the last section but was manually expanded */}
-                    {!isLatestSection && (
-                      <button 
-                        onClick={() => setExpandedSections(prev => ({ ...prev, [idx]: false }))}
-                        className="self-end text-[12px] text-muted-foreground hover:text-white flex items-center gap-1 mb-1"
-                      >
-                        Collapse <ChevronUp className="w-3 h-3" />
-                      </button>
+                  <div key={idx} className={cn("w-full flex flex-col gap-2 animate-fadeInUp", isLongResponse && "liquid-glass-card p-5 rounded-[16px]")}>
+                    {isLongResponse && (
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[12px] uppercase tracking-widest font-semibold text-[#858AE3]">{getSectionTitle(idx, visibleSections.length)}</span>
+                        {!isLatestSection && (
+                          <button 
+                            onClick={() => setExpandedSections(prev => ({ ...prev, [idx]: false }))}
+                            className="text-[12px] text-muted-foreground hover:text-white flex items-center gap-1"
+                          >
+                            Collapse <ChevronUp className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
                     )}
                     <p className={cn(
-                      "text-[18px] md:text-[22px] font-medium leading-[1.7] tracking-[-0.01em] text-[#97DFFC] max-w-[90vw] md:max-w-[700px]",
-                      alignLeft ? "text-left" : "text-center self-center"
+                      "text-[18px] md:text-[22px] font-medium leading-[1.7] tracking-[-0.01em] text-[#97DFFC] w-full",
+                      isLongResponse || visibleSections.length > 1 ? "text-left" : "text-center self-center"
                     )}>
                       {section}
                     </p>
@@ -525,7 +523,7 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
 
               {/* Intelligence Card */}
               {showActionCard && latestMessage.metadata && revealedCharCount >= latestMessage.content.length && (
-                <div className="w-full max-w-[90vw] md:max-w-[700px] liquid-glass-card p-5 text-left border-[#858AE3]/15 mt-4">
+                <div className="w-full liquid-glass-card p-5 text-left border-[#858AE3]/15 mt-4">
                   <div className="flex flex-col md:flex-row md:items-start justify-between gap-3 mb-4">
                     <div>
                       <div className="text-card-label text-[#858AE3] mb-1.5">Recommended Action</div>
@@ -538,7 +536,6 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
                       </div>
                     )}
                   </div>
-                  
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 border-t border-glass-border pt-4">
                     {latestMessage.metadata.expectedGain && (
                       <div>
@@ -552,14 +549,6 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
                         <div className="text-[13px] font-medium text-white">{latestMessage.metadata.estimatedTime}</div>
                       </div>
                     )}
-                    {latestMessage.metadata.basedOn && (
-                      <div>
-                        <div className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-medium mb-1">Context</div>
-                        <div className="text-[12px] font-medium text-muted-foreground">
-                          {latestMessage.metadata.basedOn.opportunities} Opps · {latestMessage.metadata.basedOn.profile} Profile
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
@@ -568,7 +557,7 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
 
           {/* Suggestions when idle */}
           {!latestMessage && advisorState !== 'thinking' && (
-            <div className="flex flex-col items-center gap-4 animate-fadeInUp mt-8">
+            <div className="flex flex-col items-center gap-4 animate-fadeInUp mt-4">
               <p className="text-[14px] text-muted-foreground mb-1">Try saying:</p>
               <div className="flex flex-wrap justify-center gap-2">
                 {suggestions.map(s => (
@@ -583,56 +572,33 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
               </div>
             </div>
           )}
-
         </div>
-
-        {/* Floating "Jump to Latest" Button */}
-        {!autoScrollEnabled && advisorState === 'speaking' && (
-          <div className="sticky bottom-4 z-50 animate-fadeInUp">
-            <button 
-              onClick={() => {
-                setAutoScrollEnabled(true)
-                if (scrollContainerRef.current) {
-                  scrollContainerRef.current.scrollTo({ top: scrollContainerRef.current.scrollHeight, behavior: 'smooth' })
-                }
-              }}
-              className="flex items-center gap-2 bg-[#858AE3] text-[#030712] px-4 py-2 rounded-full font-semibold shadow-[0_0_20px_rgba(133,138,227,0.3)] hover:scale-105 transition-all text-[13px]"
-            >
-              <ArrowDown className="w-4 h-4" /> Jump to Latest
-            </button>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} className="h-8 shrink-0" />
       </div>
 
-      {/* ─── BOTTOM CONTROLS (FIXED) ─── */}
-      <div className="w-full shrink-0 flex flex-col items-center justify-end p-6 relative z-10 min-h-[100px] mb-[env(safe-area-inset-bottom)] md:mb-0 border-t border-white/5 bg-[#030712]/50">
-        {/* Voice Orb */}
-        <div className="absolute top-[-30px] left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 shrink-0">
-          <VoiceOrb 
-            isListening={advisorState === 'listening'}
-            isProcessing={advisorState === 'thinking'}
-            isSpeaking={advisorState === 'speaking'}
-            onToggleListen={handleToggleListen}
-          />
-          <span className={cn(
-            "text-[10px] uppercase tracking-[0.12em] font-medium transition-crisp",
-            advisorState === 'listening' ? "text-[#97DFFC]" :
-            advisorState === 'thinking' ? "text-[#858AE3]" :
-            advisorState === 'speaking' ? "text-[#858AE3]" :
-            "text-muted-foreground"
-          )}>
-            {stateLabel}
-          </span>
+      {/* Floating "Jump to Latest" Button */}
+      {!autoScrollEnabled && advisorState === 'speaking' && (
+        <div className="absolute bottom-[130px] md:bottom-[140px] left-1/2 -translate-x-1/2 z-[220] animate-fadeInUp">
+          <button 
+            onClick={() => {
+              setAutoScrollEnabled(true)
+              if (scrollContainerRef.current) {
+                scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+              }
+            }}
+            className="flex items-center gap-2 bg-[#858AE3] text-[#030712] px-4 py-2 rounded-full font-semibold shadow-[0_0_20px_rgba(133,138,227,0.3)] hover:scale-105 transition-all text-[13px]"
+          >
+            <ArrowDown className="w-4 h-4" /> Jump to Latest
+          </button>
         </div>
+      )}
 
-        {showKeyboard ? (
-          <div className="w-full max-w-xl flex items-center gap-2 bg-[#071225]/80 border border-glass-border p-2 rounded-2xl animate-fadeInUp mb-12 md:mb-0 mt-8" style={{ backdropFilter: 'blur(12px)' }}>
-            <button 
-              onClick={() => setShowKeyboard(false)}
-              className="p-2.5 text-muted-foreground hover:text-white transition-crisp"
-            >
+      {/* ─── BOTTOM AREA: KEYBOARD INPUT & BACK ─── */}
+      <div className="absolute bottom-0 w-full flex flex-col items-center justify-end z-[210]">
+        
+        {/* Keyboard Input Bar (Fades in if active) */}
+        {showKeyboard && (
+          <div className="w-[92vw] md:w-full md:max-w-xl flex items-center gap-2 bg-[#071225]/90 border border-glass-border p-2 rounded-2xl animate-fadeInUp mb-4" style={{ backdropFilter: 'blur(12px)' }}>
+            <button onClick={() => setShowKeyboard(false)} className="p-2.5 text-muted-foreground hover:text-white transition-crisp">
               <X className="w-4 h-4" />
             </button>
             <input 
@@ -652,24 +618,24 @@ export function AdvisorImmersionMode({ isOpen, onClose }: { isOpen: boolean; onC
               <Send className="w-4 h-4" />
             </button>
           </div>
-        ) : (
-          <div className="flex items-center gap-5 animate-fadeInUp mb-14 md:mb-0 mt-8 w-full max-w-xl justify-end">
-            <button 
-              onClick={() => setShowKeyboard(true)}
-              className="p-3.5 rounded-full bg-[#071225] border border-glass-border hover:bg-white/5 hover:border-white/10 text-muted-foreground hover:text-white transition-crisp"
-            >
-              <Keyboard className="w-5 h-5" />
-            </button>
-          </div>
         )}
-      </div>
-      
-      {/* ─── MOBILE BOTTOM EXIT ACTION ─── */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full z-20" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+
+        {/* Floating Keyboard Button */}
+        {!showKeyboard && (
+          <button 
+            onClick={() => setShowKeyboard(true)}
+            className="absolute bottom-[70px] right-4 md:right-[calc(50%-380px)] p-3.5 rounded-full bg-[#071225] border border-glass-border hover:bg-white/5 hover:border-white/10 text-muted-foreground hover:text-white transition-crisp"
+          >
+            <Keyboard className="w-5 h-5" />
+          </button>
+        )}
+
+        {/* Fixed Back to Dashboard Bottom Bar */}
         <button 
           onClick={handleClose}
           aria-label="Back to Dashboard"
-          className="w-full min-h-[56px] flex items-center justify-center gap-2 bg-[#030712]/95 border-t border-glass-border text-[15px] font-medium text-white/90 hover:bg-[#071225] transition-colors"
+          className="w-full flex items-center justify-center gap-2 bg-[#030712]/95 border-t border-glass-border text-[15px] font-medium text-white/90 hover:bg-[#071225] transition-colors"
+          style={{ height: '56px', paddingBottom: 'env(safe-area-inset-bottom)', boxSizing: 'content-box' }}
         >
           <ArrowLeft className="w-5 h-5" /> Back to Dashboard
         </button>
