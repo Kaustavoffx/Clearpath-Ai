@@ -1,11 +1,12 @@
 'use server'
 
 import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+import { env } from '@/lib/env';
 
 export async function askAiAdvisor(opportunityId: string, prompt: string) {
+  const startTime = Date.now();
   const supabase = await createClient();
 
   // 1. Fetch comprehensive context
@@ -38,13 +39,60 @@ ${docs?.map(d => `- ${d.name} (Status: ${d.status})`).join('\n') || 'No document
 ${prompt}
   `;
 
+  let responseText = "";
+  let providerUsed = 'Gemini';
+  let fallbackTriggered = false;
+
   try {
+    if (!env.GEMINI_API_KEY) throw new Error("Missing Gemini API Key");
+    const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-pro',
         contents: context,
     });
+    responseText = response.text || "";
+    if (!responseText) throw new Error("Empty response from Gemini");
+  } catch (geminiError) {
+    console.warn("Gemini AI Action failed. Triggering OpenAI fallback:", geminiError);
+    fallbackTriggered = true;
+    providerUsed = 'OpenAI';
     
-    // Also log this query in the activity feed
+    try {
+      if (!env.OPENAI_API_KEY) throw new Error("Missing OpenAI API Key");
+      const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: context }],
+        temperature: 0.1,
+      });
+      responseText = response.choices[0].message.content || "";
+    } catch (openaiError) {
+      console.error("OpenAI fallback also failed:", openaiError);
+      providerUsed = 'GracefulFallback';
+      responseText = "ClearPath Advisor is temporarily unavailable. Please try again in a few moments.";
+    }
+  }
+
+  const latency = Date.now() - startTime;
+  const tokenEstimate = Math.round(context.length / 4);
+
+  // Log to usage_logs
+  try {
+    await supabase.from('usage_logs').insert({
+      user_id: opp.user_id,
+      service: providerUsed,
+      operation: 'Opportunity AI Action',
+      token_estimate: tokenEstimate,
+      request_count: 1,
+      latency: latency,
+      fallback_triggered: fallbackTriggered
+    });
+  } catch (e) {
+    console.error("Failed to log usage:", e);
+  }
+
+  // Also log this query in the activity feed
+  try {
     await supabase.from('activity_feed').insert({
       opportunity_id: opportunityId,
       user_id: opp.user_id,
@@ -52,10 +100,9 @@ ${prompt}
       description: `Consulted AI Advisor regarding: "${prompt}"`,
       metadata: { prompt }
     });
-
-    return response.text;
-  } catch (error) {
-    console.error("AI Advisor Error:", error);
-    return "The Intelligence Core encountered an error processing your request. Please try again.";
+  } catch (e) {
+    // Ignore activity feed log errors
   }
+
+  return responseText;
 }

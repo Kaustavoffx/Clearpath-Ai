@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ShieldAlert, Key, Laptop, Smartphone, AlertCircle, Save, CheckCircle2, Monitor } from "lucide-react"
+import { ShieldAlert, Key, Laptop, Smartphone, AlertCircle, Save, CheckCircle2, Monitor, Settings2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -27,6 +27,7 @@ export function SecurityCenter({ initialSecurity, initialSessions }: { initialSe
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
+  const [advancedMode, setAdvancedMode] = useState(false)
 
   const handleSave = async () => {
     setSaving(true)
@@ -119,51 +120,76 @@ export function SecurityCenter({ initialSecurity, initialSessions }: { initialSe
         <div className="card-wrapper group/card-wrapper h-full">
           <div className="card-glow rounded-[24px]" />
           <div className="liquid-glass-card p-7 rounded-[24px] border border-glass-border flex flex-col h-full">
-            <h3 className="text-[16px] font-semibold text-foreground flex items-center gap-2 mb-6 shrink-0">
-              <Key className="w-5 h-5 text-success" /> API Key Management
+            <h3 className="text-[16px] font-semibold text-foreground flex items-center justify-between gap-2 mb-6 shrink-0">
+              <span className="flex items-center gap-2">
+                <Key className="w-5 h-5 text-success" /> API Settings
+              </span>
+              <Button
+                variant="ghost"
+                onClick={() => setAdvancedMode(!advancedMode)}
+                className="h-8 text-[12px] text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5"
+              >
+                <Settings2 className="w-3.5 h-3.5" />
+                Advanced Configuration
+              </Button>
             </h3>
-          <p className="text-[12px] text-muted-foreground mb-6">
-            Provide your own API keys to bypass the Free Plan limits. Keys are encrypted at rest and never exposed.
-          </p>
-          
-          <div className="space-y-4 flex-1">
-            <div className="grid gap-2">
-              <Label className="text-[12px] font-medium text-foreground">OpenAI API Key</Label>
-              <Input 
-                type="password"
-                value={keys.openai_key}
-                onChange={e => setKeys(prev => ({ ...prev, openai_key: e.target.value }))}
-                placeholder="sk-..."
-                className="h-10 bg-black/20 border-glass-border focus-visible:ring-success rounded-xl px-4 text-[13px]"
-              />
+
+          {!advancedMode ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-glass-layer border border-glass-border rounded-[16px]">
+              <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center mb-4">
+                <CheckCircle2 className="w-6 h-6 text-success" />
+              </div>
+              <h4 className="text-[14px] font-medium text-foreground mb-2">Platform APIs Active</h4>
+              <p className="text-[12px] text-muted-foreground">
+                ClearPath Advisor is fully powered by our secure server-side infrastructure. No configuration is required.
+              </p>
             </div>
-            <div className="grid gap-2">
-              <Label className="text-[12px] font-medium text-foreground">Gemini API Key</Label>
-              <Input 
-                type="password"
-                value={keys.gemini_key}
-                onChange={e => setKeys(prev => ({ ...prev, gemini_key: e.target.value }))}
-                placeholder="AIzaSy..."
-                className="h-10 bg-black/20 border-glass-border focus-visible:ring-success rounded-xl px-4 text-[13px]"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label className="text-[12px] font-medium text-foreground">Deepgram API Key</Label>
-              <Input 
-                type="password"
-                value={keys.deepgram_key}
-                onChange={e => setKeys(prev => ({ ...prev, deepgram_key: e.target.value }))}
-                placeholder="dg..."
-                className="h-10 bg-black/20 border-glass-border focus-visible:ring-success rounded-xl px-4 text-[13px]"
-              />
-            </div>
-          </div>
-          
-          <div className="mt-6 flex justify-end">
-            <Button onClick={handleSave} disabled={saving} className="h-9 px-6 bg-success hover:bg-success/90 text-white rounded-[10px] text-[12px] font-semibold transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-              {saving ? 'Encrypting...' : 'Save Keys securely'}
-            </Button>
-          </div>
+          ) : (
+            <>
+              <p className="text-[12px] text-muted-foreground mb-6">
+                Developer Options: Provide your own API keys to bypass the Free Plan limits. Keys are encrypted at rest and never exposed.
+              </p>
+              
+              <div className="space-y-4 flex-1">
+                <div className="grid gap-2">
+                  <Label className="text-[12px] font-medium text-foreground">OpenAI API Key</Label>
+                  <Input 
+                    type="password"
+                    value={keys.openai_key}
+                    onChange={e => setKeys(prev => ({ ...prev, openai_key: e.target.value }))}
+                    placeholder="sk-..."
+                    className="h-10 bg-black/20 border-glass-border focus-visible:ring-success rounded-xl px-4 text-[13px]"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[12px] font-medium text-foreground">Gemini API Key</Label>
+                  <Input 
+                    type="password"
+                    value={keys.gemini_key}
+                    onChange={e => setKeys(prev => ({ ...prev, gemini_key: e.target.value }))}
+                    placeholder="AIzaSy..."
+                    className="h-10 bg-black/20 border-glass-border focus-visible:ring-success rounded-xl px-4 text-[13px]"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label className="text-[12px] font-medium text-foreground">Deepgram API Key</Label>
+                  <Input 
+                    type="password"
+                    value={keys.deepgram_key}
+                    onChange={e => setKeys(prev => ({ ...prev, deepgram_key: e.target.value }))}
+                    placeholder="dg..."
+                    className="h-10 bg-black/20 border-glass-border focus-visible:ring-success rounded-xl px-4 text-[13px]"
+                  />
+                </div>
+              </div>
+              
+              <div className="mt-6 flex justify-end">
+                <Button onClick={handleSave} disabled={saving} className="h-9 px-6 bg-success hover:bg-success/90 text-white rounded-[10px] text-[12px] font-semibold transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                  {saving ? 'Encrypting...' : 'Save Keys securely'}
+                </Button>
+              </div>
+            </>
+          )}
           </div>
           </div>
 

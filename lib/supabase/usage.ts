@@ -49,11 +49,12 @@ export async function checkAndIncrementUsage(userId: string, feature: FeatureTyp
   const currentCount = (usage as any)[countColumn] as number;
   const isProviderConnected = (usage as any)[providerColumn] as boolean;
   
-  const hasFreeUsage = currentCount < 3;
+  const limit = feature === 'advisor_session' ? 20 : 3;
+  const hasFreeUsage = currentCount < limit;
 
   // 2. Increment usage if they are using free tier OR if they have provider connected
   // Even if they have provider, we might want to track total usage, but let's strictly follow the spec:
-  // "IF count < 3 Allow ELSE Require Connected AI Provider"
+  // "IF count < limit Allow ELSE Require Connected AI Provider"
   
   if (hasFreeUsage) {
     // Increment the free count

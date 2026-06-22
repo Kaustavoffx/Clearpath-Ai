@@ -58,6 +58,6 @@ export async function rateLimit(
 // Pre-configured limits per the spec
 export const LIMITS = {
   DOCUMENT_ANALYSIS: { limit: 3, windowMs: 60 * 1000 }, // 3 per minute
-  ADVISOR: { limit: 10, windowMs: 60 * 1000 },          // 10 per minute
+  ADVISOR: { limit: 20, windowMs: 24 * 60 * 60 * 1000 },          // 20 per day
   VOICE: { limit: 15, windowMs: 60 * 1000 }             // 15 per minute
 };
